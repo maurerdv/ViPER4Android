@@ -3727,7 +3727,13 @@ class MainViewModel @Inject constructor(
 
     fun deletePreset(id: Long) {
         viewModelScope.launch {
+            val preset = repository.getPresetById(id) ?: return@launch
             repository.deletePresetById(id)
+            try {
+                val presetDir = getFilesDir("Preset")
+                File(presetDir, "${preset.name}.json").delete()
+            } catch (_: Exception) {
+            }
         }
     }
 
@@ -3740,6 +3746,13 @@ class MainViewModel @Inject constructor(
                     updatedAt = System.currentTimeMillis()
                 )
             )
+            try {
+                val presetDir = getFilesDir("Preset")
+                val oldFile = File(presetDir, "${preset.name}.json")
+                val newFile = File(presetDir, "$newName.json")
+                oldFile.renameTo(newFile)
+            } catch (_: Exception) {
+            }
         }
     }
 
