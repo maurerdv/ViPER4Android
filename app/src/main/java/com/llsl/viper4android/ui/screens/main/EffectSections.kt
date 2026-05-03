@@ -52,8 +52,8 @@ import kotlin.math.roundToInt
 
 @Composable
 fun MasterLimiterSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val outputVolume = if (isSpkMode) state.spkOutputVolume else state.outputVolume
-    val limiter = if (isSpkMode) state.spkLimiter else state.limiter
+    val outputVolume = if (isSpkMode) state.out.spkVolume else state.out.volume
+    val limiter = if (isSpkMode) state.out.spkLimiter else state.out.limiter
     val onOutputVolumeChange: (Int) -> Unit =
         if (isSpkMode) viewModel::setSpkOutputVolume else viewModel::setOutputVolume
     val onLimiterChange: (Int) -> Unit =
@@ -81,11 +81,11 @@ fun MasterLimiterSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             valueLabel = "${"%.1f".format(gainDb)}dB"
         )
         if (!isSpkMode) {
-            val left = 50 - state.channelPan / 2
-            val right = 50 + state.channelPan / 2
+            val left = 50 - state.out.channelPan / 2
+            val right = 50 + state.out.channelPan / 2
             LabeledSlider(
                 label = stringResource(R.string.label_pan),
-                value = state.channelPan.toFloat(),
+                value = state.out.channelPan.toFloat(),
                 onValueChange = { viewModel.setChannelPan(it.roundToInt()) },
                 valueRange = -100f..100f,
                 valueLabel = "${left}:${right}"
@@ -106,10 +106,10 @@ fun MasterLimiterSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
 
 @Composable
 fun PlaybackGainSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkAgcEnabled else state.agcEnabled
-    val strength = if (isSpkMode) state.spkAgcStrength else state.agcStrength
-    val maxGain = if (isSpkMode) state.spkAgcMaxGain else state.agcMaxGain
-    val threshold = if (isSpkMode) state.spkAgcOutputThreshold else state.agcOutputThreshold
+    val enabled = if (isSpkMode) state.agc.spkEnabled else state.agc.enabled
+    val strength = if (isSpkMode) state.agc.spkStrength else state.agc.strength
+    val maxGain = if (isSpkMode) state.agc.spkMaxGain else state.agc.maxGain
+    val threshold = if (isSpkMode) state.agc.spkOutputThreshold else state.agc.outputThreshold
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkAgcEnabled else viewModel::setAgcEnabled
     val onStrengthChange: (Int) -> Unit =
@@ -154,23 +154,23 @@ fun PlaybackGainSection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
 
 @Composable
 fun FetCompressorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkFetEnabled else state.fetEnabled
-    val threshold = if (isSpkMode) state.spkFetThreshold else state.fetThreshold
-    val ratio = if (isSpkMode) state.spkFetRatio else state.fetRatio
-    val autoKnee = if (isSpkMode) state.spkFetAutoKnee else state.fetAutoKnee
-    val knee = if (isSpkMode) state.spkFetKnee else state.fetKnee
-    val kneeMulti = if (isSpkMode) state.spkFetKneeMulti else state.fetKneeMulti
-    val autoGain = if (isSpkMode) state.spkFetAutoGain else state.fetAutoGain
-    val gain = if (isSpkMode) state.spkFetGain else state.fetGain
-    val autoAttack = if (isSpkMode) state.spkFetAutoAttack else state.fetAutoAttack
-    val attack = if (isSpkMode) state.spkFetAttack else state.fetAttack
-    val maxAttack = if (isSpkMode) state.spkFetMaxAttack else state.fetMaxAttack
-    val autoRelease = if (isSpkMode) state.spkFetAutoRelease else state.fetAutoRelease
-    val release = if (isSpkMode) state.spkFetRelease else state.fetRelease
-    val maxRelease = if (isSpkMode) state.spkFetMaxRelease else state.fetMaxRelease
-    val crest = if (isSpkMode) state.spkFetCrest else state.fetCrest
-    val adapt = if (isSpkMode) state.spkFetAdapt else state.fetAdapt
-    val noClip = if (isSpkMode) state.spkFetNoClip else state.fetNoClip
+    val enabled = if (isSpkMode) state.fet.spkEnabled else state.fet.enabled
+    val threshold = if (isSpkMode) state.fet.spkThreshold else state.fet.threshold
+    val ratio = if (isSpkMode) state.fet.spkRatio else state.fet.ratio
+    val autoKnee = if (isSpkMode) state.fet.spkAutoKnee else state.fet.autoKnee
+    val knee = if (isSpkMode) state.fet.spkKnee else state.fet.knee
+    val kneeMulti = if (isSpkMode) state.fet.spkKneeMulti else state.fet.kneeMulti
+    val autoGain = if (isSpkMode) state.fet.spkAutoGain else state.fet.autoGain
+    val gain = if (isSpkMode) state.fet.spkGain else state.fet.gain
+    val autoAttack = if (isSpkMode) state.fet.spkAutoAttack else state.fet.autoAttack
+    val attack = if (isSpkMode) state.fet.spkAttack else state.fet.attack
+    val maxAttack = if (isSpkMode) state.fet.spkMaxAttack else state.fet.maxAttack
+    val autoRelease = if (isSpkMode) state.fet.spkAutoRelease else state.fet.autoRelease
+    val release = if (isSpkMode) state.fet.spkRelease else state.fet.release
+    val maxRelease = if (isSpkMode) state.fet.spkMaxRelease else state.fet.maxRelease
+    val crest = if (isSpkMode) state.fet.spkCrest else state.fet.crest
+    val adapt = if (isSpkMode) state.fet.spkAdapt else state.fet.adapt
+    val noClip = if (isSpkMode) state.fet.spkNoClip else state.fet.noClip
 
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkFetEnabled else viewModel::setFetEnabled
@@ -313,8 +313,8 @@ fun FetCompressorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
 
 @Composable
 fun DdcSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkDdcEnabled else state.ddcEnabled
-    val device = if (isSpkMode) state.spkDdcDevice else state.ddcDevice
+    val enabled = if (isSpkMode) state.ddc.spkEnabled else state.ddc.enabled
+    val device = if (isSpkMode) state.ddc.spkDevice else state.ddc.device
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkDdcEnabled else viewModel::setDdcEnabled
     val onDeviceChange: (String) -> Unit =
@@ -348,9 +348,9 @@ fun SpectrumExtensionSection(
     viewModel: MainViewModel,
     isSpkMode: Boolean = false
 ) {
-    val enabled = if (isSpkMode) state.spkVseEnabled else state.vseEnabled
-    val strength = if (isSpkMode) state.spkVseStrength else state.vseStrength
-    val exciter = if (isSpkMode) state.spkVseExciter else state.vseExciter
+    val enabled = if (isSpkMode) state.vse.spkEnabled else state.vse.enabled
+    val strength = if (isSpkMode) state.vse.spkStrength else state.vse.strength
+    val exciter = if (isSpkMode) state.vse.spkExciter else state.vse.exciter
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkVseEnabled else viewModel::setVseEnabled
     val onStrengthChange: (Int) -> Unit =
@@ -384,10 +384,10 @@ fun SpectrumExtensionSection(
 
 @Composable
 fun EqualizerSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkEqEnabled else state.eqEnabled
-    val bandCount = if (isSpkMode) state.spkEqBandCount else state.eqBandCount
-    val presetId = if (isSpkMode) state.spkEqPresetId else state.eqPresetId
-    val eqBands = if (isSpkMode) state.spkEqBands else state.eqBands
+    val enabled = if (isSpkMode) state.eq.spkEnabled else state.eq.enabled
+    val bandCount = if (isSpkMode) state.eq.spkBandCount else state.eq.bandCount
+    val presetId = if (isSpkMode) state.eq.spkPresetId else state.eq.presetId
+    val eqBands = if (isSpkMode) state.eq.spkBands else state.eq.bands
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkEqEnabled else viewModel::setEqEnabled
     val onBandCountChange: (Int) -> Unit =
@@ -396,7 +396,7 @@ fun EqualizerSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
         if (isSpkMode) viewModel::setSpkEqPreset else viewModel::setEqPreset
     val onBandsChange: (String) -> Unit =
         if (isSpkMode) viewModel::setSpkEqBands else viewModel::setEqBands
-    val eqPresets = if (isSpkMode) state.spkEqPresets else state.eqPresets
+    val eqPresets = if (isSpkMode) state.eq.spkPresets else state.eq.presets
     val onPresetAdd: (String) -> Unit =
         if (isSpkMode) viewModel::addSpkEqPreset else viewModel::addEqPreset
     val onPresetDelete: (Long) -> Unit =
@@ -454,10 +454,10 @@ fun EqualizerSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
 
 @Composable
 fun ConvolverSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkConvolverEnabled else state.convolverEnabled
-    val kernel = if (isSpkMode) state.spkConvolverKernel else state.convolverKernel
+    val enabled = if (isSpkMode) state.convolver.spkEnabled else state.convolver.enabled
+    val kernel = if (isSpkMode) state.convolver.spkKernel else state.convolver.kernel
     val crossChannel =
-        if (isSpkMode) state.spkConvolverCrossChannel else state.convolverCrossChannel
+        if (isSpkMode) state.convolver.spkCrossChannel else state.convolver.crossChannel
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkConvolverEnabled else viewModel::setConvolverEnabled
     val onKernelChange: (String) -> Unit =
@@ -495,10 +495,10 @@ fun ConvolverSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
 
 @Composable
 fun FieldSurroundSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkFieldSurroundEnabled else state.fieldSurroundEnabled
-    val widening = if (isSpkMode) state.spkFieldSurroundWidening else state.fieldSurroundWidening
-    val midImage = if (isSpkMode) state.spkFieldSurroundMidImage else state.fieldSurroundMidImage
-    val depth = if (isSpkMode) state.spkFieldSurroundDepth else state.fieldSurroundDepth
+    val enabled = if (isSpkMode) state.fieldSurround.spkEnabled else state.fieldSurround.enabled
+    val widening = if (isSpkMode) state.fieldSurround.spkWidening else state.fieldSurround.widening
+    val midImage = if (isSpkMode) state.fieldSurround.spkMidImage else state.fieldSurround.midImage
+    val depth = if (isSpkMode) state.fieldSurround.spkDepth else state.fieldSurround.depth
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkFieldSurroundEnabled else viewModel::setFieldSurroundEnabled
     val onWideningChange: (Int) -> Unit =
@@ -540,9 +540,9 @@ fun FieldSurroundSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
 
 @Composable
 fun DiffSurroundSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkDiffSurroundEnabled else state.diffSurroundEnabled
-    val delay = if (isSpkMode) state.spkDiffSurroundDelay else state.diffSurroundDelay
-    val reverse = if (isSpkMode) state.spkDiffSurroundReverse else state.diffSurroundReverse
+    val enabled = if (isSpkMode) state.diffSurround.spkEnabled else state.diffSurround.enabled
+    val delay = if (isSpkMode) state.diffSurround.spkDelay else state.diffSurround.delay
+    val reverse = if (isSpkMode) state.diffSurround.spkReverse else state.diffSurround.reverse
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkDiffSurroundEnabled else viewModel::setDiffSurroundEnabled
     val onDelayChange: (Int) -> Unit =
@@ -580,8 +580,8 @@ fun HeadphoneSurroundSection(
     viewModel: MainViewModel,
     isSpkMode: Boolean = false
 ) {
-    val enabled = if (isSpkMode) state.spkVheEnabled else state.vheEnabled
-    val quality = if (isSpkMode) state.spkVheQuality else state.vheQuality
+    val enabled = if (isSpkMode) state.vhe.spkEnabled else state.vhe.enabled
+    val quality = if (isSpkMode) state.vhe.spkQuality else state.vhe.quality
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkVheEnabled else viewModel::setVheEnabled
     val onQualityChange: (Int) -> Unit =
@@ -605,12 +605,12 @@ fun HeadphoneSurroundSection(
 
 @Composable
 fun ReverberationSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkReverbEnabled else state.reverbEnabled
-    val roomSize = if (isSpkMode) state.spkReverbRoomSize else state.reverbRoomSize
-    val width = if (isSpkMode) state.spkReverbWidth else state.reverbWidth
-    val dampening = if (isSpkMode) state.spkReverbDampening else state.reverbDampening
-    val wet = if (isSpkMode) state.spkReverbWet else state.reverbWet
-    val dry = if (isSpkMode) state.spkReverbDry else state.reverbDry
+    val enabled = if (isSpkMode) state.reverb.spkEnabled else state.reverb.enabled
+    val roomSize = if (isSpkMode) state.reverb.spkRoomSize else state.reverb.roomSize
+    val width = if (isSpkMode) state.reverb.spkWidth else state.reverb.width
+    val dampening = if (isSpkMode) state.reverb.spkDampening else state.reverb.dampening
+    val wet = if (isSpkMode) state.reverb.spkWet else state.reverb.wet
+    val dry = if (isSpkMode) state.reverb.spkDry else state.reverb.dry
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkReverbEnabled else viewModel::setReverbEnabled
     val onRoomSizeChange: (Int) -> Unit =
@@ -668,40 +668,43 @@ fun ReverberationSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
 
 @Composable
 fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkDynamicSystemEnabled else state.dynamicSystemEnabled
-    val strength = if (isSpkMode) state.spkDynamicSystemStrength else state.dynamicSystemStrength
-    val dsPresetId = if (isSpkMode) state.spkDsPresetId else state.dsPresetId
-    val dsPresets = if (isSpkMode) state.spkDsPresets else state.dsPresets
-    val xLow = if (isSpkMode) state.spkDsXLow else state.dsXLow
-    val xHigh = if (isSpkMode) state.spkDsXHigh else state.dsXHigh
-    val yLow = if (isSpkMode) state.spkDsYLow else state.dsYLow
-    val yHigh = if (isSpkMode) state.spkDsYHigh else state.dsYHigh
-    val sideGainLow = if (isSpkMode) state.spkDsSideGainLow else state.dsSideGainLow
-    val sideGainHigh = if (isSpkMode) state.spkDsSideGainHigh else state.dsSideGainHigh
+    val enabled = if (isSpkMode) state.dynamicSystem.spkEnabled else state.dynamicSystem.enabled
+    val strength = if (isSpkMode) state.dynamicSystem.spkStrength else state.dynamicSystem.strength
+    val dsPresetId =
+        if (isSpkMode) state.dynamicSystem.spkPresetId else state.dynamicSystem.presetId
+    val dsPresets = if (isSpkMode) state.dynamicSystem.spkPresets else state.dynamicSystem.presets
+    val xLow = if (isSpkMode) state.dynamicSystem.spkXLow else state.dynamicSystem.xLow
+    val xHigh = if (isSpkMode) state.dynamicSystem.spkXHigh else state.dynamicSystem.xHigh
+    val yLow = if (isSpkMode) state.dynamicSystem.spkYLow else state.dynamicSystem.yLow
+    val yHigh = if (isSpkMode) state.dynamicSystem.spkYHigh else state.dynamicSystem.yHigh
+    val sideGainLow =
+        if (isSpkMode) state.dynamicSystem.spkSideGainLow else state.dynamicSystem.sideGainLow
+    val sideGainHigh =
+        if (isSpkMode) state.dynamicSystem.spkSideGainHigh else state.dynamicSystem.sideGainHigh
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkDynamicSystemEnabled else viewModel::setDynamicSystemEnabled
     val onStrengthChange: (Int) -> Unit =
         if (isSpkMode) viewModel::setSpkDynamicSystemStrength else viewModel::setDynamicSystemStrength
     val onPresetSelect: (Long) -> Unit =
-        if (isSpkMode) viewModel::setSpkDsPreset else viewModel::setDsPreset
+        if (isSpkMode) viewModel::setSpkDsPreset else viewModel::setDynamicSystemPreset
     val onXLowChange: (Int) -> Unit =
-        if (isSpkMode) viewModel::setSpkDsXLow else viewModel::setDsXLow
+        if (isSpkMode) viewModel::setSpkDsXLow else viewModel::setDynamicSystemXLow
     val onXHighChange: (Int) -> Unit =
-        if (isSpkMode) viewModel::setSpkDsXHigh else viewModel::setDsXHigh
+        if (isSpkMode) viewModel::setSpkDsXHigh else viewModel::setDynamicSystemXHigh
     val onYLowChange: (Int) -> Unit =
-        if (isSpkMode) viewModel::setSpkDsYLow else viewModel::setDsYLow
+        if (isSpkMode) viewModel::setSpkDsYLow else viewModel::setDynamicSystemYLow
     val onYHighChange: (Int) -> Unit =
-        if (isSpkMode) viewModel::setSpkDsYHigh else viewModel::setDsYHigh
+        if (isSpkMode) viewModel::setSpkDsYHigh else viewModel::setDynamicSystemYHigh
     val onSideGainLowChange: (Int) -> Unit =
-        if (isSpkMode) viewModel::setSpkDsSideGainLow else viewModel::setDsSideGainLow
+        if (isSpkMode) viewModel::setSpkDsSideGainLow else viewModel::setDynamicSystemSideGainLow
     val onSideGainHighChange: (Int) -> Unit =
-        if (isSpkMode) viewModel::setSpkDsSideGainHigh else viewModel::setDsSideGainHigh
+        if (isSpkMode) viewModel::setSpkDsSideGainHigh else viewModel::setDynamicSystemSideGainHigh
     val onPresetAdd: (String) -> Unit =
-        if (isSpkMode) viewModel::addSpkDsPreset else viewModel::addDsPreset
+        if (isSpkMode) viewModel::addSpkDsPreset else viewModel::addDynamicSystemPreset
     val onPresetDelete: (Long) -> Unit =
-        if (isSpkMode) viewModel::deleteSpkDsPreset else viewModel::deleteDsPreset
+        if (isSpkMode) viewModel::deleteSpkDsPreset else viewModel::deleteDynamicSystemPreset
     val onReset: () -> Unit =
-        if (isSpkMode) viewModel::resetSpkDsCoefficients else viewModel::resetDsCoefficients
+        if (isSpkMode) viewModel::resetSpkDsCoefficients else viewModel::resetDynamicSystemCoefficients
 
     var showSaveDialog by remember { mutableStateOf(false) }
     var presetNameInput by remember { mutableStateOf("") }
@@ -849,7 +852,7 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
 
 @Composable
 fun TubeSimulatorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkTubeSimulatorEnabled else state.tubeSimulatorEnabled
+    val enabled = if (isSpkMode) state.tube.spkEnabled else state.tube.enabled
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkTubeSimulatorEnabled else viewModel::setTubeSimulatorEnabled
 
@@ -864,11 +867,11 @@ fun TubeSimulatorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
 
 @Composable
 fun ViperBassSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkBassEnabled else state.bassEnabled
-    val mode = if (isSpkMode) state.spkBassMode else state.bassMode
-    val frequency = if (isSpkMode) state.spkBassFrequency else state.bassFrequency
-    val gain = if (isSpkMode) state.spkBassGain else state.bassGain
-    val antiPop = if (isSpkMode) state.spkBassAntiPop else state.bassAntiPop
+    val enabled = if (isSpkMode) state.bass.spkEnabled else state.bass.enabled
+    val mode = if (isSpkMode) state.bass.spkMode else state.bass.mode
+    val frequency = if (isSpkMode) state.bass.spkFrequency else state.bass.frequency
+    val gain = if (isSpkMode) state.bass.spkGain else state.bass.gain
+    val antiPop = if (isSpkMode) state.bass.spkAntiPop else state.bass.antiPop
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkBassEnabled else viewModel::setBassEnabled
     val onModeChange: (Int) -> Unit =
@@ -931,11 +934,11 @@ fun ViperBassSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
 
 @Composable
 fun ViperBassMonoSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkBassMonoEnabled else state.bassMonoEnabled
-    val mode = if (isSpkMode) state.spkBassMonoMode else state.bassMonoMode
-    val frequency = if (isSpkMode) state.spkBassMonoFrequency else state.bassMonoFrequency
-    val gain = if (isSpkMode) state.spkBassMonoGain else state.bassMonoGain
-    val antiPop = if (isSpkMode) state.spkBassMonoAntiPop else state.bassMonoAntiPop
+    val enabled = if (isSpkMode) state.bassMono.spkEnabled else state.bassMono.enabled
+    val mode = if (isSpkMode) state.bassMono.spkMode else state.bassMono.mode
+    val frequency = if (isSpkMode) state.bassMono.spkFrequency else state.bassMono.frequency
+    val gain = if (isSpkMode) state.bassMono.spkGain else state.bassMono.gain
+    val antiPop = if (isSpkMode) state.bassMono.spkAntiPop else state.bassMono.antiPop
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkBassMonoEnabled else viewModel::setBassMonoEnabled
     val onModeChange: (Int) -> Unit =
@@ -998,9 +1001,9 @@ fun ViperBassMonoSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
 
 @Composable
 fun ViperClaritySection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkClarityEnabled else state.clarityEnabled
-    val mode = if (isSpkMode) state.spkClarityMode else state.clarityMode
-    val gain = if (isSpkMode) state.spkClarityGain else state.clarityGain
+    val enabled = if (isSpkMode) state.clarity.spkEnabled else state.clarity.enabled
+    val mode = if (isSpkMode) state.clarity.spkMode else state.clarity.mode
+    val gain = if (isSpkMode) state.clarity.spkGain else state.clarity.gain
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkClarityEnabled else viewModel::setClarityEnabled
     val onModeChange: (Int) -> Unit =
@@ -1049,8 +1052,8 @@ fun AuditoryProtectionSection(
     viewModel: MainViewModel,
     isSpkMode: Boolean = false
 ) {
-    val enabled = if (isSpkMode) state.spkCureEnabled else state.cureEnabled
-    val strength = if (isSpkMode) state.spkCureStrength else state.cureStrength
+    val enabled = if (isSpkMode) state.cure.spkEnabled else state.cure.enabled
+    val strength = if (isSpkMode) state.cure.spkStrength else state.cure.strength
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkCureEnabled else viewModel::setCureEnabled
     val onStrengthChange: (Int) -> Unit =
@@ -1079,8 +1082,8 @@ fun AuditoryProtectionSection(
 
 @Composable
 fun AnalogXSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
-    val enabled = if (isSpkMode) state.spkAnalogxEnabled else state.analogxEnabled
-    val mode = if (isSpkMode) state.spkAnalogxMode else state.analogxMode
+    val enabled = if (isSpkMode) state.analog.spkEnabled else state.analog.enabled
+    val mode = if (isSpkMode) state.analog.spkMode else state.analog.mode
     val onEnabledChange: (Boolean) -> Unit =
         if (isSpkMode) viewModel::setSpkAnalogxEnabled else viewModel::setAnalogxEnabled
     val onModeChange: (Int) -> Unit =

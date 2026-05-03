@@ -108,24 +108,24 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "${ViperParams.PARAM_SPK_OUTPUT_VOLUME}",
         jsonKey = "outputVolume", spkJsonKey = "spkOutputVolume",
         defaultValue = 11,
-        getHp = { it.outputVolume }, setHp = { copy(outputVolume = it) },
-        getSp = { it.spkOutputVolume }, setSp = { copy(spkOutputVolume = it) }
+        getHp = { it.out.volume }, setHp = { copy(out = out.copy(volume = it)) },
+        getSp = { it.out.spkVolume }, setSp = { copy(out = out.copy(spkVolume = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_CHANNEL_PAN}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_CHANNEL_PAN}",
         jsonKey = "channelPan", spkJsonKey = "spkChannelPan",
         defaultValue = 0,
-        getHp = { it.channelPan }, setHp = { copy(channelPan = it) },
-        getSp = { it.spkChannelPan }, setSp = { copy(spkChannelPan = it) }
+        getHp = { it.out.channelPan }, setHp = { copy(out = out.copy(channelPan = it)) },
+        getSp = { it.out.spkChannelPan }, setSp = { copy(out = out.copy(spkChannelPan = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_LIMITER}",
         spkPrefKey = "${ViperParams.PARAM_SPK_LIMITER}",
         jsonKey = "limiter", spkJsonKey = "spkLimiter",
         defaultValue = 5,
-        getHp = { it.limiter }, setHp = { copy(limiter = it) },
-        getSp = { it.spkLimiter }, setSp = { copy(spkLimiter = it) }
+        getHp = { it.out.limiter }, setHp = { copy(out = out.copy(limiter = it)) },
+        getSp = { it.out.spkLimiter }, setSp = { copy(out = out.copy(spkLimiter = it)) }
     ),
 
     // AGC
@@ -134,32 +134,35 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "${ViperParams.PARAM_SPK_AGC_ENABLE}",
         jsonKey = "agcEnabled", spkJsonKey = "spkAgcEnabled",
         defaultValue = false,
-        getHp = { it.agcEnabled }, setHp = { copy(agcEnabled = it) },
-        getSp = { it.spkAgcEnabled }, setSp = { copy(spkAgcEnabled = it) }
+        getHp = { it.agc.enabled }, setHp = { copy(agc = agc.copy(enabled = it)) },
+        getSp = { it.agc.spkEnabled }, setSp = { copy(agc = agc.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_AGC_RATIO}",
         spkPrefKey = "${ViperParams.PARAM_SPK_AGC_RATIO}",
         jsonKey = "agcStrength", spkJsonKey = "spkAgcStrength",
         defaultValue = 0,
-        getHp = { it.agcStrength }, setHp = { copy(agcStrength = it) },
-        getSp = { it.spkAgcStrength }, setSp = { copy(spkAgcStrength = it) }
+        getHp = { it.agc.strength }, setHp = { copy(agc = agc.copy(strength = it)) },
+        getSp = { it.agc.spkStrength }, setSp = { copy(agc = agc.copy(spkStrength = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_AGC_MAX_SCALER}",
         spkPrefKey = "${ViperParams.PARAM_SPK_AGC_MAX_SCALER}",
         jsonKey = "agcMaxGain", spkJsonKey = "spkAgcMaxGain",
         defaultValue = 3,
-        getHp = { it.agcMaxGain }, setHp = { copy(agcMaxGain = it) },
-        getSp = { it.spkAgcMaxGain }, setSp = { copy(spkAgcMaxGain = it) }
+        getHp = { it.agc.maxGain }, setHp = { copy(agc = agc.copy(maxGain = it)) },
+        getSp = { it.agc.spkMaxGain }, setSp = { copy(agc = agc.copy(spkMaxGain = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_AGC_VOLUME}",
         spkPrefKey = "${ViperParams.PARAM_SPK_AGC_VOLUME}",
-        jsonKey = "agcOutputThreshold", spkJsonKey = "spkAgcOutputThreshold",
+        jsonKey = "agcOutputThreshold",
+        spkJsonKey = "spkAgcOutputThreshold",
         defaultValue = 3,
-        getHp = { it.agcOutputThreshold }, setHp = { copy(agcOutputThreshold = it) },
-        getSp = { it.spkAgcOutputThreshold }, setSp = { copy(spkAgcOutputThreshold = it) }
+        getHp = { it.agc.outputThreshold },
+        setHp = { copy(agc = agc.copy(outputThreshold = it)) },
+        getSp = { it.agc.spkOutputThreshold },
+        setSp = { copy(agc = agc.copy(spkOutputThreshold = it)) }
     ),
 
     // FET Compressor
@@ -168,136 +171,136 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_ENABLE}",
         jsonKey = "fetEnabled", spkJsonKey = "spkFetEnabled",
         defaultValue = false,
-        getHp = { it.fetEnabled }, setHp = { copy(fetEnabled = it) },
-        getSp = { it.spkFetEnabled }, setSp = { copy(spkFetEnabled = it) }
+        getHp = { it.fet.enabled }, setHp = { copy(fet = fet.copy(enabled = it)) },
+        getSp = { it.fet.spkEnabled }, setSp = { copy(fet = fet.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_THRESHOLD}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_THRESHOLD}",
         jsonKey = "fetThreshold", spkJsonKey = "spkFetThreshold",
         defaultValue = 100,
-        getHp = { it.fetThreshold }, setHp = { copy(fetThreshold = it) },
-        getSp = { it.spkFetThreshold }, setSp = { copy(spkFetThreshold = it) }
+        getHp = { it.fet.threshold }, setHp = { copy(fet = fet.copy(threshold = it)) },
+        getSp = { it.fet.spkThreshold }, setSp = { copy(fet = fet.copy(spkThreshold = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_RATIO}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_RATIO}",
         jsonKey = "fetRatio", spkJsonKey = "spkFetRatio",
         defaultValue = 100,
-        getHp = { it.fetRatio }, setHp = { copy(fetRatio = it) },
-        getSp = { it.spkFetRatio }, setSp = { copy(spkFetRatio = it) }
+        getHp = { it.fet.ratio }, setHp = { copy(fet = fet.copy(ratio = it)) },
+        getSp = { it.fet.spkRatio }, setSp = { copy(fet = fet.copy(spkRatio = it)) }
     ),
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_KNEE}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_KNEE}",
         jsonKey = "fetAutoKnee", spkJsonKey = "spkFetAutoKnee",
         defaultValue = true,
-        getHp = { it.fetAutoKnee }, setHp = { copy(fetAutoKnee = it) },
-        getSp = { it.spkFetAutoKnee }, setSp = { copy(spkFetAutoKnee = it) }
+        getHp = { it.fet.autoKnee }, setHp = { copy(fet = fet.copy(autoKnee = it)) },
+        getSp = { it.fet.spkAutoKnee }, setSp = { copy(fet = fet.copy(spkAutoKnee = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE}",
         jsonKey = "fetKnee", spkJsonKey = "spkFetKnee",
         defaultValue = 0,
-        getHp = { it.fetKnee }, setHp = { copy(fetKnee = it) },
-        getSp = { it.spkFetKnee }, setSp = { copy(spkFetKnee = it) }
+        getHp = { it.fet.knee }, setHp = { copy(fet = fet.copy(knee = it)) },
+        getSp = { it.fet.spkKnee }, setSp = { copy(fet = fet.copy(spkKnee = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE_MULTI}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE_MULTI}",
         jsonKey = "fetKneeMulti", spkJsonKey = "spkFetKneeMulti",
         defaultValue = 0,
-        getHp = { it.fetKneeMulti }, setHp = { copy(fetKneeMulti = it) },
-        getSp = { it.spkFetKneeMulti }, setSp = { copy(spkFetKneeMulti = it) }
+        getHp = { it.fet.kneeMulti }, setHp = { copy(fet = fet.copy(kneeMulti = it)) },
+        getSp = { it.fet.spkKneeMulti }, setSp = { copy(fet = fet.copy(spkKneeMulti = it)) }
     ),
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_GAIN}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_GAIN}",
         jsonKey = "fetAutoGain", spkJsonKey = "spkFetAutoGain",
         defaultValue = true,
-        getHp = { it.fetAutoGain }, setHp = { copy(fetAutoGain = it) },
-        getSp = { it.spkFetAutoGain }, setSp = { copy(spkFetAutoGain = it) }
+        getHp = { it.fet.autoGain }, setHp = { copy(fet = fet.copy(autoGain = it)) },
+        getSp = { it.fet.spkAutoGain }, setSp = { copy(fet = fet.copy(spkAutoGain = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_GAIN}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_GAIN}",
         jsonKey = "fetGain", spkJsonKey = "spkFetGain",
         defaultValue = 0,
-        getHp = { it.fetGain }, setHp = { copy(fetGain = it) },
-        getSp = { it.spkFetGain }, setSp = { copy(spkFetGain = it) }
+        getHp = { it.fet.gain }, setHp = { copy(fet = fet.copy(gain = it)) },
+        getSp = { it.fet.spkGain }, setSp = { copy(fet = fet.copy(spkGain = it)) }
     ),
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_ATTACK}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_ATTACK}",
         jsonKey = "fetAutoAttack", spkJsonKey = "spkFetAutoAttack",
         defaultValue = true,
-        getHp = { it.fetAutoAttack }, setHp = { copy(fetAutoAttack = it) },
-        getSp = { it.spkFetAutoAttack }, setSp = { copy(spkFetAutoAttack = it) }
+        getHp = { it.fet.autoAttack }, setHp = { copy(fet = fet.copy(autoAttack = it)) },
+        getSp = { it.fet.spkAutoAttack }, setSp = { copy(fet = fet.copy(spkAutoAttack = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_ATTACK}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_ATTACK}",
         jsonKey = "fetAttack", spkJsonKey = "spkFetAttack",
         defaultValue = 20,
-        getHp = { it.fetAttack }, setHp = { copy(fetAttack = it) },
-        getSp = { it.spkFetAttack }, setSp = { copy(spkFetAttack = it) }
+        getHp = { it.fet.attack }, setHp = { copy(fet = fet.copy(attack = it)) },
+        getSp = { it.fet.spkAttack }, setSp = { copy(fet = fet.copy(spkAttack = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_MAX_ATTACK}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_MAX_ATTACK}",
         jsonKey = "fetMaxAttack", spkJsonKey = "spkFetMaxAttack",
         defaultValue = 80,
-        getHp = { it.fetMaxAttack }, setHp = { copy(fetMaxAttack = it) },
-        getSp = { it.spkFetMaxAttack }, setSp = { copy(spkFetMaxAttack = it) }
+        getHp = { it.fet.maxAttack }, setHp = { copy(fet = fet.copy(maxAttack = it)) },
+        getSp = { it.fet.spkMaxAttack }, setSp = { copy(fet = fet.copy(spkMaxAttack = it)) }
     ),
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_RELEASE}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_RELEASE}",
         jsonKey = "fetAutoRelease", spkJsonKey = "spkFetAutoRelease",
         defaultValue = true,
-        getHp = { it.fetAutoRelease }, setHp = { copy(fetAutoRelease = it) },
-        getSp = { it.spkFetAutoRelease }, setSp = { copy(spkFetAutoRelease = it) }
+        getHp = { it.fet.autoRelease }, setHp = { copy(fet = fet.copy(autoRelease = it)) },
+        getSp = { it.fet.spkAutoRelease }, setSp = { copy(fet = fet.copy(spkAutoRelease = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_RELEASE}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_RELEASE}",
         jsonKey = "fetRelease", spkJsonKey = "spkFetRelease",
         defaultValue = 50,
-        getHp = { it.fetRelease }, setHp = { copy(fetRelease = it) },
-        getSp = { it.spkFetRelease }, setSp = { copy(spkFetRelease = it) }
+        getHp = { it.fet.release }, setHp = { copy(fet = fet.copy(release = it)) },
+        getSp = { it.fet.spkRelease }, setSp = { copy(fet = fet.copy(spkRelease = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_MAX_RELEASE}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_MAX_RELEASE}",
         jsonKey = "fetMaxRelease", spkJsonKey = "spkFetMaxRelease",
         defaultValue = 100,
-        getHp = { it.fetMaxRelease }, setHp = { copy(fetMaxRelease = it) },
-        getSp = { it.spkFetMaxRelease }, setSp = { copy(spkFetMaxRelease = it) }
+        getHp = { it.fet.maxRelease }, setHp = { copy(fet = fet.copy(maxRelease = it)) },
+        getSp = { it.fet.spkMaxRelease }, setSp = { copy(fet = fet.copy(spkMaxRelease = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_CREST}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_CREST}",
         jsonKey = "fetCrest", spkJsonKey = "spkFetCrest",
         defaultValue = 100,
-        getHp = { it.fetCrest }, setHp = { copy(fetCrest = it) },
-        getSp = { it.spkFetCrest }, setSp = { copy(spkFetCrest = it) }
+        getHp = { it.fet.crest }, setHp = { copy(fet = fet.copy(crest = it)) },
+        getSp = { it.fet.spkCrest }, setSp = { copy(fet = fet.copy(spkCrest = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_ADAPT}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_ADAPT}",
         jsonKey = "fetAdapt", spkJsonKey = "spkFetAdapt",
         defaultValue = 50,
-        getHp = { it.fetAdapt }, setHp = { copy(fetAdapt = it) },
-        getSp = { it.spkFetAdapt }, setSp = { copy(spkFetAdapt = it) }
+        getHp = { it.fet.adapt }, setHp = { copy(fet = fet.copy(adapt = it)) },
+        getSp = { it.fet.spkAdapt }, setSp = { copy(fet = fet.copy(spkAdapt = it)) }
     ),
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_NO_CLIP}",
         spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_NO_CLIP}",
         jsonKey = "fetNoClip", spkJsonKey = "spkFetNoClip",
         defaultValue = true,
-        getHp = { it.fetNoClip }, setHp = { copy(fetNoClip = it) },
-        getSp = { it.spkFetNoClip }, setSp = { copy(spkFetNoClip = it) }
+        getHp = { it.fet.noClip }, setHp = { copy(fet = fet.copy(noClip = it)) },
+        getSp = { it.fet.spkNoClip }, setSp = { copy(fet = fet.copy(spkNoClip = it)) }
     ),
 
     // DDC
@@ -306,16 +309,16 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_DDC_ENABLE}",
         jsonKey = "ddcEnabled", spkJsonKey = "spkDdcEnabled",
         defaultValue = false,
-        getHp = { it.ddcEnabled }, setHp = { copy(ddcEnabled = it) },
-        getSp = { it.spkDdcEnabled }, setSp = { copy(spkDdcEnabled = it) }
+        getHp = { it.ddc.enabled }, setHp = { copy(ddc = ddc.copy(enabled = it)) },
+        getSp = { it.ddc.spkEnabled }, setSp = { copy(ddc = ddc.copy(spkEnabled = it)) }
     ),
     StringPref(
         hpPrefKey = ViperRepository.PREF_DDC_DEVICE,
         spkPrefKey = "spk_${ViperRepository.PREF_DDC_DEVICE}",
         jsonKey = "ddcDevice", spkJsonKey = "spkDdcDevice",
         defaultValue = "",
-        getHp = { it.ddcDevice }, setHp = { copy(ddcDevice = it) },
-        getSp = { it.spkDdcDevice }, setSp = { copy(spkDdcDevice = it) }
+        getHp = { it.ddc.device }, setHp = { copy(ddc = ddc.copy(device = it)) },
+        getSp = { it.ddc.spkDevice }, setSp = { copy(ddc = ddc.copy(spkDevice = it)) }
     ),
 
     // Spectrum Extension
@@ -324,24 +327,24 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_ENABLE}",
         jsonKey = "vseEnabled", spkJsonKey = "spkVseEnabled",
         defaultValue = false,
-        getHp = { it.vseEnabled }, setHp = { copy(vseEnabled = it) },
-        getSp = { it.spkVseEnabled }, setSp = { copy(spkVseEnabled = it) }
+        getHp = { it.vse.enabled }, setHp = { copy(vse = vse.copy(enabled = it)) },
+        getSp = { it.vse.spkEnabled }, setSp = { copy(vse = vse.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_SPECTRUM_EXTENSION_BARK}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_BARK}",
         jsonKey = "vseStrength", spkJsonKey = "spkVseStrength",
         defaultValue = 10,
-        getHp = { it.vseStrength }, setHp = { copy(vseStrength = it) },
-        getSp = { it.spkVseStrength }, setSp = { copy(spkVseStrength = it) }
+        getHp = { it.vse.strength }, setHp = { copy(vse = vse.copy(strength = it)) },
+        getSp = { it.vse.spkStrength }, setSp = { copy(vse = vse.copy(spkStrength = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_SPECTRUM_EXTENSION_BARK_RECONSTRUCT}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_BARK_RECONSTRUCT}",
         jsonKey = "vseExciter", spkJsonKey = "spkVseExciter",
         defaultValue = 0,
-        getHp = { it.vseExciter }, setHp = { copy(vseExciter = it) },
-        getSp = { it.spkVseExciter }, setSp = { copy(spkVseExciter = it) }
+        getHp = { it.vse.exciter }, setHp = { copy(vse = vse.copy(exciter = it)) },
+        getSp = { it.vse.spkExciter }, setSp = { copy(vse = vse.copy(spkExciter = it)) }
     ),
 
     // EQ
@@ -350,117 +353,147 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "${ViperParams.PARAM_SPK_EQ_ENABLE}",
         jsonKey = "eqEnabled", spkJsonKey = "spkEqEnabled",
         defaultValue = false,
-        getHp = { it.eqEnabled }, setHp = { copy(eqEnabled = it) },
-        getSp = { it.spkEqEnabled }, setSp = { copy(spkEqEnabled = it) }
+        getHp = { it.eq.enabled }, setHp = { copy(eq = eq.copy(enabled = it)) },
+        getSp = { it.eq.spkEnabled }, setSp = { copy(eq = eq.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_EQ_BAND_COUNT}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_EQ_BAND_COUNT}",
         jsonKey = "eqBandCount", spkJsonKey = "spkEqBandCount",
         defaultValue = 10,
-        getHp = { it.eqBandCount }, setHp = { copy(eqBandCount = it) },
-        getSp = { it.spkEqBandCount }, setSp = { copy(spkEqBandCount = it) }
+        getHp = { it.eq.bandCount }, setHp = { copy(eq = eq.copy(bandCount = it)) },
+        getSp = { it.eq.spkBandCount }, setSp = { copy(eq = eq.copy(spkBandCount = it)) }
     ),
     StringPref(
         hpPrefKey = "${ViperParams.PARAM_HP_EQ_BAND_LEVEL}",
         spkPrefKey = "${ViperParams.PARAM_SPK_EQ_BAND_LEVEL}",
         jsonKey = "eqBands", spkJsonKey = "spkEqBands",
         defaultValue = "0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;",
-        getHp = { it.eqBands }, setHp = { copy(eqBands = it) },
-        getSp = { it.spkEqBands }, setSp = { copy(spkEqBands = it) }
+        getHp = { it.eq.bands }, setHp = { copy(eq = eq.copy(bands = it)) },
+        getSp = { it.eq.spkBands }, setSp = { copy(eq = eq.copy(spkBands = it)) }
     ),
     NullableLongPref(
         hpPrefKey = ViperRepository.PREF_EQ_PRESET_ID,
         spkPrefKey = "spk_${ViperRepository.PREF_EQ_PRESET_ID}",
         jsonKey = "eqPresetId", spkJsonKey = "spkEqPresetId",
-        getHp = { it.eqPresetId }, setHp = { copy(eqPresetId = it) },
-        getSp = { it.spkEqPresetId }, setSp = { copy(spkEqPresetId = it) }
+        getHp = { it.eq.presetId }, setHp = { copy(eq = eq.copy(presetId = it)) },
+        getSp = { it.eq.spkPresetId }, setSp = { copy(eq = eq.copy(spkPresetId = it)) }
     ),
 
     // Convolver
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_CONVOLVER_ENABLE}",
         spkPrefKey = "${ViperParams.PARAM_SPK_CONVOLVER_ENABLE}",
-        jsonKey = "convolverEnabled", spkJsonKey = "spkConvolverEnabled",
+        jsonKey = "convolverEnabled",
+        spkJsonKey = "spkConvolverEnabled",
         defaultValue = false,
-        getHp = { it.convolverEnabled }, setHp = { copy(convolverEnabled = it) },
-        getSp = { it.spkConvolverEnabled }, setSp = { copy(spkConvolverEnabled = it) }
+        getHp = { it.convolver.enabled },
+        setHp = { copy(convolver = convolver.copy(enabled = it)) },
+        getSp = { it.convolver.spkEnabled },
+        setSp = { copy(convolver = convolver.copy(spkEnabled = it)) }
     ),
     StringPref(
         hpPrefKey = "${ViperParams.PARAM_HP_CONVOLVER_SET_KERNEL}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_CONVOLVER_SET_KERNEL}",
-        jsonKey = "convolverKernel", spkJsonKey = "spkConvolverKernel",
+        jsonKey = "convolverKernel",
+        spkJsonKey = "spkConvolverKernel",
         defaultValue = "",
-        getHp = { it.convolverKernel }, setHp = { copy(convolverKernel = it) },
-        getSp = { it.spkConvolverKernel }, setSp = { copy(spkConvolverKernel = it) }
+        getHp = { it.convolver.kernel },
+        setHp = { copy(convolver = convolver.copy(kernel = it)) },
+        getSp = { it.convolver.spkKernel },
+        setSp = { copy(convolver = convolver.copy(spkKernel = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_CONVOLVER_CROSS_CHANNEL}",
         spkPrefKey = "${ViperParams.PARAM_SPK_CONVOLVER_CROSS_CHANNEL}",
-        jsonKey = "convolverCrossChannel", spkJsonKey = "spkConvolverCrossChannel",
+        jsonKey = "convolverCrossChannel",
+        spkJsonKey = "spkConvolverCrossChannel",
         defaultValue = 0,
-        getHp = { it.convolverCrossChannel }, setHp = { copy(convolverCrossChannel = it) },
-        getSp = { it.spkConvolverCrossChannel }, setSp = { copy(spkConvolverCrossChannel = it) }
+        getHp = { it.convolver.crossChannel },
+        setHp = { copy(convolver = convolver.copy(crossChannel = it)) },
+        getSp = { it.convolver.spkCrossChannel },
+        setSp = { copy(convolver = convolver.copy(spkCrossChannel = it)) }
     ),
 
     // Field Surround
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FIELD_SURROUND_ENABLE}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_FIELD_SURROUND_ENABLE}",
-        jsonKey = "fieldSurroundEnabled", spkJsonKey = "spkFieldSurroundEnabled",
+        jsonKey = "fieldSurroundEnabled",
+        spkJsonKey = "spkFieldSurroundEnabled",
         defaultValue = false,
-        getHp = { it.fieldSurroundEnabled }, setHp = { copy(fieldSurroundEnabled = it) },
-        getSp = { it.spkFieldSurroundEnabled }, setSp = { copy(spkFieldSurroundEnabled = it) }
+        getHp = { it.fieldSurround.enabled },
+        setHp = { copy(fieldSurround = fieldSurround.copy(enabled = it)) },
+        getSp = { it.fieldSurround.spkEnabled },
+        setSp = { copy(fieldSurround = fieldSurround.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FIELD_SURROUND_WIDENING}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_FIELD_SURROUND_WIDENING}",
-        jsonKey = "fieldSurroundWidening", spkJsonKey = "spkFieldSurroundWidening",
+        jsonKey = "fieldSurroundWidening",
+        spkJsonKey = "spkFieldSurroundWidening",
         defaultValue = 0,
-        getHp = { it.fieldSurroundWidening }, setHp = { copy(fieldSurroundWidening = it) },
-        getSp = { it.spkFieldSurroundWidening }, setSp = { copy(spkFieldSurroundWidening = it) }
+        getHp = { it.fieldSurround.widening },
+        setHp = { copy(fieldSurround = fieldSurround.copy(widening = it)) },
+        getSp = { it.fieldSurround.spkWidening },
+        setSp = { copy(fieldSurround = fieldSurround.copy(spkWidening = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FIELD_SURROUND_MID_IMAGE}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_FIELD_SURROUND_MID_IMAGE}",
-        jsonKey = "fieldSurroundMidImage", spkJsonKey = "spkFieldSurroundMidImage",
+        jsonKey = "fieldSurroundMidImage",
+        spkJsonKey = "spkFieldSurroundMidImage",
         defaultValue = 5,
-        getHp = { it.fieldSurroundMidImage }, setHp = { copy(fieldSurroundMidImage = it) },
-        getSp = { it.spkFieldSurroundMidImage }, setSp = { copy(spkFieldSurroundMidImage = it) }
+        getHp = { it.fieldSurround.midImage },
+        setHp = { copy(fieldSurround = fieldSurround.copy(midImage = it)) },
+        getSp = { it.fieldSurround.spkMidImage },
+        setSp = { copy(fieldSurround = fieldSurround.copy(spkMidImage = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_FIELD_SURROUND_DEPTH}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_FIELD_SURROUND_DEPTH}",
-        jsonKey = "fieldSurroundDepth", spkJsonKey = "spkFieldSurroundDepth",
+        jsonKey = "fieldSurroundDepth",
+        spkJsonKey = "spkFieldSurroundDepth",
         defaultValue = 0,
-        getHp = { it.fieldSurroundDepth }, setHp = { copy(fieldSurroundDepth = it) },
-        getSp = { it.spkFieldSurroundDepth }, setSp = { copy(spkFieldSurroundDepth = it) }
+        getHp = { it.fieldSurround.depth },
+        setHp = { copy(fieldSurround = fieldSurround.copy(depth = it)) },
+        getSp = { it.fieldSurround.spkDepth },
+        setSp = { copy(fieldSurround = fieldSurround.copy(spkDepth = it)) }
     ),
 
     // Diff Surround
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_DIFF_SURROUND_ENABLE}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_DIFF_SURROUND_ENABLE}",
-        jsonKey = "diffSurroundEnabled", spkJsonKey = "spkDiffSurroundEnabled",
+        jsonKey = "diffSurroundEnabled",
+        spkJsonKey = "spkDiffSurroundEnabled",
         defaultValue = false,
-        getHp = { it.diffSurroundEnabled }, setHp = { copy(diffSurroundEnabled = it) },
-        getSp = { it.spkDiffSurroundEnabled }, setSp = { copy(spkDiffSurroundEnabled = it) }
+        getHp = { it.diffSurround.enabled },
+        setHp = { copy(diffSurround = diffSurround.copy(enabled = it)) },
+        getSp = { it.diffSurround.spkEnabled },
+        setSp = { copy(diffSurround = diffSurround.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_DIFF_SURROUND_DELAY}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_DIFF_SURROUND_DELAY}",
-        jsonKey = "diffSurroundDelay", spkJsonKey = "spkDiffSurroundDelay",
+        jsonKey = "diffSurroundDelay",
+        spkJsonKey = "spkDiffSurroundDelay",
         defaultValue = 4,
-        getHp = { it.diffSurroundDelay }, setHp = { copy(diffSurroundDelay = it) },
-        getSp = { it.spkDiffSurroundDelay }, setSp = { copy(spkDiffSurroundDelay = it) }
+        getHp = { it.diffSurround.delay },
+        setHp = { copy(diffSurround = diffSurround.copy(delay = it)) },
+        getSp = { it.diffSurround.spkDelay },
+        setSp = { copy(diffSurround = diffSurround.copy(spkDelay = it)) }
     ),
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_DIFF_SURROUND_REVERSE}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_DIFF_SURROUND_REVERSE}",
-        jsonKey = "diffSurroundReverse", spkJsonKey = "spkDiffSurroundReverse",
+        jsonKey = "diffSurroundReverse",
+        spkJsonKey = "spkDiffSurroundReverse",
         defaultValue = false,
-        getHp = { it.diffSurroundReverse }, setHp = { copy(diffSurroundReverse = it) },
-        getSp = { it.spkDiffSurroundReverse }, setSp = { copy(spkDiffSurroundReverse = it) }
+        getHp = { it.diffSurround.reverse },
+        setHp = { copy(diffSurround = diffSurround.copy(reverse = it)) },
+        getSp = { it.diffSurround.spkReverse },
+        setSp = { copy(diffSurround = diffSurround.copy(spkReverse = it)) }
     ),
 
     // VHE (Headphone Surround)
@@ -469,16 +502,16 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_HEADPHONE_SURROUND_ENABLE}",
         jsonKey = "vheEnabled", spkJsonKey = "spkVheEnabled",
         defaultValue = false,
-        getHp = { it.vheEnabled }, setHp = { copy(vheEnabled = it) },
-        getSp = { it.spkVheEnabled }, setSp = { copy(spkVheEnabled = it) }
+        getHp = { it.vhe.enabled }, setHp = { copy(vhe = vhe.copy(enabled = it)) },
+        getSp = { it.vhe.spkEnabled }, setSp = { copy(vhe = vhe.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_HEADPHONE_SURROUND_STRENGTH}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_HEADPHONE_SURROUND_STRENGTH}",
         jsonKey = "vheQuality", spkJsonKey = "spkVheQuality",
         defaultValue = 0,
-        getHp = { it.vheQuality }, setHp = { copy(vheQuality = it) },
-        getSp = { it.spkVheQuality }, setSp = { copy(spkVheQuality = it) }
+        getHp = { it.vhe.quality }, setHp = { copy(vhe = vhe.copy(quality = it)) },
+        getSp = { it.vhe.spkQuality }, setSp = { copy(vhe = vhe.copy(spkQuality = it)) }
     ),
 
     // Reverb
@@ -487,129 +520,162 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "${ViperParams.PARAM_SPK_REVERB_ENABLE}",
         jsonKey = "reverbEnabled", spkJsonKey = "spkReverbEnabled",
         defaultValue = false,
-        getHp = { it.reverbEnabled }, setHp = { copy(reverbEnabled = it) },
-        getSp = { it.spkReverbEnabled }, setSp = { copy(spkReverbEnabled = it) }
+        getHp = { it.reverb.enabled }, setHp = { copy(reverb = reverb.copy(enabled = it)) },
+        getSp = { it.reverb.spkEnabled }, setSp = { copy(reverb = reverb.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_REVERB_ROOM_SIZE}",
         spkPrefKey = "${ViperParams.PARAM_SPK_REVERB_ROOM_SIZE}",
         jsonKey = "reverbRoomSize", spkJsonKey = "spkReverbRoomSize",
         defaultValue = 0,
-        getHp = { it.reverbRoomSize }, setHp = { copy(reverbRoomSize = it) },
-        getSp = { it.spkReverbRoomSize }, setSp = { copy(spkReverbRoomSize = it) }
+        getHp = { it.reverb.roomSize }, setHp = { copy(reverb = reverb.copy(roomSize = it)) },
+        getSp = { it.reverb.spkRoomSize }, setSp = { copy(reverb = reverb.copy(spkRoomSize = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_REVERB_ROOM_WIDTH}",
         spkPrefKey = "${ViperParams.PARAM_SPK_REVERB_ROOM_WIDTH}",
         jsonKey = "reverbWidth", spkJsonKey = "spkReverbWidth",
         defaultValue = 0,
-        getHp = { it.reverbWidth }, setHp = { copy(reverbWidth = it) },
-        getSp = { it.spkReverbWidth }, setSp = { copy(spkReverbWidth = it) }
+        getHp = { it.reverb.width }, setHp = { copy(reverb = reverb.copy(width = it)) },
+        getSp = { it.reverb.spkWidth }, setSp = { copy(reverb = reverb.copy(spkWidth = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_REVERB_ROOM_DAMPENING}",
         spkPrefKey = "${ViperParams.PARAM_SPK_REVERB_ROOM_DAMPENING}",
-        jsonKey = "reverbDampening", spkJsonKey = "spkReverbDampening",
+        jsonKey = "reverbDampening",
+        spkJsonKey = "spkReverbDampening",
         defaultValue = 0,
-        getHp = { it.reverbDampening }, setHp = { copy(reverbDampening = it) },
-        getSp = { it.spkReverbDampening }, setSp = { copy(spkReverbDampening = it) }
+        getHp = { it.reverb.dampening },
+        setHp = { copy(reverb = reverb.copy(dampening = it)) },
+        getSp = { it.reverb.spkDampening },
+        setSp = { copy(reverb = reverb.copy(spkDampening = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_REVERB_ROOM_WET_SIGNAL}",
         spkPrefKey = "${ViperParams.PARAM_SPK_REVERB_ROOM_WET_SIGNAL}",
         jsonKey = "reverbWet", spkJsonKey = "spkReverbWet",
         defaultValue = 0,
-        getHp = { it.reverbWet }, setHp = { copy(reverbWet = it) },
-        getSp = { it.spkReverbWet }, setSp = { copy(spkReverbWet = it) }
+        getHp = { it.reverb.wet }, setHp = { copy(reverb = reverb.copy(wet = it)) },
+        getSp = { it.reverb.spkWet }, setSp = { copy(reverb = reverb.copy(spkWet = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_REVERB_ROOM_DRY_SIGNAL}",
         spkPrefKey = "${ViperParams.PARAM_SPK_REVERB_ROOM_DRY_SIGNAL}",
         jsonKey = "reverbDry", spkJsonKey = "spkReverbDry",
         defaultValue = 50,
-        getHp = { it.reverbDry }, setHp = { copy(reverbDry = it) },
-        getSp = { it.spkReverbDry }, setSp = { copy(spkReverbDry = it) }
+        getHp = { it.reverb.dry }, setHp = { copy(reverb = reverb.copy(dry = it)) },
+        getSp = { it.reverb.spkDry }, setSp = { copy(reverb = reverb.copy(spkDry = it)) }
     ),
 
     // Dynamic System
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_ENABLE}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_ENABLE}",
-        jsonKey = "dynamicSystemEnabled", spkJsonKey = "spkDynamicSystemEnabled",
+        jsonKey = "dynamicSystemEnabled",
+        spkJsonKey = "spkDynamicSystemEnabled",
         defaultValue = false,
-        getHp = { it.dynamicSystemEnabled }, setHp = { copy(dynamicSystemEnabled = it) },
-        getSp = { it.spkDynamicSystemEnabled }, setSp = { copy(spkDynamicSystemEnabled = it) }
+        getHp = { it.dynamicSystem.enabled },
+        setHp = { copy(dynamicSystem = dynamicSystem.copy(enabled = it)) },
+        getSp = { it.dynamicSystem.spkEnabled },
+        setSp = { copy(dynamicSystem = dynamicSystem.copy(spkEnabled = it)) }
     ),
     NullableLongPref(
         hpPrefKey = ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID,
         spkPrefKey = "spk_${ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID}",
-        jsonKey = "dsPresetId", spkJsonKey = "spkDsPresetId",
-        getHp = { it.dsPresetId }, setHp = { copy(dsPresetId = it) },
-        getSp = { it.spkDsPresetId }, setSp = { copy(spkDsPresetId = it) }
+        jsonKey = "dsPresetId",
+        spkJsonKey = "spkDsPresetId",
+        getHp = { it.dynamicSystem.presetId },
+        setHp = { copy(dynamicSystem = dynamicSystem.copy(presetId = it)) },
+        getSp = { it.dynamicSystem.spkPresetId },
+        setSp = { copy(dynamicSystem = dynamicSystem.copy(spkPresetId = it)) }
     ),
     IntPref(
         hpPrefKey = ViperRepository.PERF_DYNAMIC_SYS_DEVICE,
         spkPrefKey = "spk_${ViperRepository.PERF_DYNAMIC_SYS_DEVICE}",
-        jsonKey = "dynamicSystemDevice", spkJsonKey = "spkDynamicSystemDevice",
+        jsonKey = "dynamicSystemDevice",
+        spkJsonKey = "spkDynamicSystemDevice",
         defaultValue = 0,
-        getHp = { it.dynamicSystemDevice }, setHp = { copy(dynamicSystemDevice = it) },
-        getSp = { it.spkDynamicSystemDevice }, setSp = { copy(spkDynamicSystemDevice = it) }
+        getHp = { it.dynamicSystem.device },
+        setHp = { copy(dynamicSystem = dynamicSystem.copy(device = it)) },
+        getSp = { it.dynamicSystem.spkDevice },
+        setSp = { copy(dynamicSystem = dynamicSystem.copy(spkDevice = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_STRENGTH}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_STRENGTH}",
-        jsonKey = "dynamicSystemStrength", spkJsonKey = "spkDynamicSystemStrength",
+        jsonKey = "dynamicSystemStrength",
+        spkJsonKey = "spkDynamicSystemStrength",
         defaultValue = 50,
-        getHp = { it.dynamicSystemStrength }, setHp = { copy(dynamicSystemStrength = it) },
-        getSp = { it.spkDynamicSystemStrength }, setSp = { copy(spkDynamicSystemStrength = it) }
+        getHp = { it.dynamicSystem.strength },
+        setHp = { copy(dynamicSystem = dynamicSystem.copy(strength = it)) },
+        getSp = { it.dynamicSystem.spkStrength },
+        setSp = { copy(dynamicSystem = dynamicSystem.copy(spkStrength = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_X_COEFFICIENTS}_low",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_X_COEFFICIENTS}_low",
-        jsonKey = "dsXLow", spkJsonKey = "spkDsXLow",
+        jsonKey = "dsXLow",
+        spkJsonKey = "spkDsXLow",
         defaultValue = 100,
-        getHp = { it.dsXLow }, setHp = { copy(dsXLow = it) },
-        getSp = { it.spkDsXLow }, setSp = { copy(spkDsXLow = it) }
+        getHp = { it.dynamicSystem.xLow },
+        setHp = { copy(dynamicSystem = dynamicSystem.copy(xLow = it)) },
+        getSp = { it.dynamicSystem.spkXLow },
+        setSp = { copy(dynamicSystem = dynamicSystem.copy(spkXLow = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_X_COEFFICIENTS}_high",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_X_COEFFICIENTS}_high",
-        jsonKey = "dsXHigh", spkJsonKey = "spkDsXHigh",
+        jsonKey = "dsXHigh",
+        spkJsonKey = "spkDsXHigh",
         defaultValue = 5600,
-        getHp = { it.dsXHigh }, setHp = { copy(dsXHigh = it) },
-        getSp = { it.spkDsXHigh }, setSp = { copy(spkDsXHigh = it) }
+        getHp = { it.dynamicSystem.xHigh },
+        setHp = { copy(dynamicSystem = dynamicSystem.copy(xHigh = it)) },
+        getSp = { it.dynamicSystem.spkXHigh },
+        setSp = { copy(dynamicSystem = dynamicSystem.copy(spkXHigh = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_Y_COEFFICIENTS}_low",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_Y_COEFFICIENTS}_low",
-        jsonKey = "dsYLow", spkJsonKey = "spkDsYLow",
+        jsonKey = "dsYLow",
+        spkJsonKey = "spkDsYLow",
         defaultValue = 40,
-        getHp = { it.dsYLow }, setHp = { copy(dsYLow = it) },
-        getSp = { it.spkDsYLow }, setSp = { copy(spkDsYLow = it) }
+        getHp = { it.dynamicSystem.yLow },
+        setHp = { copy(dynamicSystem = dynamicSystem.copy(yLow = it)) },
+        getSp = { it.dynamicSystem.spkYLow },
+        setSp = { copy(dynamicSystem = dynamicSystem.copy(spkYLow = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_Y_COEFFICIENTS}_high",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_Y_COEFFICIENTS}_high",
-        jsonKey = "dsYHigh", spkJsonKey = "spkDsYHigh",
+        jsonKey = "dsYHigh",
+        spkJsonKey = "spkDsYHigh",
         defaultValue = 80,
-        getHp = { it.dsYHigh }, setHp = { copy(dsYHigh = it) },
-        getSp = { it.spkDsYHigh }, setSp = { copy(spkDsYHigh = it) }
+        getHp = { it.dynamicSystem.yHigh },
+        setHp = { copy(dynamicSystem = dynamicSystem.copy(yHigh = it)) },
+        getSp = { it.dynamicSystem.spkYHigh },
+        setSp = { copy(dynamicSystem = dynamicSystem.copy(spkYHigh = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN}_low",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_SIDE_GAIN}_low",
-        jsonKey = "dsSideGainLow", spkJsonKey = "spkDsSideGainLow",
+        jsonKey = "dsSideGainLow",
+        spkJsonKey = "spkDsSideGainLow",
         defaultValue = 50,
-        getHp = { it.dsSideGainLow }, setHp = { copy(dsSideGainLow = it) },
-        getSp = { it.spkDsSideGainLow }, setSp = { copy(spkDsSideGainLow = it) }
+        getHp = { it.dynamicSystem.sideGainLow },
+        setHp = { copy(dynamicSystem = dynamicSystem.copy(sideGainLow = it)) },
+        getSp = { it.dynamicSystem.spkSideGainLow },
+        setSp = { copy(dynamicSystem = dynamicSystem.copy(spkSideGainLow = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN}_high",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_SIDE_GAIN}_high",
-        jsonKey = "dsSideGainHigh", spkJsonKey = "spkDsSideGainHigh",
+        jsonKey = "dsSideGainHigh",
+        spkJsonKey = "spkDsSideGainHigh",
         defaultValue = 50,
-        getHp = { it.dsSideGainHigh }, setHp = { copy(dsSideGainHigh = it) },
-        getSp = { it.spkDsSideGainHigh }, setSp = { copy(spkDsSideGainHigh = it) }
+        getHp = { it.dynamicSystem.sideGainHigh },
+        setHp = { copy(dynamicSystem = dynamicSystem.copy(sideGainHigh = it)) },
+        getSp = { it.dynamicSystem.spkSideGainHigh },
+        setSp = { copy(dynamicSystem = dynamicSystem.copy(spkSideGainHigh = it)) }
     ),
 
     // Tube Simulator
@@ -618,8 +684,8 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_TUBE_SIMULATOR_ENABLE}",
         jsonKey = "tubeSimulatorEnabled", spkJsonKey = "spkTubeSimulatorEnabled",
         defaultValue = false,
-        getHp = { it.tubeSimulatorEnabled }, setHp = { copy(tubeSimulatorEnabled = it) },
-        getSp = { it.spkTubeSimulatorEnabled }, setSp = { copy(spkTubeSimulatorEnabled = it) }
+        getHp = { it.tube.enabled }, setHp = { copy(tube = tube.copy(enabled = it)) },
+        getSp = { it.tube.spkEnabled }, setSp = { copy(tube = tube.copy(spkEnabled = it)) }
     ),
 
     // Bass
@@ -628,82 +694,91 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_ENABLE}",
         jsonKey = "bassEnabled", spkJsonKey = "spkBassEnabled",
         defaultValue = false,
-        getHp = { it.bassEnabled }, setHp = { copy(bassEnabled = it) },
-        getSp = { it.spkBassEnabled }, setSp = { copy(spkBassEnabled = it) }
+        getHp = { it.bass.enabled }, setHp = { copy(bass = bass.copy(enabled = it)) },
+        getSp = { it.bass.spkEnabled }, setSp = { copy(bass = bass.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_BASS_MODE}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_MODE}",
         jsonKey = "bassMode", spkJsonKey = "spkBassMode",
         defaultValue = 0,
-        getHp = { it.bassMode }, setHp = { copy(bassMode = it) },
-        getSp = { it.spkBassMode }, setSp = { copy(spkBassMode = it) }
+        getHp = { it.bass.mode }, setHp = { copy(bass = bass.copy(mode = it)) },
+        getSp = { it.bass.spkMode }, setSp = { copy(bass = bass.copy(spkMode = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_BASS_FREQUENCY}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_FREQUENCY}",
         jsonKey = "bassFrequency", spkJsonKey = "spkBassFrequency",
         defaultValue = 55,
-        getHp = { it.bassFrequency }, setHp = { copy(bassFrequency = it) },
-        getSp = { it.spkBassFrequency }, setSp = { copy(spkBassFrequency = it) }
+        getHp = { it.bass.frequency }, setHp = { copy(bass = bass.copy(frequency = it)) },
+        getSp = { it.bass.spkFrequency }, setSp = { copy(bass = bass.copy(spkFrequency = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_BASS_GAIN}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_GAIN}",
         jsonKey = "bassGain", spkJsonKey = "spkBassGain",
         defaultValue = 0,
-        getHp = { it.bassGain }, setHp = { copy(bassGain = it) },
-        getSp = { it.spkBassGain }, setSp = { copy(spkBassGain = it) }
+        getHp = { it.bass.gain }, setHp = { copy(bass = bass.copy(gain = it)) },
+        getSp = { it.bass.spkGain }, setSp = { copy(bass = bass.copy(spkGain = it)) }
     ),
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_BASS_ANTI_POP}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_ANTI_POP}",
         jsonKey = "bassAntiPop", spkJsonKey = "spkBassAntiPop",
         defaultValue = true,
-        getHp = { it.bassAntiPop }, setHp = { copy(bassAntiPop = it) },
-        getSp = { it.spkBassAntiPop }, setSp = { copy(spkBassAntiPop = it) }
+        getHp = { it.bass.antiPop }, setHp = { copy(bass = bass.copy(antiPop = it)) },
+        getSp = { it.bass.spkAntiPop }, setSp = { copy(bass = bass.copy(spkAntiPop = it)) }
     ),
 
     // Bass Mono
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_BASS_MONO_ENABLE}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_MONO_ENABLE}",
-        jsonKey = "bassMonoEnabled", spkJsonKey = "spkBassMonoEnabled",
+        jsonKey = "bassMonoEnabled",
+        spkJsonKey = "spkBassMonoEnabled",
         defaultValue = false,
-        getHp = { it.bassMonoEnabled }, setHp = { copy(bassMonoEnabled = it) },
-        getSp = { it.spkBassMonoEnabled }, setSp = { copy(spkBassMonoEnabled = it) }
+        getHp = { it.bassMono.enabled },
+        setHp = { copy(bassMono = bassMono.copy(enabled = it)) },
+        getSp = { it.bassMono.spkEnabled },
+        setSp = { copy(bassMono = bassMono.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_BASS_MONO_MODE}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_MONO_MODE}",
         jsonKey = "bassMonoMode", spkJsonKey = "spkBassMonoMode",
         defaultValue = 0,
-        getHp = { it.bassMonoMode }, setHp = { copy(bassMonoMode = it) },
-        getSp = { it.spkBassMonoMode }, setSp = { copy(spkBassMonoMode = it) }
+        getHp = { it.bassMono.mode }, setHp = { copy(bassMono = bassMono.copy(mode = it)) },
+        getSp = { it.bassMono.spkMode }, setSp = { copy(bassMono = bassMono.copy(spkMode = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_BASS_MONO_FREQUENCY}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_MONO_FREQUENCY}",
-        jsonKey = "bassMonoFrequency", spkJsonKey = "spkBassMonoFrequency",
+        jsonKey = "bassMonoFrequency",
+        spkJsonKey = "spkBassMonoFrequency",
         defaultValue = 55,
-        getHp = { it.bassMonoFrequency }, setHp = { copy(bassMonoFrequency = it) },
-        getSp = { it.spkBassMonoFrequency }, setSp = { copy(spkBassMonoFrequency = it) }
+        getHp = { it.bassMono.frequency },
+        setHp = { copy(bassMono = bassMono.copy(frequency = it)) },
+        getSp = { it.bassMono.spkFrequency },
+        setSp = { copy(bassMono = bassMono.copy(spkFrequency = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_BASS_MONO_GAIN}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_MONO_GAIN}",
         jsonKey = "bassMonoGain", spkJsonKey = "spkBassMonoGain",
         defaultValue = 0,
-        getHp = { it.bassMonoGain }, setHp = { copy(bassMonoGain = it) },
-        getSp = { it.spkBassMonoGain }, setSp = { copy(spkBassMonoGain = it) }
+        getHp = { it.bassMono.gain }, setHp = { copy(bassMono = bassMono.copy(gain = it)) },
+        getSp = { it.bassMono.spkGain }, setSp = { copy(bassMono = bassMono.copy(spkGain = it)) }
     ),
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_BASS_MONO_ANTI_POP}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_MONO_ANTI_POP}",
-        jsonKey = "bassMonoAntiPop", spkJsonKey = "spkBassMonoAntiPop",
+        jsonKey = "bassMonoAntiPop",
+        spkJsonKey = "spkBassMonoAntiPop",
         defaultValue = true,
-        getHp = { it.bassMonoAntiPop }, setHp = { copy(bassMonoAntiPop = it) },
-        getSp = { it.spkBassMonoAntiPop }, setSp = { copy(spkBassMonoAntiPop = it) }
+        getHp = { it.bassMono.antiPop },
+        setHp = { copy(bassMono = bassMono.copy(antiPop = it)) },
+        getSp = { it.bassMono.spkAntiPop },
+        setSp = { copy(bassMono = bassMono.copy(spkAntiPop = it)) }
     ),
 
     // Clarity
@@ -712,24 +787,24 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_CLARITY_ENABLE}",
         jsonKey = "clarityEnabled", spkJsonKey = "spkClarityEnabled",
         defaultValue = false,
-        getHp = { it.clarityEnabled }, setHp = { copy(clarityEnabled = it) },
-        getSp = { it.spkClarityEnabled }, setSp = { copy(spkClarityEnabled = it) }
+        getHp = { it.clarity.enabled }, setHp = { copy(clarity = clarity.copy(enabled = it)) },
+        getSp = { it.clarity.spkEnabled }, setSp = { copy(clarity = clarity.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_CLARITY_MODE}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_CLARITY_MODE}",
         jsonKey = "clarityMode", spkJsonKey = "spkClarityMode",
         defaultValue = 0,
-        getHp = { it.clarityMode }, setHp = { copy(clarityMode = it) },
-        getSp = { it.spkClarityMode }, setSp = { copy(spkClarityMode = it) }
+        getHp = { it.clarity.mode }, setHp = { copy(clarity = clarity.copy(mode = it)) },
+        getSp = { it.clarity.spkMode }, setSp = { copy(clarity = clarity.copy(spkMode = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_CLARITY_GAIN}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_CLARITY_GAIN}",
         jsonKey = "clarityGain", spkJsonKey = "spkClarityGain",
         defaultValue = 1,
-        getHp = { it.clarityGain }, setHp = { copy(clarityGain = it) },
-        getSp = { it.spkClarityGain }, setSp = { copy(spkClarityGain = it) }
+        getHp = { it.clarity.gain }, setHp = { copy(clarity = clarity.copy(gain = it)) },
+        getSp = { it.clarity.spkGain }, setSp = { copy(clarity = clarity.copy(spkGain = it)) }
     ),
 
     // Cure
@@ -738,16 +813,16 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_CURE_ENABLE}",
         jsonKey = "cureEnabled", spkJsonKey = "spkCureEnabled",
         defaultValue = false,
-        getHp = { it.cureEnabled }, setHp = { copy(cureEnabled = it) },
-        getSp = { it.spkCureEnabled }, setSp = { copy(spkCureEnabled = it) }
+        getHp = { it.cure.enabled }, setHp = { copy(cure = cure.copy(enabled = it)) },
+        getSp = { it.cure.spkEnabled }, setSp = { copy(cure = cure.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_CURE_STRENGTH}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_CURE_STRENGTH}",
         jsonKey = "cureStrength", spkJsonKey = "spkCureStrength",
         defaultValue = 0,
-        getHp = { it.cureStrength }, setHp = { copy(cureStrength = it) },
-        getSp = { it.spkCureStrength }, setSp = { copy(spkCureStrength = it) }
+        getHp = { it.cure.strength }, setHp = { copy(cure = cure.copy(strength = it)) },
+        getSp = { it.cure.spkStrength }, setSp = { copy(cure = cure.copy(spkStrength = it)) }
     ),
 
     // AnalogX
@@ -756,16 +831,16 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_ANALOGX_ENABLE}",
         jsonKey = "analogxEnabled", spkJsonKey = "spkAnalogxEnabled",
         defaultValue = false,
-        getHp = { it.analogxEnabled }, setHp = { copy(analogxEnabled = it) },
-        getSp = { it.spkAnalogxEnabled }, setSp = { copy(spkAnalogxEnabled = it) }
+        getHp = { it.analog.enabled }, setHp = { copy(analog = analog.copy(enabled = it)) },
+        getSp = { it.analog.spkEnabled }, setSp = { copy(analog = analog.copy(spkEnabled = it)) }
     ),
     IntPref(
         hpPrefKey = "${ViperParams.PARAM_HP_ANALOGX_MODE}",
         spkPrefKey = "spk_${ViperParams.PARAM_SPK_ANALOGX_MODE}",
         jsonKey = "analogxMode", spkJsonKey = "spkAnalogxMode",
         defaultValue = 0,
-        getHp = { it.analogxMode }, setHp = { copy(analogxMode = it) },
-        getSp = { it.spkAnalogxMode }, setSp = { copy(spkAnalogxMode = it) }
+        getHp = { it.analog.mode }, setHp = { copy(analog = analog.copy(mode = it)) },
+        getSp = { it.analog.spkMode }, setSp = { copy(analog = analog.copy(spkMode = it)) }
     ),
 
     // Speaker-only

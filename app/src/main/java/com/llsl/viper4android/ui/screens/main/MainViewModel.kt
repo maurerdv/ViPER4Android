@@ -58,208 +58,26 @@ data class MainUiState(
     val fxType: Int = ViperParams.FX_TYPE_HEADPHONE,
 
     val masterEnabled: Boolean = false,
-
-    val outputVolume: Int = 11,
-    val channelPan: Int = 0,
-    val limiter: Int = 5,
-
-    val agcEnabled: Boolean = false,
-    val agcStrength: Int = 0,
-    val agcMaxGain: Int = 3,
-    val agcOutputThreshold: Int = 3,
-
-    val fetEnabled: Boolean = false,
-    val fetThreshold: Int = 100,
-    val fetRatio: Int = 100,
-    val fetAutoKnee: Boolean = true,
-    val fetKnee: Int = 0,
-    val fetKneeMulti: Int = 0,
-    val fetAutoGain: Boolean = true,
-    val fetGain: Int = 0,
-    val fetAutoAttack: Boolean = true,
-    val fetAttack: Int = 20,
-    val fetMaxAttack: Int = 80,
-    val fetAutoRelease: Boolean = true,
-    val fetRelease: Int = 50,
-    val fetMaxRelease: Int = 100,
-    val fetCrest: Int = 100,
-    val fetAdapt: Int = 50,
-    val fetNoClip: Boolean = true,
-
-    val ddcEnabled: Boolean = false,
-    val ddcDevice: String = "",
-
-    val vseEnabled: Boolean = false,
-    val vseStrength: Int = 10,
-    val vseExciter: Int = 0,
-
-    val eqEnabled: Boolean = false,
-    val eqBandCount: Int = 10,
-    val eqPresetId: Long? = null,
-    val eqBands: String = "0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;",
-    val eqBandsMap: Map<Int, String> = mapOf(10 to "0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;"),
-    val eqPresets: List<EqPreset> = emptyList(),
-
-    val convolverEnabled: Boolean = false,
-    val convolverKernel: String = "",
-    val convolverCrossChannel: Int = 0,
-
-    val fieldSurroundEnabled: Boolean = false,
-    val fieldSurroundWidening: Int = 0,
-    val fieldSurroundMidImage: Int = 5,
-    val fieldSurroundDepth: Int = 0,
-
-    val diffSurroundEnabled: Boolean = false,
-    val diffSurroundDelay: Int = 4,
-    val diffSurroundReverse: Boolean = false,
-
-    val vheEnabled: Boolean = false,
-    val vheQuality: Int = 0,
-
-    val reverbEnabled: Boolean = false,
-    val reverbRoomSize: Int = 0,
-    val reverbWidth: Int = 0,
-    val reverbDampening: Int = 0,
-    val reverbWet: Int = 0,
-    val reverbDry: Int = 50,
-
-    val dynamicSystemEnabled: Boolean = false,
-    val dynamicSystemDevice: Int = 0,
-    val dynamicSystemStrength: Int = 50,
-    val dsPresetId: Long? = null,
-    val dsPresets: List<DsPreset> = emptyList(),
-    val dsXLow: Int = 100,
-    val dsXHigh: Int = 5600,
-    val dsYLow: Int = 40,
-    val dsYHigh: Int = 80,
-    val dsSideGainLow: Int = 50,
-    val dsSideGainHigh: Int = 50,
-
-    val tubeSimulatorEnabled: Boolean = false,
-
-    val bassEnabled: Boolean = false,
-    val bassMode: Int = 0,
-    val bassFrequency: Int = 55,
-    val bassGain: Int = 0,
-    val bassAntiPop: Boolean = true,
-
-    val bassMonoEnabled: Boolean = false,
-    val bassMonoMode: Int = 0,
-    val bassMonoFrequency: Int = 55,
-    val bassMonoGain: Int = 0,
-    val bassMonoAntiPop: Boolean = true,
-
-    val clarityEnabled: Boolean = false,
-    val clarityMode: Int = 0,
-    val clarityGain: Int = 1,
-
-    val cureEnabled: Boolean = false,
-    val cureStrength: Int = 0,
-
-    val analogxEnabled: Boolean = false,
-    val analogxMode: Int = 0,
-
     val spkMasterEnabled: Boolean = false,
 
-    val spkOutputVolume: Int = 11,
-    val spkChannelPan: Int = 0,
-    val spkLimiter: Int = 5,
-
-    val spkAgcEnabled: Boolean = false,
-    val spkAgcStrength: Int = 0,
-    val spkAgcMaxGain: Int = 3,
-    val spkAgcOutputThreshold: Int = 3,
-
-    val spkFetEnabled: Boolean = false,
-    val spkFetThreshold: Int = 100,
-    val spkFetRatio: Int = 100,
-    val spkFetAutoKnee: Boolean = true,
-    val spkFetKnee: Int = 0,
-    val spkFetKneeMulti: Int = 0,
-    val spkFetAutoGain: Boolean = true,
-    val spkFetGain: Int = 0,
-    val spkFetAutoAttack: Boolean = true,
-    val spkFetAttack: Int = 20,
-    val spkFetMaxAttack: Int = 80,
-    val spkFetAutoRelease: Boolean = true,
-    val spkFetRelease: Int = 50,
-    val spkFetMaxRelease: Int = 100,
-    val spkFetCrest: Int = 100,
-    val spkFetAdapt: Int = 50,
-    val spkFetNoClip: Boolean = true,
-
-    val spkDdcEnabled: Boolean = false,
-    val spkDdcDevice: String = "",
-
-    val spkVseEnabled: Boolean = false,
-    val spkVseStrength: Int = 10,
-    val spkVseExciter: Int = 0,
-
-    val spkEqEnabled: Boolean = false,
-    val spkEqBandCount: Int = 10,
-    val spkEqPresetId: Long? = null,
-    val spkEqBands: String = "0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;",
-    val spkEqBandsMap: Map<Int, String> = mapOf(10 to "0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;"),
-    val spkEqPresets: List<EqPreset> = emptyList(),
-
-    val spkConvolverEnabled: Boolean = false,
-    val spkConvolverKernel: String = "",
-    val spkConvolverCrossChannel: Int = 0,
-
-    val spkFieldSurroundEnabled: Boolean = false,
-    val spkFieldSurroundWidening: Int = 0,
-    val spkFieldSurroundMidImage: Int = 5,
-    val spkFieldSurroundDepth: Int = 0,
-
-    val spkDiffSurroundEnabled: Boolean = false,
-    val spkDiffSurroundDelay: Int = 4,
-    val spkDiffSurroundReverse: Boolean = false,
-
-    val spkVheEnabled: Boolean = false,
-    val spkVheQuality: Int = 0,
-
-    val spkReverbEnabled: Boolean = false,
-    val spkReverbRoomSize: Int = 0,
-    val spkReverbWidth: Int = 0,
-    val spkReverbDampening: Int = 0,
-    val spkReverbWet: Int = 0,
-    val spkReverbDry: Int = 50,
-
-    val spkDynamicSystemEnabled: Boolean = false,
-    val spkDynamicSystemDevice: Int = 0,
-    val spkDynamicSystemStrength: Int = 50,
-    val spkDsPresetId: Long? = null,
-    val spkDsPresets: List<DsPreset> = emptyList(),
-    val spkDsXLow: Int = 100,
-    val spkDsXHigh: Int = 5600,
-    val spkDsYLow: Int = 40,
-    val spkDsYHigh: Int = 80,
-    val spkDsSideGainLow: Int = 50,
-    val spkDsSideGainHigh: Int = 50,
-
-    val spkTubeSimulatorEnabled: Boolean = false,
-
-    val spkBassEnabled: Boolean = false,
-    val spkBassMode: Int = 0,
-    val spkBassFrequency: Int = 55,
-    val spkBassGain: Int = 0,
-    val spkBassAntiPop: Boolean = true,
-
-    val spkBassMonoEnabled: Boolean = false,
-    val spkBassMonoMode: Int = 0,
-    val spkBassMonoFrequency: Int = 55,
-    val spkBassMonoGain: Int = 0,
-    val spkBassMonoAntiPop: Boolean = true,
-
-    val spkClarityEnabled: Boolean = false,
-    val spkClarityMode: Int = 0,
-    val spkClarityGain: Int = 1,
-
-    val spkCureEnabled: Boolean = false,
-    val spkCureStrength: Int = 0,
-
-    val spkAnalogxEnabled: Boolean = false,
-    val spkAnalogxMode: Int = 0,
+    val out: OutputState = OutputState(),
+    val agc: AgcState = AgcState(),
+    val fet: FetState = FetState(),
+    val ddc: DdcState = DdcState(),
+    val vse: VseState = VseState(),
+    val eq: EqState = EqState(),
+    val convolver: ConvolverState = ConvolverState(),
+    val fieldSurround: FieldSurroundState = FieldSurroundState(),
+    val diffSurround: DiffSurroundState = DiffSurroundState(),
+    val vhe: VheState = VheState(),
+    val reverb: ReverbState = ReverbState(),
+    val dynamicSystem: DynamicSystemState = DynamicSystemState(),
+    val bass: BassState = BassState(),
+    val bassMono: BassMonoState = BassMonoState(),
+    val clarity: ClarityState = ClarityState(),
+    val cure: CureState = CureState(),
+    val analog: AnalogXState = AnalogXState(),
+    val tube: TubeSimulatorState = TubeSimulatorState(),
 
     val speakerOptEnabled: Boolean = false,
 
@@ -365,8 +183,8 @@ class MainViewModel @Inject constructor(
                     activeDeviceId = initialDevice.id
                 )
             }
-            loadEqPresetsForBandCount(_uiState.value.eqBandCount, isSpk = false)
-            loadEqPresetsForBandCount(_uiState.value.spkEqBandCount, isSpk = true)
+            loadEqPresetsForBandCount(_uiState.value.eq.bandCount, isSpk = false)
+            loadEqPresetsForBandCount(_uiState.value.eq.spkBandCount, isSpk = true)
             loadDsPresets()
             loadDeviceSettings(initialDevice)
             ensureDeviceEntry(initialDevice)
@@ -399,7 +217,14 @@ class MainViewModel @Inject constructor(
         dsPresetsJob?.cancel()
         dsPresetsJob = viewModelScope.launch {
             repository.getAllDsPresets().collect { presets ->
-                _uiState.update { it.copy(dsPresets = presets, spkDsPresets = presets) }
+                _uiState.update {
+                    it.copy(
+                        dynamicSystem = it.dynamicSystem.copy(
+                            presets = presets,
+                            spkPresets = presets
+                        )
+                    )
+                }
             }
         }
     }
@@ -434,14 +259,14 @@ class MainViewModel @Inject constructor(
             spkEqPresetsJob?.cancel()
             spkEqPresetsJob = viewModelScope.launch {
                 repository.getEqPresetsByBandCount(bandCount).collect { presets ->
-                    _uiState.update { it.copy(spkEqPresets = presets) }
+                    _uiState.update { it.copy(eq = it.eq.copy(spkPresets = presets)) }
                 }
             }
         } else {
             eqPresetsJob?.cancel()
             eqPresetsJob = viewModelScope.launch {
                 repository.getEqPresetsByBandCount(bandCount).collect { presets ->
-                    _uiState.update { it.copy(eqPresets = presets) }
+                    _uiState.update { it.copy(eq = it.eq.copy(presets = presets)) }
                 }
             }
         }
@@ -453,8 +278,8 @@ class MainViewModel @Inject constructor(
                 .first()
         val state = loadEffectPrefs(repository, isSpk = false, state = _uiState.value)
 
-        val eqBandCount = state.eqBandCount
-        val rawEqBands = state.eqBands
+        val eqBandCount = state.eq.bandCount
+        val rawEqBands = state.eq.bands
         val parsedBandCount = rawEqBands.split(";").count { it.isNotBlank() }
         val eqBands = if (parsedBandCount != eqBandCount) {
             List(eqBandCount) { 0f }.joinToString(";") {
@@ -472,19 +297,15 @@ class MainViewModel @Inject constructor(
         eqBandsMap[eqBandCount] = eqBands
 
         _uiState.update {
-            state.copy(
-                fxType = fxType,
-                eqBands = eqBands,
-                eqBandsMap = eqBandsMap
-            )
+            state.copy(fxType = fxType, eq = state.eq.copy(bands = eqBands, bandsMap = eqBandsMap))
         }
     }
 
     private suspend fun loadSpeakerPreferences() {
         val state = loadEffectPrefs(repository, isSpk = true, state = _uiState.value)
 
-        val spkEqBandCount = state.spkEqBandCount
-        val rawSpkEqBands = state.spkEqBands
+        val spkEqBandCount = state.eq.spkBandCount
+        val rawSpkEqBands = state.eq.spkBands
         val parsedSpkBandCount = rawSpkEqBands.split(";").count { it.isNotBlank() }
         val spkEqBands = if (parsedSpkBandCount != spkEqBandCount) {
             List(spkEqBandCount) { 0f }.joinToString(";") {
@@ -503,10 +324,7 @@ class MainViewModel @Inject constructor(
         spkEqBandsMap[spkEqBandCount] = spkEqBands
 
         _uiState.update {
-            state.copy(
-                spkEqBands = spkEqBands,
-                spkEqBandsMap = spkEqBandsMap
-            )
+            state.copy(eq = state.eq.copy(spkBands = spkEqBands, spkBandsMap = spkEqBandsMap))
         }
     }
 
@@ -525,9 +343,9 @@ class MainViewModel @Inject constructor(
         val byteArrayParams = mutableListOf<ByteArrayParam>()
 
         val ddcEnabled =
-            if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) state.spkDdcEnabled else state.ddcEnabled
+            if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) state.ddc.spkEnabled else state.ddc.enabled
         val ddcDevice =
-            if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) state.spkDdcDevice else state.ddcDevice
+            if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) state.ddc.spkDevice else state.ddc.device
         FileLogger.i("ViewModel", "applyFullState: ddcEnabled=$ddcEnabled ddcDevice='$ddcDevice'")
         if (ddcEnabled && ddcDevice.isNotEmpty()) {
             val ba = prepareDdcByteArray(ddcDevice)
@@ -536,9 +354,9 @@ class MainViewModel @Inject constructor(
         }
 
         val convolverEnabled =
-            if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) state.spkConvolverEnabled else state.convolverEnabled
+            if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) state.convolver.spkEnabled else state.convolver.enabled
         val kernel =
-            if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) state.spkConvolverKernel else state.convolverKernel
+            if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) state.convolver.spkKernel else state.convolver.kernel
         FileLogger.i(
             "ViewModel",
             "applyFullState: convolverEnabled=$convolverEnabled kernel='$kernel'"
@@ -668,7 +486,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setOutputVolume(value: Int) {
-        _uiState.update { it.copy(outputVolume = value) }
+        _uiState.update { it.copy(out = it.out.copy(volume = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_OUTPUT_VOLUME}",
@@ -681,7 +499,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setChannelPan(value: Int) {
-        _uiState.update { it.copy(channelPan = value) }
+        _uiState.update { it.copy(out = it.out.copy(channelPan = value)) }
         saveAndDispatchInt(
             "${ViperParams.PARAM_HP_CHANNEL_PAN}",
             ViperParams.PARAM_HP_CHANNEL_PAN,
@@ -690,7 +508,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setLimiter(value: Int) {
-        _uiState.update { it.copy(limiter = value) }
+        _uiState.update { it.copy(out = it.out.copy(limiter = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_LIMITER}",
@@ -702,26 +520,26 @@ class MainViewModel @Inject constructor(
 
     fun setAgcEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "AGC: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(agcEnabled = enabled) }
+        _uiState.update { it.copy(agc = it.agc.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_HP_AGC_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(ViperParams.PARAM_HP_AGC_ENABLE, intArrayOf(if (enabled) 1 else 0)),
                     ParamEntry(
                         ViperParams.PARAM_HP_AGC_RATIO,
-                        intArrayOf(EffectDispatcher.PLAYBACK_GAIN_RATIO_VALUES.getOrElse(s.agcStrength) { 50 })
+                        intArrayOf(EffectDispatcher.PLAYBACK_GAIN_RATIO_VALUES.getOrElse(state.agc.strength) { 50 })
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_AGC_MAX_SCALER,
-                        intArrayOf(EffectDispatcher.MULTI_FACTOR_VALUES.getOrElse(s.agcMaxGain) { 100 })
+                        intArrayOf(EffectDispatcher.MULTI_FACTOR_VALUES.getOrElse(state.agc.maxGain) { 100 })
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_AGC_VOLUME,
-                        intArrayOf(EffectDispatcher.OUTPUT_DB_VALUES.getOrElse(s.agcOutputThreshold) { 100 })
+                        intArrayOf(EffectDispatcher.OUTPUT_DB_VALUES.getOrElse(state.agc.outputThreshold) { 100 })
                     )
                 )
             )
@@ -729,7 +547,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setAgcStrength(value: Int) {
-        _uiState.update { it.copy(agcStrength = value) }
+        _uiState.update { it.copy(agc = it.agc.copy(strength = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_AGC_RATIO}",
@@ -742,7 +560,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setAgcMaxGain(value: Int) {
-        _uiState.update { it.copy(agcMaxGain = value) }
+        _uiState.update { it.copy(agc = it.agc.copy(maxGain = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_AGC_MAX_SCALER}",
@@ -755,7 +573,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setAgcOutputThreshold(value: Int) {
-        _uiState.update { it.copy(agcOutputThreshold = value) }
+        _uiState.update { it.copy(agc = it.agc.copy(outputThreshold = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_AGC_VOLUME}",
@@ -767,7 +585,7 @@ class MainViewModel @Inject constructor(
 
     fun setFetEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "FET Compressor: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(fetEnabled = enabled) }
+        _uiState.update { it.copy(fet = it.fet.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "${ViperParams.PARAM_HP_FET_COMPRESSOR_ENABLE}",
@@ -775,7 +593,7 @@ class MainViewModel @Inject constructor(
             )
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
@@ -784,193 +602,227 @@ class MainViewModel @Inject constructor(
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FET_COMPRESSOR_THRESHOLD,
-                        intArrayOf(s.fetThreshold)
+                        intArrayOf(state.fet.threshold)
                     ),
-                    ParamEntry(ViperParams.PARAM_HP_FET_COMPRESSOR_RATIO, intArrayOf(s.fetRatio)),
+                    ParamEntry(
+                        ViperParams.PARAM_HP_FET_COMPRESSOR_RATIO,
+                        intArrayOf(state.fet.ratio)
+                    ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_KNEE,
-                        intArrayOf(if (s.fetAutoKnee) 100 else 0)
+                        intArrayOf(if (state.fet.autoKnee) 100 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE, intArrayOf(s.fetKnee)),
+                    ParamEntry(
+                        ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE,
+                        intArrayOf(state.fet.knee)
+                    ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE_MULTI,
-                        intArrayOf(s.fetKneeMulti)
+                        intArrayOf(state.fet.kneeMulti)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_GAIN,
-                        intArrayOf(if (s.fetAutoGain) 100 else 0)
+                        intArrayOf(if (state.fet.autoGain) 100 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_HP_FET_COMPRESSOR_GAIN, intArrayOf(s.fetGain)),
+                    ParamEntry(
+                        ViperParams.PARAM_HP_FET_COMPRESSOR_GAIN,
+                        intArrayOf(state.fet.gain)
+                    ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_ATTACK,
-                        intArrayOf(if (s.fetAutoAttack) 100 else 0)
+                        intArrayOf(if (state.fet.autoAttack) 100 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_HP_FET_COMPRESSOR_ATTACK, intArrayOf(s.fetAttack)),
+                    ParamEntry(
+                        ViperParams.PARAM_HP_FET_COMPRESSOR_ATTACK,
+                        intArrayOf(state.fet.attack)
+                    ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FET_COMPRESSOR_MAX_ATTACK,
-                        intArrayOf(s.fetMaxAttack)
+                        intArrayOf(state.fet.maxAttack)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_RELEASE,
-                        intArrayOf(if (s.fetAutoRelease) 100 else 0)
+                        intArrayOf(if (state.fet.autoRelease) 100 else 0)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FET_COMPRESSOR_RELEASE,
-                        intArrayOf(s.fetRelease)
+                        intArrayOf(state.fet.release)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FET_COMPRESSOR_MAX_RELEASE,
-                        intArrayOf(s.fetMaxRelease)
+                        intArrayOf(state.fet.maxRelease)
                     ),
-                    ParamEntry(ViperParams.PARAM_HP_FET_COMPRESSOR_CREST, intArrayOf(s.fetCrest)),
-                    ParamEntry(ViperParams.PARAM_HP_FET_COMPRESSOR_ADAPT, intArrayOf(s.fetAdapt)),
+                    ParamEntry(
+                        ViperParams.PARAM_HP_FET_COMPRESSOR_CREST,
+                        intArrayOf(state.fet.crest)
+                    ),
+                    ParamEntry(
+                        ViperParams.PARAM_HP_FET_COMPRESSOR_ADAPT,
+                        intArrayOf(state.fet.adapt)
+                    ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FET_COMPRESSOR_NO_CLIP,
-                        intArrayOf(if (s.fetNoClip) 100 else 0)
+                        intArrayOf(if (state.fet.noClip) 100 else 0)
                     )
                 )
             )
         }
     }
 
-    fun setFetThreshold(v: Int) {
-        _uiState.update { it.copy(fetThreshold = v) }; saveAndDispatchInt(
+    fun setFetThreshold(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(threshold = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_THRESHOLD}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_THRESHOLD,
-            v
+            value
         )
     }
 
-    fun setFetRatio(v: Int) {
-        _uiState.update { it.copy(fetRatio = v) }; saveAndDispatchInt(
+    fun setFetRatio(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(ratio = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_RATIO}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_RATIO,
-            v
+            value
         )
     }
 
-    fun setFetAutoKnee(v: Boolean) {
-        _uiState.update { it.copy(fetAutoKnee = v) }; saveAndDispatchFetBool(
+    fun setFetAutoKnee(value: Boolean) {
+        _uiState.update { it.copy(fet = it.fet.copy(autoKnee = value)) }
+        saveAndDispatchFetBool(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_KNEE}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_KNEE,
-            v
+            value
         )
     }
 
-    fun setFetKnee(v: Int) {
-        _uiState.update { it.copy(fetKnee = v) }; saveAndDispatchInt(
+    fun setFetKnee(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(knee = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE,
-            v
+            value
         )
     }
 
-    fun setFetKneeMulti(v: Int) {
-        _uiState.update { it.copy(fetKneeMulti = v) }; saveAndDispatchInt(
+    fun setFetKneeMulti(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(kneeMulti = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE_MULTI}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE_MULTI,
-            v
+            value
         )
     }
 
-    fun setFetAutoGain(v: Boolean) {
-        _uiState.update { it.copy(fetAutoGain = v) }; saveAndDispatchFetBool(
+    fun setFetAutoGain(value: Boolean) {
+        _uiState.update { it.copy(fet = it.fet.copy(autoGain = value)) }
+        saveAndDispatchFetBool(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_GAIN}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_GAIN,
-            v
+            value
         )
     }
 
-    fun setFetGain(v: Int) {
-        _uiState.update { it.copy(fetGain = v) }; saveAndDispatchInt(
+    fun setFetGain(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(gain = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_GAIN}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_GAIN,
-            v
+            value
         )
     }
 
-    fun setFetAutoAttack(v: Boolean) {
-        _uiState.update { it.copy(fetAutoAttack = v) }; saveAndDispatchFetBool(
+    fun setFetAutoAttack(value: Boolean) {
+        _uiState.update { it.copy(fet = it.fet.copy(autoAttack = value)) }
+        saveAndDispatchFetBool(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_ATTACK}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_ATTACK,
-            v
+            value
         )
     }
 
-    fun setFetAttack(v: Int) {
-        _uiState.update { it.copy(fetAttack = v) }; saveAndDispatchInt(
+    fun setFetAttack(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(attack = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_ATTACK}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_ATTACK,
-            v
+            value
         )
     }
 
-    fun setFetMaxAttack(v: Int) {
-        _uiState.update { it.copy(fetMaxAttack = v) }; saveAndDispatchInt(
+    fun setFetMaxAttack(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(maxAttack = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_MAX_ATTACK}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_MAX_ATTACK,
-            v
+            value
         )
     }
 
-    fun setFetAutoRelease(v: Boolean) {
-        _uiState.update { it.copy(fetAutoRelease = v) }; saveAndDispatchFetBool(
+    fun setFetAutoRelease(value: Boolean) {
+        _uiState.update { it.copy(fet = it.fet.copy(autoRelease = value)) }
+        saveAndDispatchFetBool(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_RELEASE}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_RELEASE,
-            v
+            value
         )
     }
 
-    fun setFetRelease(v: Int) {
-        _uiState.update { it.copy(fetRelease = v) }; saveAndDispatchInt(
+    fun setFetRelease(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(release = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_RELEASE}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_RELEASE,
-            v
+            value
         )
     }
 
-    fun setFetMaxRelease(v: Int) {
-        _uiState.update { it.copy(fetMaxRelease = v) }; saveAndDispatchInt(
+    fun setFetMaxRelease(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(maxRelease = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_MAX_RELEASE}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_MAX_RELEASE,
-            v
+            value
         )
     }
 
-    fun setFetCrest(v: Int) {
-        _uiState.update { it.copy(fetCrest = v) }; saveAndDispatchInt(
+    fun setFetCrest(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(crest = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_CREST}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_CREST,
-            v
+            value
         )
     }
 
-    fun setFetAdapt(v: Int) {
-        _uiState.update { it.copy(fetAdapt = v) }; saveAndDispatchInt(
+    fun setFetAdapt(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(adapt = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_ADAPT}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_ADAPT,
-            v
+            value
         )
     }
 
-    fun setFetNoClip(v: Boolean) {
-        _uiState.update { it.copy(fetNoClip = v) }; saveAndDispatchFetBool(
+    fun setFetNoClip(value: Boolean) {
+        _uiState.update { it.copy(fet = it.fet.copy(noClip = value)) }
+        saveAndDispatchFetBool(
             "${ViperParams.PARAM_HP_FET_COMPRESSOR_NO_CLIP}",
             ViperParams.PARAM_HP_FET_COMPRESSOR_NO_CLIP,
-            v
+            value
         )
     }
 
     fun setDdcEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "DDC: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(ddcEnabled = enabled) }
+        _uiState.update { it.copy(ddc = it.ddc.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "${ViperParams.PARAM_HP_DDC_ENABLE}",
                 enabled
             )
         }
-        val device = _uiState.value.ddcDevice
+        val device = _uiState.value.ddc.device
         val effectiveEnabled = enabled && device.isNotEmpty()
         if (effectiveEnabled && activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
             loadVdcByName(device, ViperParams.PARAM_HP_DDC_ENABLE)
@@ -981,7 +833,7 @@ class MainViewModel @Inject constructor(
 
     fun setDdcDevice(device: String) {
         FileLogger.i("ViewModel", "DDC selected: $device")
-        _uiState.update { it.copy(ddcDevice = device) }
+        _uiState.update { it.copy(ddc = it.ddc.copy(device = device)) }
         viewModelScope.launch {
             repository.setStringPreference(
                 ViperRepository.PREF_DDC_DEVICE,
@@ -993,7 +845,7 @@ class MainViewModel @Inject constructor(
                 dispatchInt(ViperParams.PARAM_HP_DDC_ENABLE, 0)
             } else {
                 val enableParam =
-                    if (_uiState.value.ddcEnabled) ViperParams.PARAM_HP_DDC_ENABLE else null
+                    if (_uiState.value.ddc.enabled) ViperParams.PARAM_HP_DDC_ENABLE else null
                 loadVdcByName(device, enableParam)
             }
         }
@@ -1001,7 +853,7 @@ class MainViewModel @Inject constructor(
 
     fun setVseEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "VSE: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(vseEnabled = enabled) }
+        _uiState.update { it.copy(vse = it.vse.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "${ViperParams.PARAM_HP_SPECTRUM_EXTENSION_ENABLE}",
@@ -1009,7 +861,7 @@ class MainViewModel @Inject constructor(
             )
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
@@ -1018,11 +870,11 @@ class MainViewModel @Inject constructor(
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_SPECTRUM_EXTENSION_BARK,
-                        intArrayOf(EffectDispatcher.VSE_BARK_VALUES.getOrElse(s.vseStrength) { 7600 })
+                        intArrayOf(EffectDispatcher.VSE_BARK_VALUES.getOrElse(state.vse.strength) { 7600 })
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_SPECTRUM_EXTENSION_BARK_RECONSTRUCT,
-                        intArrayOf((s.vseExciter * 5.6).toInt())
+                        intArrayOf((state.vse.exciter * 5.6).toInt())
                     )
                 )
             )
@@ -1030,7 +882,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setVseStrength(value: Int) {
-        _uiState.update { it.copy(vseStrength = value) }
+        _uiState.update { it.copy(vse = it.vse.copy(strength = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_SPECTRUM_EXTENSION_BARK}",
@@ -1043,7 +895,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setVseExciter(value: Int) {
-        _uiState.update { it.copy(vseExciter = value) }
+        _uiState.update { it.copy(vse = it.vse.copy(exciter = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_SPECTRUM_EXTENSION_BARK_RECONSTRUCT}",
@@ -1058,7 +910,7 @@ class MainViewModel @Inject constructor(
 
     fun setEqEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "EQ: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(eqEnabled = enabled) }
+        _uiState.update { it.copy(eq = it.eq.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_HP_EQ_ENABLE}", enabled)
         }
@@ -1073,12 +925,18 @@ class MainViewModel @Inject constructor(
 
     fun setEqPreset(presetId: Long) {
         val state = _uiState.value
-        val preset = state.eqPresets.find { it.id == presetId } ?: return
+        val preset = state.eq.presets.find { it.id == presetId } ?: return
         val bands = preset.bands
-        val bandCount = state.eqBandCount
-        _uiState.update { s ->
-            val updatedMap = s.eqBandsMap.toMutableMap().apply { put(bandCount, bands) }
-            s.copy(eqPresetId = presetId, eqBands = bands, eqBandsMap = updatedMap)
+        val bandCount = state.eq.bandCount
+        _uiState.update { state ->
+            val updatedMap = state.eq.bandsMap.toMutableMap().apply { put(bandCount, bands) }
+            state.copy(
+                eq = state.eq.copy(
+                    presetId = presetId,
+                    bands = bands,
+                    bandsMap = updatedMap
+                )
+            )
         }
         viewModelScope.launch {
             repository.setIntPreference(ViperRepository.PREF_EQ_PRESET_ID, presetId.toInt())
@@ -1089,10 +947,10 @@ class MainViewModel @Inject constructor(
     }
 
     fun setEqBands(bands: String) {
-        val bandCount = _uiState.value.eqBandCount
+        val bandCount = _uiState.value.eq.bandCount
         _uiState.update { state ->
-            val updatedMap = state.eqBandsMap.toMutableMap().apply { put(bandCount, bands) }
-            state.copy(eqBands = bands, eqBandsMap = updatedMap)
+            val updatedMap = state.eq.bandsMap.toMutableMap().apply { put(bandCount, bands) }
+            state.copy(eq = state.eq.copy(bands = bands, bandsMap = updatedMap))
         }
         viewModelScope.launch {
             repository.setStringPreference("${ViperParams.PARAM_HP_EQ_BAND_LEVEL}", bands)
@@ -1103,26 +961,28 @@ class MainViewModel @Inject constructor(
 
     fun setEqBandCount(count: Int) {
         val currentState = _uiState.value
-        val oldCount = currentState.eqBandCount
+        val oldCount = currentState.eq.bandCount
         FileLogger.d("ViewModel", "EQ band count: $oldCount -> $count")
-        val updatedMap = currentState.eqBandsMap.toMutableMap().apply {
-            put(oldCount, currentState.eqBands)
+        val updatedMap = currentState.eq.bandsMap.toMutableMap().apply {
+            put(oldCount, currentState.eq.bands)
         }
         val defaultBands =
             List(count) { 0f }.joinToString(";") { String.format(Locale.US, "%.1f", it) } + ";"
         val bands = updatedMap[count] ?: defaultBands
         _uiState.update {
             it.copy(
-                eqBandCount = count,
-                eqBands = bands,
-                eqPresetId = null,
-                eqBandsMap = updatedMap
+                eq = it.eq.copy(
+                    bandCount = count,
+                    bands = bands,
+                    presetId = null,
+                    bandsMap = updatedMap
+                )
             )
         }
         viewModelScope.launch {
             repository.setIntPreference("${ViperParams.PARAM_HP_EQ_BAND_COUNT}", count)
             repository.setStringPreference("${ViperParams.PARAM_HP_EQ_BAND_LEVEL}", bands)
-            repository.setStringPreference("eq_bands_$oldCount", currentState.eqBands)
+            repository.setStringPreference("eq_bands_$oldCount", currentState.eq.bands)
             repository.setStringPreference("eq_bands_$count", bands)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
@@ -1138,10 +998,10 @@ class MainViewModel @Inject constructor(
 
     fun addEqPreset(name: String) {
         val state = _uiState.value
-        val preset = EqPreset(name = name, bandCount = state.eqBandCount, bands = state.eqBands)
+        val preset = EqPreset(name = name, bandCount = state.eq.bandCount, bands = state.eq.bands)
         viewModelScope.launch {
             val id = repository.saveEqPreset(preset)
-            _uiState.update { it.copy(eqPresetId = id) }
+            _uiState.update { it.copy(eq = it.eq.copy(presetId = id)) }
             repository.setIntPreference(ViperRepository.PREF_EQ_PRESET_ID, id.toInt())
         }
     }
@@ -1149,32 +1009,32 @@ class MainViewModel @Inject constructor(
     fun deleteEqPreset(presetId: Long) {
         viewModelScope.launch {
             repository.deleteEqPresetById(presetId)
-            if (_uiState.value.eqPresetId == presetId) {
-                _uiState.update { it.copy(eqPresetId = null) }
+            if (_uiState.value.eq.presetId == presetId) {
+                _uiState.update { it.copy(eq = it.eq.copy(presetId = null)) }
                 repository.setIntPreference(ViperRepository.PREF_EQ_PRESET_ID, -1)
             }
         }
     }
 
     fun resetEqBands() {
-        val bandCount = _uiState.value.eqBandCount
+        val bandCount = _uiState.value.eq.bandCount
         val flatBands =
             List(bandCount) { 0f }.joinToString(";") { String.format(Locale.US, "%.1f", it) } + ";"
         setEqBands(flatBands)
-        _uiState.update { it.copy(eqPresetId = null) }
+        _uiState.update { it.copy(eq = it.eq.copy(presetId = null)) }
         viewModelScope.launch { repository.setIntPreference(ViperRepository.PREF_EQ_PRESET_ID, -1) }
     }
 
     fun setConvolverEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "Convolver: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(convolverEnabled = enabled) }
+        _uiState.update { it.copy(convolver = it.convolver.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "${ViperParams.PARAM_HP_CONVOLVER_ENABLE}",
                 enabled
             )
         }
-        val kernel = _uiState.value.convolverKernel
+        val kernel = _uiState.value.convolver.kernel
         val effectiveEnabled = enabled && kernel.isNotEmpty()
         if (effectiveEnabled && activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
             loadKernelByName(kernel, ViperParams.PARAM_HP_CONVOLVER_ENABLE)
@@ -1185,7 +1045,7 @@ class MainViewModel @Inject constructor(
 
     fun setConvolverKernel(kernel: String) {
         FileLogger.i("ViewModel", "Convolver kernel selected: $kernel")
-        _uiState.update { it.copy(convolverKernel = kernel) }
+        _uiState.update { it.copy(convolver = it.convolver.copy(kernel = kernel)) }
         viewModelScope.launch {
             repository.setStringPreference(
                 "${ViperParams.PARAM_HP_CONVOLVER_SET_KERNEL}",
@@ -1197,14 +1057,14 @@ class MainViewModel @Inject constructor(
                 dispatchInt(ViperParams.PARAM_HP_CONVOLVER_ENABLE, 0)
             } else {
                 val enableParam =
-                    if (_uiState.value.convolverEnabled) ViperParams.PARAM_HP_CONVOLVER_ENABLE else null
+                    if (_uiState.value.convolver.enabled) ViperParams.PARAM_HP_CONVOLVER_ENABLE else null
                 loadKernelByName(kernel, enableParam)
             }
         }
     }
 
     fun setConvolverCrossChannel(value: Int) {
-        _uiState.update { it.copy(convolverCrossChannel = value) }
+        _uiState.update { it.copy(convolver = it.convolver.copy(crossChannel = value)) }
         saveAndDispatchInt(
             "${ViperParams.PARAM_HP_CONVOLVER_CROSS_CHANNEL}",
             ViperParams.PARAM_HP_CONVOLVER_CROSS_CHANNEL,
@@ -1214,7 +1074,7 @@ class MainViewModel @Inject constructor(
 
     fun setFieldSurroundEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "Field Surround: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(fieldSurroundEnabled = enabled) }
+        _uiState.update { it.copy(fieldSurround = it.fieldSurround.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "${ViperParams.PARAM_HP_FIELD_SURROUND_ENABLE}",
@@ -1222,7 +1082,7 @@ class MainViewModel @Inject constructor(
             )
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
@@ -1231,15 +1091,15 @@ class MainViewModel @Inject constructor(
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FIELD_SURROUND_WIDENING,
-                        intArrayOf(EffectDispatcher.FIELD_SURROUND_WIDENING_VALUES.getOrElse(s.fieldSurroundWidening) { 0 })
+                        intArrayOf(EffectDispatcher.FIELD_SURROUND_WIDENING_VALUES.getOrElse(state.fieldSurround.widening) { 0 })
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FIELD_SURROUND_MID_IMAGE,
-                        intArrayOf(s.fieldSurroundMidImage * 10 + 100)
+                        intArrayOf(state.fieldSurround.midImage * 10 + 100)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_FIELD_SURROUND_DEPTH,
-                        intArrayOf(s.fieldSurroundDepth * 75 + 200)
+                        intArrayOf(state.fieldSurround.depth * 75 + 200)
                     )
                 )
             )
@@ -1247,7 +1107,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setFieldSurroundWidening(value: Int) {
-        _uiState.update { it.copy(fieldSurroundWidening = value) }
+        _uiState.update { it.copy(fieldSurround = it.fieldSurround.copy(widening = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_FIELD_SURROUND_WIDENING}",
@@ -1260,7 +1120,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setFieldSurroundMidImage(value: Int) {
-        _uiState.update { it.copy(fieldSurroundMidImage = value) }
+        _uiState.update { it.copy(fieldSurround = it.fieldSurround.copy(midImage = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_FIELD_SURROUND_MID_IMAGE}",
@@ -1271,7 +1131,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setFieldSurroundDepth(value: Int) {
-        _uiState.update { it.copy(fieldSurroundDepth = value) }
+        _uiState.update { it.copy(fieldSurround = it.fieldSurround.copy(depth = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_FIELD_SURROUND_DEPTH}",
@@ -1283,12 +1143,12 @@ class MainViewModel @Inject constructor(
 
     fun setDiffSurroundEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "Diff Surround: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(diffSurroundEnabled = enabled) }
+        _uiState.update { it.copy(diffSurround = it.diffSurround.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_HP_DIFF_SURROUND_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
@@ -1297,11 +1157,11 @@ class MainViewModel @Inject constructor(
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_DIFF_SURROUND_DELAY,
-                        intArrayOf(EffectDispatcher.DIFF_SURROUND_DELAY_VALUES.getOrElse(s.diffSurroundDelay) { 500 })
+                        intArrayOf(EffectDispatcher.DIFF_SURROUND_DELAY_VALUES.getOrElse(state.diffSurround.delay) { 500 })
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_DIFF_SURROUND_REVERSE,
-                        intArrayOf(if (s.diffSurroundReverse) 1 else 0)
+                        intArrayOf(if (state.diffSurround.reverse) 1 else 0)
                     )
                 )
             )
@@ -1309,7 +1169,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setDiffSurroundDelay(value: Int) {
-        _uiState.update { it.copy(diffSurroundDelay = value) }
+        _uiState.update { it.copy(diffSurround = it.diffSurround.copy(delay = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_DIFF_SURROUND_DELAY}",
@@ -1322,7 +1182,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setDiffSurroundReverse(reverse: Boolean) {
-        _uiState.update { it.copy(diffSurroundReverse = reverse) }
+        _uiState.update { it.copy(diffSurround = it.diffSurround.copy(reverse = reverse)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "${ViperParams.PARAM_HP_DIFF_SURROUND_REVERSE}",
@@ -1334,7 +1194,7 @@ class MainViewModel @Inject constructor(
 
     fun setVheEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "VHE: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(vheEnabled = enabled) }
+        _uiState.update { it.copy(vhe = it.vhe.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "${ViperParams.PARAM_HP_HEADPHONE_SURROUND_ENABLE}",
@@ -1342,7 +1202,7 @@ class MainViewModel @Inject constructor(
             )
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
@@ -1351,7 +1211,7 @@ class MainViewModel @Inject constructor(
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_HEADPHONE_SURROUND_STRENGTH,
-                        intArrayOf(s.vheQuality)
+                        intArrayOf(state.vhe.quality)
                     )
                 )
             )
@@ -1359,7 +1219,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setVheQuality(value: Int) {
-        _uiState.update { it.copy(vheQuality = value) }
+        _uiState.update { it.copy(vhe = it.vhe.copy(quality = value)) }
         saveAndDispatchInt(
             "${ViperParams.PARAM_HP_HEADPHONE_SURROUND_STRENGTH}",
             ViperParams.PARAM_HP_HEADPHONE_SURROUND_STRENGTH,
@@ -1369,12 +1229,12 @@ class MainViewModel @Inject constructor(
 
     fun setReverbEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "Reverb: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(reverbEnabled = enabled) }
+        _uiState.update { it.copy(reverb = it.reverb.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_HP_REVERB_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
@@ -1383,73 +1243,85 @@ class MainViewModel @Inject constructor(
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_REVERB_ROOM_SIZE,
-                        intArrayOf(s.reverbRoomSize * 10)
+                        intArrayOf(state.reverb.roomSize * 10)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_REVERB_ROOM_WIDTH,
-                        intArrayOf(s.reverbWidth * 10)
+                        intArrayOf(state.reverb.width * 10)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_REVERB_ROOM_DAMPENING,
-                        intArrayOf(s.reverbDampening)
+                        intArrayOf(state.reverb.dampening)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_REVERB_ROOM_WET_SIGNAL,
-                        intArrayOf(s.reverbWet)
+                        intArrayOf(state.reverb.wet)
                     ),
-                    ParamEntry(ViperParams.PARAM_HP_REVERB_ROOM_DRY_SIGNAL, intArrayOf(s.reverbDry))
+                    ParamEntry(
+                        ViperParams.PARAM_HP_REVERB_ROOM_DRY_SIGNAL,
+                        intArrayOf(state.reverb.dry)
+                    )
                 )
             )
         }
     }
 
-    fun setReverbRoomSize(v: Int) {
-        _uiState.update { it.copy(reverbRoomSize = v) }; viewModelScope.launch {
+    fun setReverbRoomSize(value: Int) {
+        _uiState.update { it.copy(reverb = it.reverb.copy(roomSize = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_REVERB_ROOM_SIZE}",
-                v
+                value
             )
-        }; hpDispatchInt(ViperParams.PARAM_HP_REVERB_ROOM_SIZE, v * 10)
+        }
+        hpDispatchInt(ViperParams.PARAM_HP_REVERB_ROOM_SIZE, value * 10)
     }
 
-    fun setReverbWidth(v: Int) {
-        _uiState.update { it.copy(reverbWidth = v) }; viewModelScope.launch {
+    fun setReverbWidth(value: Int) {
+        _uiState.update { it.copy(reverb = it.reverb.copy(width = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_REVERB_ROOM_WIDTH}",
-                v
+                value
             )
-        }; hpDispatchInt(ViperParams.PARAM_HP_REVERB_ROOM_WIDTH, v * 10)
+        }
+        hpDispatchInt(ViperParams.PARAM_HP_REVERB_ROOM_WIDTH, value * 10)
     }
 
-    fun setReverbDampening(v: Int) {
-        _uiState.update { it.copy(reverbDampening = v) }; viewModelScope.launch {
+    fun setReverbDampening(value: Int) {
+        _uiState.update { it.copy(reverb = it.reverb.copy(dampening = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_REVERB_ROOM_DAMPENING}",
-                v
+                value
             )
-        }; hpDispatchInt(ViperParams.PARAM_HP_REVERB_ROOM_DAMPENING, v)
+        }
+        hpDispatchInt(ViperParams.PARAM_HP_REVERB_ROOM_DAMPENING, value)
     }
 
-    fun setReverbWet(v: Int) {
-        _uiState.update { it.copy(reverbWet = v) }; viewModelScope.launch {
+    fun setReverbWet(value: Int) {
+        _uiState.update { it.copy(reverb = it.reverb.copy(wet = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_REVERB_ROOM_WET_SIGNAL}",
-                v
+                value
             )
-        }; hpDispatchInt(ViperParams.PARAM_HP_REVERB_ROOM_WET_SIGNAL, v)
+        }
+        hpDispatchInt(ViperParams.PARAM_HP_REVERB_ROOM_WET_SIGNAL, value)
     }
 
-    fun setReverbDry(v: Int) {
-        _uiState.update { it.copy(reverbDry = v) }; saveAndDispatchInt(
+    fun setReverbDry(value: Int) {
+        _uiState.update { it.copy(reverb = it.reverb.copy(dry = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_REVERB_ROOM_DRY_SIGNAL}",
             ViperParams.PARAM_HP_REVERB_ROOM_DRY_SIGNAL,
-            v
+            value
         )
     }
 
     fun setDynamicSystemEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "Dynamic System: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(dynamicSystemEnabled = enabled) }
+        _uiState.update { it.copy(dynamicSystem = it.dynamicSystem.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_ENABLE}",
@@ -1460,7 +1332,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setDynamicSystemStrength(value: Int) {
-        _uiState.update { it.copy(dynamicSystemStrength = value) }
+        _uiState.update { it.copy(dynamicSystem = it.dynamicSystem.copy(strength = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_STRENGTH}",
@@ -1472,41 +1344,46 @@ class MainViewModel @Inject constructor(
 
     private fun hpDispatchDynamicSystem() {
         if (activeDeviceType != ViperParams.FX_TYPE_HEADPHONE) return
-        val s = _uiState.value
+        val state = _uiState.value
         viperService?.dispatchParamsBatch(
             listOf(
                 ParamEntry(
                     ViperParams.PARAM_HP_DYNAMIC_SYSTEM_ENABLE,
-                    intArrayOf(if (s.dynamicSystemEnabled) 1 else 0)
+                    intArrayOf(if (state.dynamicSystem.enabled) 1 else 0)
                 ),
                 ParamEntry(
                     ViperParams.PARAM_HP_DYNAMIC_SYSTEM_STRENGTH,
-                    intArrayOf(s.dynamicSystemStrength * 20 + 100)
+                    intArrayOf(state.dynamicSystem.strength * 20 + 100)
                 ),
                 ParamEntry(
                     ViperParams.PARAM_HP_DYNAMIC_SYSTEM_X_COEFFICIENTS,
-                    intArrayOf(s.dsXLow, s.dsXHigh)
+                    intArrayOf(state.dynamicSystem.xLow, state.dynamicSystem.xHigh)
                 ),
                 ParamEntry(
                     ViperParams.PARAM_HP_DYNAMIC_SYSTEM_Y_COEFFICIENTS,
-                    intArrayOf(s.dsYLow, s.dsYHigh)
+                    intArrayOf(state.dynamicSystem.yLow, state.dynamicSystem.yHigh)
                 ),
                 ParamEntry(
                     ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN,
-                    intArrayOf(s.dsSideGainLow, s.dsSideGainHigh)
+                    intArrayOf(state.dynamicSystem.sideGainLow, state.dynamicSystem.sideGainHigh)
                 )
             )
         )
     }
 
-    fun setDsPreset(presetId: Long) {
-        val preset = _uiState.value.dsPresets.find { it.id == presetId } ?: return
+    fun setDynamicSystemPreset(presetId: Long) {
+        val preset = _uiState.value.dynamicSystem.presets.find { it.id == presetId } ?: return
         _uiState.update {
             it.copy(
-                dsPresetId = presetId,
-                dsXLow = preset.xLow, dsXHigh = preset.xHigh,
-                dsYLow = preset.yLow, dsYHigh = preset.yHigh,
-                dsSideGainLow = preset.sideGainLow, dsSideGainHigh = preset.sideGainHigh
+                dynamicSystem = it.dynamicSystem.copy(
+                    presetId = presetId,
+                    xLow = preset.xLow,
+                    xHigh = preset.xHigh,
+                    yLow = preset.yLow,
+                    yHigh = preset.yHigh,
+                    sideGainLow = preset.sideGainLow,
+                    sideGainHigh = preset.sideGainHigh
+                )
             )
         }
         viewModelScope.launch {
@@ -1542,104 +1419,157 @@ class MainViewModel @Inject constructor(
         hpDispatchDynamicSystem()
     }
 
-    fun setDsXLow(v: Int) {
-        _uiState.update { it.copy(dsXLow = v, dsPresetId = null) }
+    fun setDynamicSystemXLow(value: Int) {
+        _uiState.update {
+            it.copy(
+                dynamicSystem = it.dynamicSystem.copy(
+                    xLow = value,
+                    presetId = null
+                )
+            )
+        }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_X_COEFFICIENTS}_low",
-                v
+                value
             )
             repository.setIntPreference(ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID, -1)
         }
         hpDispatchDynamicSystem()
     }
 
-    fun setDsXHigh(v: Int) {
-        _uiState.update { it.copy(dsXHigh = v, dsPresetId = null) }
+    fun setDynamicSystemXHigh(value: Int) {
+        _uiState.update {
+            it.copy(
+                dynamicSystem = it.dynamicSystem.copy(
+                    xHigh = value,
+                    presetId = null
+                )
+            )
+        }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_X_COEFFICIENTS}_high",
-                v
+                value
             )
             repository.setIntPreference(ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID, -1)
         }
         hpDispatchDynamicSystem()
     }
 
-    fun setDsYLow(v: Int) {
-        _uiState.update { it.copy(dsYLow = v, dsPresetId = null) }
+    fun setDynamicSystemYLow(value: Int) {
+        _uiState.update {
+            it.copy(
+                dynamicSystem = it.dynamicSystem.copy(
+                    yLow = value,
+                    presetId = null
+                )
+            )
+        }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_Y_COEFFICIENTS}_low",
-                v
+                value
             )
             repository.setIntPreference(ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID, -1)
         }
         hpDispatchDynamicSystem()
     }
 
-    fun setDsYHigh(v: Int) {
-        _uiState.update { it.copy(dsYHigh = v, dsPresetId = null) }
+    fun setDynamicSystemYHigh(value: Int) {
+        _uiState.update {
+            it.copy(
+                dynamicSystem = it.dynamicSystem.copy(
+                    yHigh = value,
+                    presetId = null
+                )
+            )
+        }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_Y_COEFFICIENTS}_high",
-                v
+                value
             )
             repository.setIntPreference(ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID, -1)
         }
         hpDispatchDynamicSystem()
     }
 
-    fun setDsSideGainLow(v: Int) {
-        _uiState.update { it.copy(dsSideGainLow = v, dsPresetId = null) }
+    fun setDynamicSystemSideGainLow(value: Int) {
+        _uiState.update {
+            it.copy(
+                dynamicSystem = it.dynamicSystem.copy(
+                    sideGainLow = value,
+                    presetId = null
+                )
+            )
+        }
         viewModelScope.launch {
-            repository.setIntPreference("${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN}_low", v)
+            repository.setIntPreference(
+                "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN}_low",
+                value
+            )
             repository.setIntPreference(ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID, -1)
         }
         hpDispatchDynamicSystem()
     }
 
-    fun setDsSideGainHigh(v: Int) {
-        _uiState.update { it.copy(dsSideGainHigh = v, dsPresetId = null) }
+    fun setDynamicSystemSideGainHigh(value: Int) {
+        _uiState.update {
+            it.copy(
+                dynamicSystem = it.dynamicSystem.copy(
+                    sideGainHigh = value,
+                    presetId = null
+                )
+            )
+        }
         viewModelScope.launch {
-            repository.setIntPreference("${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN}_high", v)
+            repository.setIntPreference(
+                "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN}_high",
+                value
+            )
             repository.setIntPreference(ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID, -1)
         }
         hpDispatchDynamicSystem()
     }
 
-    fun addDsPreset(name: String) {
-        val s = _uiState.value
+    fun addDynamicSystemPreset(name: String) {
+        val state = _uiState.value
         val preset = DsPreset(
             name = name,
-            xLow = s.dsXLow, xHigh = s.dsXHigh,
-            yLow = s.dsYLow, yHigh = s.dsYHigh,
-            sideGainLow = s.dsSideGainLow, sideGainHigh = s.dsSideGainHigh
+            xLow = state.dynamicSystem.xLow,
+            xHigh = state.dynamicSystem.xHigh,
+            yLow = state.dynamicSystem.yLow,
+            yHigh = state.dynamicSystem.yHigh,
+            sideGainLow = state.dynamicSystem.sideGainLow,
+            sideGainHigh = state.dynamicSystem.sideGainHigh
         )
         viewModelScope.launch {
             val id = repository.saveDsPreset(preset)
-            _uiState.update { it.copy(dsPresetId = id) }
+            _uiState.update { it.copy(dynamicSystem = it.dynamicSystem.copy(presetId = id)) }
             repository.setIntPreference(ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID, id.toInt())
         }
     }
 
-    fun deleteDsPreset(presetId: Long) {
+    fun deleteDynamicSystemPreset(presetId: Long) {
         viewModelScope.launch {
             repository.deleteDsPresetById(presetId)
-            if (_uiState.value.dsPresetId == presetId) {
-                _uiState.update { it.copy(dsPresetId = null) }
+            if (_uiState.value.dynamicSystem.presetId == presetId) {
+                _uiState.update { it.copy(dynamicSystem = it.dynamicSystem.copy(presetId = null)) }
                 repository.setIntPreference(ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID, -1)
             }
         }
     }
 
-    fun resetDsCoefficients() {
+    fun resetDynamicSystemCoefficients() {
         _uiState.update {
             it.copy(
-                dsXLow = 100, dsXHigh = 5600,
-                dsYLow = 40, dsYHigh = 80,
-                dsSideGainLow = 50, dsSideGainHigh = 50,
-                dsPresetId = null
+                dynamicSystem = it.dynamicSystem.copy(
+                    xLow = 100, xHigh = 5600,
+                    yLow = 40, yHigh = 80,
+                    sideGainLow = 50, sideGainHigh = 50,
+                    presetId = null
+                )
             )
         }
         viewModelScope.launch {
@@ -1653,7 +1583,7 @@ class MainViewModel @Inject constructor(
 
     fun setTubeSimulatorEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "Tube Simulator: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(tubeSimulatorEnabled = enabled) }
+        _uiState.update { it.copy(tube = it.tube.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "${ViperParams.PARAM_HP_TUBE_SIMULATOR_ENABLE}",
@@ -1674,24 +1604,27 @@ class MainViewModel @Inject constructor(
 
     fun setBassEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "Bass: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(bassEnabled = enabled) }
+        _uiState.update { it.copy(bass = it.bass.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_HP_BASS_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(ViperParams.PARAM_HP_BASS_ENABLE, intArrayOf(if (enabled) 1 else 0)),
-                    ParamEntry(ViperParams.PARAM_HP_BASS_MODE, intArrayOf(s.bassMode)),
+                    ParamEntry(ViperParams.PARAM_HP_BASS_MODE, intArrayOf(state.bass.mode)),
                     ParamEntry(
                         ViperParams.PARAM_HP_BASS_FREQUENCY,
-                        intArrayOf(s.bassFrequency + 15)
+                        intArrayOf(state.bass.frequency + 15)
                     ),
-                    ParamEntry(ViperParams.PARAM_HP_BASS_GAIN, intArrayOf(s.bassGain * 50 + 50)),
+                    ParamEntry(
+                        ViperParams.PARAM_HP_BASS_GAIN,
+                        intArrayOf(state.bass.gain * 50 + 50)
+                    ),
                     ParamEntry(
                         ViperParams.PARAM_HP_BASS_ANTI_POP,
-                        intArrayOf(if (s.bassAntiPop) 1 else 0)
+                        intArrayOf(if (state.bass.antiPop) 1 else 0)
                     )
                 )
             )
@@ -1699,33 +1632,35 @@ class MainViewModel @Inject constructor(
     }
 
     fun setBassMode(mode: Int) {
-        _uiState.update { it.copy(bassMode = mode) }; saveAndDispatchInt(
+        _uiState.update { it.copy(bass = it.bass.copy(mode = mode)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_BASS_MODE}",
             ViperParams.PARAM_HP_BASS_MODE,
             mode
         )
     }
 
-    fun setBassFrequency(v: Int) {
-        _uiState.update { it.copy(bassFrequency = v) }; viewModelScope.launch {
+    fun setBassFrequency(value: Int) {
+        _uiState.update { it.copy(bass = it.bass.copy(frequency = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_HP_BASS_FREQUENCY}",
-                v
+                value
             )
-        }; hpDispatchInt(ViperParams.PARAM_HP_BASS_FREQUENCY, v + 15)
+        }
+        hpDispatchInt(ViperParams.PARAM_HP_BASS_FREQUENCY, value + 15)
     }
 
-    fun setBassGain(v: Int) {
-        _uiState.update { it.copy(bassGain = v) }; viewModelScope.launch {
-            repository.setIntPreference(
-                "${ViperParams.PARAM_HP_BASS_GAIN}",
-                v
-            )
-        }; hpDispatchInt(ViperParams.PARAM_HP_BASS_GAIN, v * 50 + 50)
+    fun setBassGain(value: Int) {
+        _uiState.update { it.copy(bass = it.bass.copy(gain = value)) }
+        viewModelScope.launch {
+            repository.setIntPreference("${ViperParams.PARAM_HP_BASS_GAIN}", value)
+        }
+        hpDispatchInt(ViperParams.PARAM_HP_BASS_GAIN, value * 50 + 50)
     }
 
     fun setBassAntiPop(enabled: Boolean) {
-        _uiState.update { it.copy(bassAntiPop = enabled) }
+        _uiState.update { it.copy(bass = it.bass.copy(antiPop = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_HP_BASS_ANTI_POP}", enabled)
         }
@@ -1734,30 +1669,33 @@ class MainViewModel @Inject constructor(
 
     fun setBassMonoEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "Bass Mono: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(bassMonoEnabled = enabled) }
+        _uiState.update { it.copy(bassMono = it.bassMono.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_HP_BASS_MONO_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
                         ViperParams.PARAM_HP_BASS_MONO_ENABLE,
                         intArrayOf(if (enabled) 1 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_HP_BASS_MONO_MODE, intArrayOf(s.bassMonoMode)),
+                    ParamEntry(
+                        ViperParams.PARAM_HP_BASS_MONO_MODE,
+                        intArrayOf(state.bassMono.mode)
+                    ),
                     ParamEntry(
                         ViperParams.PARAM_HP_BASS_MONO_FREQUENCY,
-                        intArrayOf(s.bassMonoFrequency + 15)
+                        intArrayOf(state.bassMono.frequency + 15)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_BASS_MONO_GAIN,
-                        intArrayOf(s.bassMonoGain * 50 + 50)
+                        intArrayOf(state.bassMono.gain * 50 + 50)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_HP_BASS_MONO_ANTI_POP,
-                        intArrayOf(if (s.bassMonoAntiPop) 1 else 0)
+                        intArrayOf(if (state.bassMono.antiPop) 1 else 0)
                     )
                 )
             )
@@ -1765,33 +1703,32 @@ class MainViewModel @Inject constructor(
     }
 
     fun setBassMonoMode(mode: Int) {
-        _uiState.update { it.copy(bassMonoMode = mode) }; saveAndDispatchInt(
+        _uiState.update { it.copy(bassMono = it.bassMono.copy(mode = mode)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_BASS_MONO_MODE}",
             ViperParams.PARAM_HP_BASS_MONO_MODE,
             mode
         )
     }
 
-    fun setBassMonoFrequency(v: Int) {
-        _uiState.update { it.copy(bassMonoFrequency = v) }; viewModelScope.launch {
-            repository.setIntPreference(
-                "${ViperParams.PARAM_HP_BASS_MONO_FREQUENCY}",
-                v
-            )
-        }; hpDispatchInt(ViperParams.PARAM_HP_BASS_MONO_FREQUENCY, v + 15)
+    fun setBassMonoFrequency(value: Int) {
+        _uiState.update { it.copy(bassMono = it.bassMono.copy(frequency = value)) }
+        viewModelScope.launch {
+            repository.setIntPreference("${ViperParams.PARAM_HP_BASS_MONO_FREQUENCY}", value)
+        }
+        hpDispatchInt(ViperParams.PARAM_HP_BASS_MONO_FREQUENCY, value + 15)
     }
 
-    fun setBassMonoGain(v: Int) {
-        _uiState.update { it.copy(bassMonoGain = v) }; viewModelScope.launch {
-            repository.setIntPreference(
-                "${ViperParams.PARAM_HP_BASS_MONO_GAIN}",
-                v
-            )
-        }; hpDispatchInt(ViperParams.PARAM_HP_BASS_MONO_GAIN, v * 50 + 50)
+    fun setBassMonoGain(value: Int) {
+        _uiState.update { it.copy(bassMono = it.bassMono.copy(gain = value)) }
+        viewModelScope.launch {
+            repository.setIntPreference("${ViperParams.PARAM_HP_BASS_MONO_GAIN}", value)
+        }
+        hpDispatchInt(ViperParams.PARAM_HP_BASS_MONO_GAIN, value * 50 + 50)
     }
 
     fun setBassMonoAntiPop(enabled: Boolean) {
-        _uiState.update { it.copy(bassMonoAntiPop = enabled) }
+        _uiState.update { it.copy(bassMono = it.bassMono.copy(antiPop = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_HP_BASS_MONO_ANTI_POP}", enabled)
         }
@@ -1800,89 +1737,94 @@ class MainViewModel @Inject constructor(
 
     fun setClarityEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "Clarity: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(clarityEnabled = enabled) }
+        _uiState.update { it.copy(clarity = it.clarity.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_HP_CLARITY_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
                         ViperParams.PARAM_HP_CLARITY_ENABLE,
                         intArrayOf(if (enabled) 1 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_HP_CLARITY_MODE, intArrayOf(s.clarityMode)),
-                    ParamEntry(ViperParams.PARAM_HP_CLARITY_GAIN, intArrayOf(s.clarityGain * 50))
+                    ParamEntry(ViperParams.PARAM_HP_CLARITY_MODE, intArrayOf(state.clarity.mode)),
+                    ParamEntry(
+                        ViperParams.PARAM_HP_CLARITY_GAIN,
+                        intArrayOf(state.clarity.gain * 50)
+                    )
                 )
             )
         }
     }
 
     fun setClarityMode(mode: Int) {
-        _uiState.update { it.copy(clarityMode = mode) }; saveAndDispatchInt(
+        _uiState.update { it.copy(clarity = it.clarity.copy(mode = mode)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_CLARITY_MODE}",
             ViperParams.PARAM_HP_CLARITY_MODE,
             mode
         )
     }
 
-    fun setClarityGain(v: Int) {
-        _uiState.update { it.copy(clarityGain = v) }; viewModelScope.launch {
-            repository.setIntPreference(
-                "${ViperParams.PARAM_HP_CLARITY_GAIN}",
-                v
-            )
-        }; hpDispatchInt(ViperParams.PARAM_HP_CLARITY_GAIN, v * 50)
+    fun setClarityGain(value: Int) {
+        _uiState.update { it.copy(clarity = it.clarity.copy(gain = value)) }
+        viewModelScope.launch {
+            repository.setIntPreference("${ViperParams.PARAM_HP_CLARITY_GAIN}", value)
+        }
+        hpDispatchInt(ViperParams.PARAM_HP_CLARITY_GAIN, value * 50)
     }
 
     fun setCureEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "Cure: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(cureEnabled = enabled) }
+        _uiState.update { it.copy(cure = it.cure.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_HP_CURE_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(ViperParams.PARAM_HP_CURE_ENABLE, intArrayOf(if (enabled) 1 else 0)),
-                    ParamEntry(ViperParams.PARAM_HP_CURE_STRENGTH, intArrayOf(s.cureStrength))
+                    ParamEntry(ViperParams.PARAM_HP_CURE_STRENGTH, intArrayOf(state.cure.strength))
                 )
             )
         }
     }
 
-    fun setCureStrength(v: Int) {
-        _uiState.update { it.copy(cureStrength = v) }; saveAndDispatchInt(
+    fun setCureStrength(value: Int) {
+        _uiState.update { it.copy(cure = it.cure.copy(strength = value)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_CURE_STRENGTH}",
             ViperParams.PARAM_HP_CURE_STRENGTH,
-            v
+            value
         )
     }
 
     fun setAnalogxEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "AnalogX: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(analogxEnabled = enabled) }
+        _uiState.update { it.copy(analog = it.analog.copy(enabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_HP_ANALOGX_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_HEADPHONE) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
                         ViperParams.PARAM_HP_ANALOGX_ENABLE,
                         intArrayOf(if (enabled) 1 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_HP_ANALOGX_MODE, intArrayOf(s.analogxMode))
+                    ParamEntry(ViperParams.PARAM_HP_ANALOGX_MODE, intArrayOf(state.analog.mode))
                 )
             )
         }
     }
 
     fun setAnalogxMode(mode: Int) {
-        _uiState.update { it.copy(analogxMode = mode) }; saveAndDispatchInt(
+        _uiState.update { it.copy(analog = it.analog.copy(mode = mode)) }
+        saveAndDispatchInt(
             "${ViperParams.PARAM_HP_ANALOGX_MODE}",
             ViperParams.PARAM_HP_ANALOGX_MODE,
             mode
@@ -1903,14 +1845,14 @@ class MainViewModel @Inject constructor(
 
     fun setSpkConvolverEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] Convolver: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkConvolverEnabled = enabled) }
+        _uiState.update { it.copy(convolver = it.convolver.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "${ViperParams.PARAM_SPK_CONVOLVER_ENABLE}",
                 enabled
             )
         }
-        val kernel = _uiState.value.spkConvolverKernel
+        val kernel = _uiState.value.convolver.spkKernel
         val effectiveEnabled = enabled && kernel.isNotEmpty()
         if (effectiveEnabled && activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
             loadKernelByName(kernel, ViperParams.PARAM_SPK_CONVOLVER_ENABLE)
@@ -1921,7 +1863,7 @@ class MainViewModel @Inject constructor(
 
     fun setSpkConvolverKernel(kernel: String) {
         FileLogger.i("ViewModel", "[Spk] Convolver kernel selected: $kernel")
-        _uiState.update { it.copy(spkConvolverKernel = kernel) }
+        _uiState.update { it.copy(convolver = it.convolver.copy(spkKernel = kernel)) }
         viewModelScope.launch {
             repository.setStringPreference(
                 "spk_${ViperParams.PARAM_HP_CONVOLVER_SET_KERNEL}",
@@ -1933,14 +1875,14 @@ class MainViewModel @Inject constructor(
                 dispatchInt(ViperParams.PARAM_SPK_CONVOLVER_ENABLE, 0)
             } else {
                 val enableParam =
-                    if (_uiState.value.spkConvolverEnabled) ViperParams.PARAM_SPK_CONVOLVER_ENABLE else null
+                    if (_uiState.value.convolver.spkEnabled) ViperParams.PARAM_SPK_CONVOLVER_ENABLE else null
                 loadKernelByName(kernel, enableParam)
             }
         }
     }
 
     fun setSpkConvolverCrossChannel(value: Int) {
-        _uiState.update { it.copy(spkConvolverCrossChannel = value) }
+        _uiState.update { it.copy(convolver = it.convolver.copy(spkCrossChannel = value)) }
         spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_CONVOLVER_CROSS_CHANNEL}",
             ViperParams.PARAM_SPK_CONVOLVER_CROSS_CHANNEL,
@@ -1950,7 +1892,7 @@ class MainViewModel @Inject constructor(
 
     fun setSpkEqEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] EQ: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkEqEnabled = enabled) }
+        _uiState.update { it.copy(eq = it.eq.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_SPK_EQ_ENABLE}", enabled)
         }
@@ -1965,12 +1907,18 @@ class MainViewModel @Inject constructor(
 
     fun setSpkEqPreset(presetId: Long) {
         val state = _uiState.value
-        val preset = state.spkEqPresets.find { it.id == presetId } ?: return
+        val preset = state.eq.spkPresets.find { it.id == presetId } ?: return
         val bands = preset.bands
-        val bandCount = state.spkEqBandCount
+        val bandCount = state.eq.spkBandCount
         _uiState.update { s ->
-            val updatedMap = s.spkEqBandsMap.toMutableMap().apply { put(bandCount, bands) }
-            s.copy(spkEqPresetId = presetId, spkEqBands = bands, spkEqBandsMap = updatedMap)
+            val updatedMap = s.eq.spkBandsMap.toMutableMap().apply { put(bandCount, bands) }
+            s.copy(
+                eq = s.eq.copy(
+                    spkPresetId = presetId,
+                    spkBands = bands,
+                    spkBandsMap = updatedMap
+                )
+            )
         }
         viewModelScope.launch {
             repository.setIntPreference(
@@ -1984,10 +1932,10 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkEqBands(bands: String) {
-        val bandCount = _uiState.value.spkEqBandCount
-        _uiState.update { state ->
-            val updatedMap = state.spkEqBandsMap.toMutableMap().apply { put(bandCount, bands) }
-            state.copy(spkEqBands = bands, spkEqBandsMap = updatedMap)
+        val bandCount = _uiState.value.eq.spkBandCount
+        _uiState.update { s ->
+            val updatedMap = s.eq.spkBandsMap.toMutableMap().apply { put(bandCount, bands) }
+            s.copy(eq = s.eq.copy(spkBands = bands, spkBandsMap = updatedMap))
         }
         viewModelScope.launch {
             repository.setStringPreference("${ViperParams.PARAM_SPK_EQ_BAND_LEVEL}", bands)
@@ -1998,26 +1946,28 @@ class MainViewModel @Inject constructor(
 
     fun setSpkEqBandCount(count: Int) {
         val currentState = _uiState.value
-        val oldCount = currentState.spkEqBandCount
+        val oldCount = currentState.eq.spkBandCount
         FileLogger.d("ViewModel", "[Spk] EQ band count: $oldCount -> $count")
-        val updatedMap = currentState.spkEqBandsMap.toMutableMap().apply {
-            put(oldCount, currentState.spkEqBands)
+        val updatedMap = currentState.eq.spkBandsMap.toMutableMap().apply {
+            put(oldCount, currentState.eq.spkBands)
         }
         val defaultBands =
             List(count) { 0f }.joinToString(";") { String.format(Locale.US, "%.1f", it) } + ";"
         val bands = updatedMap[count] ?: defaultBands
         _uiState.update {
             it.copy(
-                spkEqBandCount = count,
-                spkEqBands = bands,
-                spkEqPresetId = null,
-                spkEqBandsMap = updatedMap
+                eq = it.eq.copy(
+                    spkBandCount = count,
+                    spkBands = bands,
+                    spkPresetId = null,
+                    spkBandsMap = updatedMap
+                )
             )
         }
         viewModelScope.launch {
             repository.setIntPreference("spk_${ViperParams.PARAM_HP_EQ_BAND_COUNT}", count)
             repository.setStringPreference("${ViperParams.PARAM_SPK_EQ_BAND_LEVEL}", bands)
-            repository.setStringPreference("spk_eq_bands_$oldCount", currentState.spkEqBands)
+            repository.setStringPreference("spk_eq_bands_$oldCount", currentState.eq.spkBands)
             repository.setStringPreference("spk_eq_bands_$count", bands)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
@@ -2034,10 +1984,10 @@ class MainViewModel @Inject constructor(
     fun addSpkEqPreset(name: String) {
         val state = _uiState.value
         val preset =
-            EqPreset(name = name, bandCount = state.spkEqBandCount, bands = state.spkEqBands)
+            EqPreset(name = name, bandCount = state.eq.spkBandCount, bands = state.eq.spkBands)
         viewModelScope.launch {
             val id = repository.saveEqPreset(preset)
-            _uiState.update { it.copy(spkEqPresetId = id) }
+            _uiState.update { it.copy(eq = it.eq.copy(spkPresetId = id)) }
             repository.setIntPreference("spk_${ViperRepository.PREF_EQ_PRESET_ID}", id.toInt())
         }
     }
@@ -2045,19 +1995,19 @@ class MainViewModel @Inject constructor(
     fun deleteSpkEqPreset(presetId: Long) {
         viewModelScope.launch {
             repository.deleteEqPresetById(presetId)
-            if (_uiState.value.spkEqPresetId == presetId) {
-                _uiState.update { it.copy(spkEqPresetId = null) }
+            if (_uiState.value.eq.spkPresetId == presetId) {
+                _uiState.update { it.copy(eq = it.eq.copy(spkPresetId = null)) }
                 repository.setIntPreference("spk_${ViperRepository.PREF_EQ_PRESET_ID}", -1)
             }
         }
     }
 
     fun resetSpkEqBands() {
-        val bandCount = _uiState.value.spkEqBandCount
+        val bandCount = _uiState.value.eq.spkBandCount
         val flatBands =
             List(bandCount) { 0f }.joinToString(";") { String.format(Locale.US, "%.1f", it) } + ";"
         setSpkEqBands(flatBands)
-        _uiState.update { it.copy(spkEqPresetId = null) }
+        _uiState.update { it.copy(eq = it.eq.copy(spkPresetId = null)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperRepository.PREF_EQ_PRESET_ID}",
@@ -2068,12 +2018,12 @@ class MainViewModel @Inject constructor(
 
     fun setSpkReverbEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] Reverb: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkReverbEnabled = enabled) }
+        _uiState.update { it.copy(reverb = it.reverb.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_SPK_REVERB_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
@@ -2082,135 +2032,150 @@ class MainViewModel @Inject constructor(
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_REVERB_ROOM_SIZE,
-                        intArrayOf(s.spkReverbRoomSize * 10)
+                        intArrayOf(state.reverb.spkRoomSize * 10)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_REVERB_ROOM_WIDTH,
-                        intArrayOf(s.spkReverbWidth * 10)
+                        intArrayOf(state.reverb.spkWidth * 10)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_REVERB_ROOM_DAMPENING,
-                        intArrayOf(s.spkReverbDampening)
+                        intArrayOf(state.reverb.spkDampening)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_REVERB_ROOM_WET_SIGNAL,
-                        intArrayOf(s.spkReverbWet)
+                        intArrayOf(state.reverb.spkWet)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_REVERB_ROOM_DRY_SIGNAL,
-                        intArrayOf(s.spkReverbDry)
+                        intArrayOf(state.reverb.spkDry)
                     )
                 )
             )
         }
     }
 
-    fun setSpkReverbRoomSize(v: Int) {
-        _uiState.update { it.copy(spkReverbRoomSize = v) }; viewModelScope.launch {
+    fun setSpkReverbRoomSize(value: Int) {
+        _uiState.update { it.copy(reverb = it.reverb.copy(spkRoomSize = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_SPK_REVERB_ROOM_SIZE}",
-                v
+                value
             )
-        }; spkDispatchInt(ViperParams.PARAM_SPK_REVERB_ROOM_SIZE, v * 10)
+        }
+        spkDispatchInt(ViperParams.PARAM_SPK_REVERB_ROOM_SIZE, value * 10)
     }
 
-    fun setSpkReverbWidth(v: Int) {
-        _uiState.update { it.copy(spkReverbWidth = v) }; viewModelScope.launch {
+    fun setSpkReverbWidth(value: Int) {
+        _uiState.update { it.copy(reverb = it.reverb.copy(spkWidth = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_SPK_REVERB_ROOM_WIDTH}",
-                v
+                value
             )
-        }; spkDispatchInt(ViperParams.PARAM_SPK_REVERB_ROOM_WIDTH, v * 10)
+        }
+        spkDispatchInt(ViperParams.PARAM_SPK_REVERB_ROOM_WIDTH, value * 10)
     }
 
-    fun setSpkReverbDampening(v: Int) {
-        _uiState.update { it.copy(spkReverbDampening = v) }; viewModelScope.launch {
+    fun setSpkReverbDampening(value: Int) {
+        _uiState.update { it.copy(reverb = it.reverb.copy(spkDampening = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_SPK_REVERB_ROOM_DAMPENING}",
-                v
+                value
             )
-        }; spkDispatchInt(ViperParams.PARAM_SPK_REVERB_ROOM_DAMPENING, v)
+        }
+        spkDispatchInt(ViperParams.PARAM_SPK_REVERB_ROOM_DAMPENING, value)
     }
 
-    fun setSpkReverbWet(v: Int) {
-        _uiState.update { it.copy(spkReverbWet = v) }; viewModelScope.launch {
+    fun setSpkReverbWet(value: Int) {
+        _uiState.update { it.copy(reverb = it.reverb.copy(spkWet = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_SPK_REVERB_ROOM_WET_SIGNAL}",
-                v
+                value
             )
-        }; spkDispatchInt(ViperParams.PARAM_SPK_REVERB_ROOM_WET_SIGNAL, v)
+        }
+        spkDispatchInt(ViperParams.PARAM_SPK_REVERB_ROOM_WET_SIGNAL, value)
     }
 
-    fun setSpkReverbDry(v: Int) {
-        _uiState.update { it.copy(spkReverbDry = v) }; spkSaveAndDispatchInt(
+    fun setSpkReverbDry(value: Int) {
+        _uiState.update { it.copy(reverb = it.reverb.copy(spkDry = value)) }
+        spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_REVERB_ROOM_DRY_SIGNAL}",
             ViperParams.PARAM_SPK_REVERB_ROOM_DRY_SIGNAL,
-            v
+            value
         )
     }
 
     fun setSpkAgcEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] AGC: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkAgcEnabled = enabled) }
+        _uiState.update { it.copy(agc = it.agc.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("${ViperParams.PARAM_SPK_AGC_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(ViperParams.PARAM_SPK_AGC_ENABLE, intArrayOf(if (enabled) 1 else 0)),
                     ParamEntry(
                         ViperParams.PARAM_SPK_AGC_RATIO,
-                        intArrayOf(EffectDispatcher.PLAYBACK_GAIN_RATIO_VALUES.getOrElse(s.spkAgcStrength) { 50 })
+                        intArrayOf(EffectDispatcher.PLAYBACK_GAIN_RATIO_VALUES.getOrElse(state.agc.spkStrength) { 50 })
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_AGC_MAX_SCALER,
-                        intArrayOf(EffectDispatcher.MULTI_FACTOR_VALUES.getOrElse(s.spkAgcMaxGain) { 100 })
+                        intArrayOf(EffectDispatcher.MULTI_FACTOR_VALUES.getOrElse(state.agc.spkMaxGain) { 100 })
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_AGC_VOLUME,
-                        intArrayOf(EffectDispatcher.OUTPUT_DB_VALUES.getOrElse(s.spkAgcOutputThreshold) { 100 })
+                        intArrayOf(EffectDispatcher.OUTPUT_DB_VALUES.getOrElse(state.agc.spkOutputThreshold) { 100 })
                     )
                 )
             )
         }
     }
 
-    fun setSpkAgcStrength(v: Int) {
-        _uiState.update { it.copy(spkAgcStrength = v) }; viewModelScope.launch {
+    fun setSpkAgcStrength(value: Int) {
+        _uiState.update { it.copy(agc = it.agc.copy(spkStrength = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_SPK_AGC_RATIO}",
-                v
+                value
             )
-        }; spkDispatchInt(
+        }
+        spkDispatchInt(
             ViperParams.PARAM_SPK_AGC_RATIO,
-            PLAYBACK_GAIN_RATIO_VALUES.getOrElse(v) { 50 })
+            PLAYBACK_GAIN_RATIO_VALUES.getOrElse(value) { 50 })
     }
 
-    fun setSpkAgcMaxGain(v: Int) {
-        _uiState.update { it.copy(spkAgcMaxGain = v) }; viewModelScope.launch {
+    fun setSpkAgcMaxGain(value: Int) {
+        _uiState.update { it.copy(agc = it.agc.copy(spkMaxGain = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_SPK_AGC_MAX_SCALER}",
-                v
+                value
             )
-        }; spkDispatchInt(
+        }
+        spkDispatchInt(
             ViperParams.PARAM_SPK_AGC_MAX_SCALER,
-            MULTI_FACTOR_VALUES.getOrElse(v) { 100 })
+            MULTI_FACTOR_VALUES.getOrElse(value) { 100 })
     }
 
-    fun setSpkAgcOutputThreshold(v: Int) {
-        _uiState.update { it.copy(spkAgcOutputThreshold = v) }; viewModelScope.launch {
+    fun setSpkAgcOutputThreshold(value: Int) {
+        _uiState.update { it.copy(agc = it.agc.copy(spkOutputThreshold = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_SPK_AGC_VOLUME}",
-                v
+                value
             )
-        }; spkDispatchInt(ViperParams.PARAM_SPK_AGC_VOLUME, OUTPUT_DB_VALUES.getOrElse(v) { 100 })
+        }
+        spkDispatchInt(ViperParams.PARAM_SPK_AGC_VOLUME, OUTPUT_DB_VALUES.getOrElse(value) { 100 })
     }
 
     fun setSpkFetEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] FET Compressor: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkFetEnabled = enabled) }
+        _uiState.update { it.copy(fet = it.fet.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "${ViperParams.PARAM_SPK_FET_COMPRESSOR_ENABLE}",
@@ -2218,7 +2183,7 @@ class MainViewModel @Inject constructor(
             )
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
@@ -2227,224 +2192,251 @@ class MainViewModel @Inject constructor(
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_THRESHOLD,
-                        intArrayOf(s.spkFetThreshold)
+                        intArrayOf(state.fet.spkThreshold)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_RATIO,
-                        intArrayOf(s.spkFetRatio)
+                        intArrayOf(state.fet.spkRatio)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_KNEE,
-                        intArrayOf(if (s.spkFetAutoKnee) 100 else 0)
+                        intArrayOf(if (state.fet.spkAutoKnee) 100 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE, intArrayOf(s.spkFetKnee)),
+                    ParamEntry(
+                        ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE,
+                        intArrayOf(state.fet.spkKnee)
+                    ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE_MULTI,
-                        intArrayOf(s.spkFetKneeMulti)
+                        intArrayOf(state.fet.spkKneeMulti)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_GAIN,
-                        intArrayOf(if (s.spkFetAutoGain) 100 else 0)
+                        intArrayOf(if (state.fet.spkAutoGain) 100 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_SPK_FET_COMPRESSOR_GAIN, intArrayOf(s.spkFetGain)),
+                    ParamEntry(
+                        ViperParams.PARAM_SPK_FET_COMPRESSOR_GAIN,
+                        intArrayOf(state.fet.spkGain)
+                    ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_ATTACK,
-                        intArrayOf(if (s.spkFetAutoAttack) 100 else 0)
+                        intArrayOf(if (state.fet.spkAutoAttack) 100 else 0)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_ATTACK,
-                        intArrayOf(s.spkFetAttack)
+                        intArrayOf(state.fet.spkAttack)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_MAX_ATTACK,
-                        intArrayOf(s.spkFetMaxAttack)
+                        intArrayOf(state.fet.spkMaxAttack)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_RELEASE,
-                        intArrayOf(if (s.spkFetAutoRelease) 100 else 0)
+                        intArrayOf(if (state.fet.spkAutoRelease) 100 else 0)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_RELEASE,
-                        intArrayOf(s.spkFetRelease)
+                        intArrayOf(state.fet.spkRelease)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_MAX_RELEASE,
-                        intArrayOf(s.spkFetMaxRelease)
+                        intArrayOf(state.fet.spkMaxRelease)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_CREST,
-                        intArrayOf(s.spkFetCrest)
+                        intArrayOf(state.fet.spkCrest)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_ADAPT,
-                        intArrayOf(s.spkFetAdapt)
+                        intArrayOf(state.fet.spkAdapt)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FET_COMPRESSOR_NO_CLIP,
-                        intArrayOf(if (s.spkFetNoClip) 100 else 0)
+                        intArrayOf(if (state.fet.spkNoClip) 100 else 0)
                     )
                 )
             )
         }
     }
 
-    fun setSpkFetThreshold(v: Int) {
-        _uiState.update { it.copy(spkFetThreshold = v) }; spkSaveAndDispatchInt(
+    fun setSpkFetThreshold(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkThreshold = value)) }
+        spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_THRESHOLD}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_THRESHOLD,
-            v
+            value
         )
     }
 
-    fun setSpkFetRatio(v: Int) {
-        _uiState.update { it.copy(spkFetRatio = v) }; spkSaveAndDispatchInt(
+    fun setSpkFetRatio(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkRatio = value)) }
+        spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_RATIO}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_RATIO,
-            v
+            value
         )
     }
 
-    fun setSpkFetAutoKnee(v: Boolean) {
-        _uiState.update { it.copy(spkFetAutoKnee = v) }; spkSaveAndDispatchFetBool(
+    fun setSpkFetAutoKnee(value: Boolean) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkAutoKnee = value)) }
+        spkSaveAndDispatchFetBool(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_KNEE}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_KNEE,
-            v
+            value
         )
     }
 
-    fun setSpkFetKnee(v: Int) {
-        _uiState.update { it.copy(spkFetKnee = v) }; spkSaveAndDispatchInt(
+    fun setSpkFetKnee(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkKnee = value)) }
+        spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE,
-            v
+            value
         )
     }
 
-    fun setSpkFetKneeMulti(v: Int) {
-        _uiState.update { it.copy(spkFetKneeMulti = v) }; spkSaveAndDispatchInt(
+    fun setSpkFetKneeMulti(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkKneeMulti = value)) }
+        spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE_MULTI}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE_MULTI,
-            v
+            value
         )
     }
 
-    fun setSpkFetAutoGain(v: Boolean) {
-        _uiState.update { it.copy(spkFetAutoGain = v) }; spkSaveAndDispatchFetBool(
+    fun setSpkFetAutoGain(value: Boolean) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkAutoGain = value)) }
+        spkSaveAndDispatchFetBool(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_GAIN}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_GAIN,
-            v
+            value
         )
     }
 
-    fun setSpkFetGain(v: Int) {
-        _uiState.update { it.copy(spkFetGain = v) }; spkSaveAndDispatchInt(
+    fun setSpkFetGain(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkGain = value)) }
+        spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_GAIN}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_GAIN,
-            v
+            value
         )
     }
 
-    fun setSpkFetAutoAttack(v: Boolean) {
-        _uiState.update { it.copy(spkFetAutoAttack = v) }; spkSaveAndDispatchFetBool(
+    fun setSpkFetAutoAttack(value: Boolean) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkAutoAttack = value)) }
+        spkSaveAndDispatchFetBool(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_ATTACK}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_ATTACK,
-            v
+            value
         )
     }
 
-    fun setSpkFetAttack(v: Int) {
-        _uiState.update { it.copy(spkFetAttack = v) }; spkSaveAndDispatchInt(
+    fun setSpkFetAttack(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkAttack = value)) }
+        spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_ATTACK}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_ATTACK,
-            v
+            value
         )
     }
 
-    fun setSpkFetMaxAttack(v: Int) {
-        _uiState.update { it.copy(spkFetMaxAttack = v) }; spkSaveAndDispatchInt(
+    fun setSpkFetMaxAttack(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkMaxAttack = value)) }
+        spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_MAX_ATTACK}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_MAX_ATTACK,
-            v
+            value
         )
     }
 
-    fun setSpkFetAutoRelease(v: Boolean) {
-        _uiState.update { it.copy(spkFetAutoRelease = v) }; spkSaveAndDispatchFetBool(
+    fun setSpkFetAutoRelease(value: Boolean) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkAutoRelease = value)) }
+        spkSaveAndDispatchFetBool(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_RELEASE}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_RELEASE,
-            v
+            value
         )
     }
 
-    fun setSpkFetRelease(v: Int) {
-        _uiState.update { it.copy(spkFetRelease = v) }; spkSaveAndDispatchInt(
+    fun setSpkFetRelease(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkRelease = value)) }
+        spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_RELEASE}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_RELEASE,
-            v
+            value
         )
     }
 
-    fun setSpkFetMaxRelease(v: Int) {
-        _uiState.update { it.copy(spkFetMaxRelease = v) }; spkSaveAndDispatchInt(
+    fun setSpkFetMaxRelease(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkMaxRelease = value)) }
+        spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_MAX_RELEASE}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_MAX_RELEASE,
-            v
+            value
         )
     }
 
-    fun setSpkFetCrest(v: Int) {
-        _uiState.update { it.copy(spkFetCrest = v) }; spkSaveAndDispatchInt(
+    fun setSpkFetCrest(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkCrest = value)) }
+        spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_CREST}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_CREST,
-            v
+            value
         )
     }
 
-    fun setSpkFetAdapt(v: Int) {
-        _uiState.update { it.copy(spkFetAdapt = v) }; spkSaveAndDispatchInt(
+    fun setSpkFetAdapt(value: Int) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkAdapt = value)) }
+        spkSaveAndDispatchInt(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_ADAPT}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_ADAPT,
-            v
+            value
         )
     }
 
-    fun setSpkFetNoClip(v: Boolean) {
-        _uiState.update { it.copy(spkFetNoClip = v) }; spkSaveAndDispatchFetBool(
+    fun setSpkFetNoClip(value: Boolean) {
+        _uiState.update { it.copy(fet = it.fet.copy(spkNoClip = value)) }
+        spkSaveAndDispatchFetBool(
             "${ViperParams.PARAM_SPK_FET_COMPRESSOR_NO_CLIP}",
             ViperParams.PARAM_SPK_FET_COMPRESSOR_NO_CLIP,
-            v
+            value
         )
     }
 
-    fun setSpkOutputVolume(v: Int) {
-        _uiState.update { it.copy(spkOutputVolume = v) }
+    fun setSpkOutputVolume(value: Int) {
+        _uiState.update { it.copy(out = it.out.copy(spkVolume = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "${ViperParams.PARAM_SPK_OUTPUT_VOLUME}",
-                v
+                value
             )
         }
         spkDispatchInt(
             ViperParams.PARAM_SPK_OUTPUT_VOLUME,
-            OUTPUT_VOLUME_VALUES.getOrElse(v) { 100 })
+            OUTPUT_VOLUME_VALUES.getOrElse(value) { 100 })
     }
 
-    fun setSpkLimiter(v: Int) {
-        _uiState.update { it.copy(spkLimiter = v) }
-        viewModelScope.launch { repository.setIntPreference("${ViperParams.PARAM_SPK_LIMITER}", v) }
-        spkDispatchInt(ViperParams.PARAM_SPK_LIMITER, OUTPUT_DB_VALUES.getOrElse(v) { 100 })
+    fun setSpkLimiter(value: Int) {
+        _uiState.update { it.copy(out = it.out.copy(spkLimiter = value)) }
+        viewModelScope.launch {
+            repository.setIntPreference(
+                "${ViperParams.PARAM_SPK_LIMITER}",
+                value
+            )
+        }
+        spkDispatchInt(ViperParams.PARAM_SPK_LIMITER, OUTPUT_DB_VALUES.getOrElse(value) { 100 })
     }
 
     fun setSpkDdcEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] DDC: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkDdcEnabled = enabled) }
+        _uiState.update { it.copy(ddc = it.ddc.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "spk_${ViperParams.PARAM_SPK_DDC_ENABLE}",
                 enabled
             )
         }
-        val device = _uiState.value.spkDdcDevice
+        val device = _uiState.value.ddc.spkDevice
         val effectiveEnabled = enabled && device.isNotEmpty()
         if (effectiveEnabled && activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
             loadVdcByName(device, ViperParams.PARAM_SPK_DDC_ENABLE)
@@ -2455,7 +2447,7 @@ class MainViewModel @Inject constructor(
 
     fun setSpkDdcDevice(device: String) {
         FileLogger.i("ViewModel", "[Spk] DDC selected: $device")
-        _uiState.update { it.copy(spkDdcDevice = device) }
+        _uiState.update { it.copy(ddc = it.ddc.copy(spkDevice = device)) }
         viewModelScope.launch {
             repository.setStringPreference(
                 "spk_${ViperRepository.PREF_DDC_DEVICE}",
@@ -2467,7 +2459,7 @@ class MainViewModel @Inject constructor(
                 dispatchInt(ViperParams.PARAM_SPK_DDC_ENABLE, 0)
             } else {
                 val enableParam =
-                    if (_uiState.value.spkDdcEnabled) ViperParams.PARAM_SPK_DDC_ENABLE else null
+                    if (_uiState.value.ddc.spkEnabled) ViperParams.PARAM_SPK_DDC_ENABLE else null
                 loadVdcByName(device, enableParam)
             }
         }
@@ -2475,7 +2467,7 @@ class MainViewModel @Inject constructor(
 
     fun setSpkVseEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] VSE: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkVseEnabled = enabled) }
+        _uiState.update { it.copy(vse = it.vse.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "spk_${ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_ENABLE}",
@@ -2483,7 +2475,7 @@ class MainViewModel @Inject constructor(
             )
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
@@ -2492,11 +2484,11 @@ class MainViewModel @Inject constructor(
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_BARK,
-                        intArrayOf(EffectDispatcher.VSE_BARK_VALUES.getOrElse(s.spkVseStrength) { 7600 })
+                        intArrayOf(EffectDispatcher.VSE_BARK_VALUES.getOrElse(state.vse.spkStrength) { 7600 })
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_BARK_RECONSTRUCT,
-                        intArrayOf((s.spkVseExciter * 5.6).toInt())
+                        intArrayOf((state.vse.spkExciter * 5.6).toInt())
                     )
                 )
             )
@@ -2504,7 +2496,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkVseStrength(value: Int) {
-        _uiState.update { it.copy(spkVseStrength = value) }
+        _uiState.update { it.copy(vse = it.vse.copy(spkStrength = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_BARK}",
@@ -2517,7 +2509,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkVseExciter(value: Int) {
-        _uiState.update { it.copy(spkVseExciter = value) }
+        _uiState.update { it.copy(vse = it.vse.copy(spkExciter = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_BARK_RECONSTRUCT}",
@@ -2532,7 +2524,7 @@ class MainViewModel @Inject constructor(
 
     fun setSpkFieldSurroundEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] Field Surround: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkFieldSurroundEnabled = enabled) }
+        _uiState.update { it.copy(fieldSurround = it.fieldSurround.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "spk_${ViperParams.PARAM_SPK_FIELD_SURROUND_ENABLE}",
@@ -2540,7 +2532,7 @@ class MainViewModel @Inject constructor(
             )
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
@@ -2549,15 +2541,15 @@ class MainViewModel @Inject constructor(
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FIELD_SURROUND_WIDENING,
-                        intArrayOf(EffectDispatcher.FIELD_SURROUND_WIDENING_VALUES.getOrElse(s.spkFieldSurroundWidening) { 0 })
+                        intArrayOf(EffectDispatcher.FIELD_SURROUND_WIDENING_VALUES.getOrElse(state.fieldSurround.spkWidening) { 0 })
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FIELD_SURROUND_MID_IMAGE,
-                        intArrayOf(s.spkFieldSurroundMidImage * 10 + 100)
+                        intArrayOf(state.fieldSurround.spkMidImage * 10 + 100)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_FIELD_SURROUND_DEPTH,
-                        intArrayOf(s.spkFieldSurroundDepth * 75 + 200)
+                        intArrayOf(state.fieldSurround.spkDepth * 75 + 200)
                     )
                 )
             )
@@ -2565,7 +2557,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkFieldSurroundWidening(value: Int) {
-        _uiState.update { it.copy(spkFieldSurroundWidening = value) }
+        _uiState.update { it.copy(fieldSurround = it.fieldSurround.copy(spkWidening = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_SPK_FIELD_SURROUND_WIDENING}",
@@ -2578,7 +2570,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkFieldSurroundMidImage(value: Int) {
-        _uiState.update { it.copy(spkFieldSurroundMidImage = value) }
+        _uiState.update { it.copy(fieldSurround = it.fieldSurround.copy(spkMidImage = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_SPK_FIELD_SURROUND_MID_IMAGE}",
@@ -2589,7 +2581,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkFieldSurroundDepth(value: Int) {
-        _uiState.update { it.copy(spkFieldSurroundDepth = value) }
+        _uiState.update { it.copy(fieldSurround = it.fieldSurround.copy(spkDepth = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_SPK_FIELD_SURROUND_DEPTH}",
@@ -2601,7 +2593,7 @@ class MainViewModel @Inject constructor(
 
     fun setSpkDiffSurroundEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] Diff Surround: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkDiffSurroundEnabled = enabled) }
+        _uiState.update { it.copy(diffSurround = it.diffSurround.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "spk_${ViperParams.PARAM_SPK_DIFF_SURROUND_ENABLE}",
@@ -2609,7 +2601,7 @@ class MainViewModel @Inject constructor(
             )
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
@@ -2618,11 +2610,11 @@ class MainViewModel @Inject constructor(
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_DIFF_SURROUND_DELAY,
-                        intArrayOf(EffectDispatcher.DIFF_SURROUND_DELAY_VALUES.getOrElse(s.spkDiffSurroundDelay) { 500 })
+                        intArrayOf(EffectDispatcher.DIFF_SURROUND_DELAY_VALUES.getOrElse(state.diffSurround.spkDelay) { 500 })
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_DIFF_SURROUND_REVERSE,
-                        intArrayOf(if (s.spkDiffSurroundReverse) 1 else 0)
+                        intArrayOf(if (state.diffSurround.spkReverse) 1 else 0)
                     )
                 )
             )
@@ -2630,7 +2622,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkDiffSurroundDelay(value: Int) {
-        _uiState.update { it.copy(spkDiffSurroundDelay = value) }
+        _uiState.update { it.copy(diffSurround = it.diffSurround.copy(spkDelay = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_SPK_DIFF_SURROUND_DELAY}",
@@ -2643,7 +2635,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkDiffSurroundReverse(reverse: Boolean) {
-        _uiState.update { it.copy(spkDiffSurroundReverse = reverse) }
+        _uiState.update { it.copy(diffSurround = it.diffSurround.copy(spkReverse = reverse)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "spk_${ViperParams.PARAM_SPK_DIFF_SURROUND_REVERSE}",
@@ -2655,7 +2647,7 @@ class MainViewModel @Inject constructor(
 
     fun setSpkVheEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] VHE: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkVheEnabled = enabled) }
+        _uiState.update { it.copy(vhe = it.vhe.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "spk_${ViperParams.PARAM_SPK_HEADPHONE_SURROUND_ENABLE}",
@@ -2663,7 +2655,7 @@ class MainViewModel @Inject constructor(
             )
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
@@ -2672,7 +2664,7 @@ class MainViewModel @Inject constructor(
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_HEADPHONE_SURROUND_STRENGTH,
-                        intArrayOf(s.spkVheQuality)
+                        intArrayOf(state.vhe.spkQuality)
                     )
                 )
             )
@@ -2680,7 +2672,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkVheQuality(value: Int) {
-        _uiState.update { it.copy(spkVheQuality = value) }
+        _uiState.update { it.copy(vhe = it.vhe.copy(spkQuality = value)) }
         spkSaveAndDispatchInt(
             "spk_${ViperParams.PARAM_SPK_HEADPHONE_SURROUND_STRENGTH}",
             ViperParams.PARAM_SPK_HEADPHONE_SURROUND_STRENGTH,
@@ -2690,7 +2682,7 @@ class MainViewModel @Inject constructor(
 
     fun setSpkDynamicSystemEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] Dynamic System: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkDynamicSystemEnabled = enabled) }
+        _uiState.update { it.copy(dynamicSystem = it.dynamicSystem.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_ENABLE}",
@@ -2701,7 +2693,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkDynamicSystemStrength(value: Int) {
-        _uiState.update { it.copy(spkDynamicSystemStrength = value) }
+        _uiState.update { it.copy(dynamicSystem = it.dynamicSystem.copy(spkStrength = value)) }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_STRENGTH}",
@@ -2713,41 +2705,46 @@ class MainViewModel @Inject constructor(
 
     private fun spkDispatchDynamicSystem() {
         if (activeDeviceType != ViperParams.FX_TYPE_SPEAKER) return
-        val s = _uiState.value
+        val state = _uiState.value
         viperService?.dispatchParamsBatch(
             listOf(
                 ParamEntry(
                     ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_ENABLE,
-                    intArrayOf(if (s.spkDynamicSystemEnabled) 1 else 0)
+                    intArrayOf(if (state.dynamicSystem.spkEnabled) 1 else 0)
                 ),
                 ParamEntry(
                     ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_STRENGTH,
-                    intArrayOf(s.spkDynamicSystemStrength * 20 + 100)
+                    intArrayOf(state.dynamicSystem.spkStrength * 20 + 100)
                 ),
                 ParamEntry(
                     ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_X_COEFFICIENTS,
-                    intArrayOf(s.spkDsXLow, s.spkDsXHigh)
+                    intArrayOf(state.dynamicSystem.spkXLow, state.dynamicSystem.spkXHigh)
                 ),
                 ParamEntry(
                     ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_Y_COEFFICIENTS,
-                    intArrayOf(s.spkDsYLow, s.spkDsYHigh)
+                    intArrayOf(state.dynamicSystem.spkYLow, state.dynamicSystem.spkYHigh)
                 ),
                 ParamEntry(
                     ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_SIDE_GAIN,
-                    intArrayOf(s.spkDsSideGainLow, s.spkDsSideGainHigh)
+                    intArrayOf(
+                        state.dynamicSystem.spkSideGainLow,
+                        state.dynamicSystem.spkSideGainHigh
+                    )
                 )
             )
         )
     }
 
     fun setSpkDsPreset(presetId: Long) {
-        val preset = _uiState.value.spkDsPresets.find { it.id == presetId } ?: return
+        val preset = _uiState.value.dynamicSystem.spkPresets.find { it.id == presetId } ?: return
         _uiState.update {
             it.copy(
-                spkDsPresetId = presetId,
-                spkDsXLow = preset.xLow, spkDsXHigh = preset.xHigh,
-                spkDsYLow = preset.yLow, spkDsYHigh = preset.yHigh,
-                spkDsSideGainLow = preset.sideGainLow, spkDsSideGainHigh = preset.sideGainHigh
+                dynamicSystem = it.dynamicSystem.copy(
+                    spkPresetId = presetId,
+                    spkXLow = preset.xLow, spkXHigh = preset.xHigh,
+                    spkYLow = preset.yLow, spkYHigh = preset.yHigh,
+                    spkSideGainLow = preset.sideGainLow, spkSideGainHigh = preset.sideGainHigh
+                )
             )
         }
         viewModelScope.launch {
@@ -2783,72 +2780,114 @@ class MainViewModel @Inject constructor(
         spkDispatchDynamicSystem()
     }
 
-    fun setSpkDsXLow(v: Int) {
-        _uiState.update { it.copy(spkDsXLow = v, spkDsPresetId = null) }
+    fun setSpkDsXLow(value: Int) {
+        _uiState.update {
+            it.copy(
+                dynamicSystem = it.dynamicSystem.copy(
+                    spkXLow = value,
+                    spkPresetId = null
+                )
+            )
+        }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_X_COEFFICIENTS}_low",
-                v
+                value
             )
             repository.setIntPreference("spk_${ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID}", -1)
         }
         spkDispatchDynamicSystem()
     }
 
-    fun setSpkDsXHigh(v: Int) {
-        _uiState.update { it.copy(spkDsXHigh = v, spkDsPresetId = null) }
+    fun setSpkDsXHigh(value: Int) {
+        _uiState.update {
+            it.copy(
+                dynamicSystem = it.dynamicSystem.copy(
+                    spkXHigh = value,
+                    spkPresetId = null
+                )
+            )
+        }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_X_COEFFICIENTS}_high",
-                v
+                value
             )
             repository.setIntPreference("spk_${ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID}", -1)
         }
         spkDispatchDynamicSystem()
     }
 
-    fun setSpkDsYLow(v: Int) {
-        _uiState.update { it.copy(spkDsYLow = v, spkDsPresetId = null) }
+    fun setSpkDsYLow(value: Int) {
+        _uiState.update {
+            it.copy(
+                dynamicSystem = it.dynamicSystem.copy(
+                    spkYLow = value,
+                    spkPresetId = null
+                )
+            )
+        }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_Y_COEFFICIENTS}_low",
-                v
+                value
             )
             repository.setIntPreference("spk_${ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID}", -1)
         }
         spkDispatchDynamicSystem()
     }
 
-    fun setSpkDsYHigh(v: Int) {
-        _uiState.update { it.copy(spkDsYHigh = v, spkDsPresetId = null) }
+    fun setSpkDsYHigh(value: Int) {
+        _uiState.update {
+            it.copy(
+                dynamicSystem = it.dynamicSystem.copy(
+                    spkYHigh = value,
+                    spkPresetId = null
+                )
+            )
+        }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_Y_COEFFICIENTS}_high",
-                v
+                value
             )
             repository.setIntPreference("spk_${ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID}", -1)
         }
         spkDispatchDynamicSystem()
     }
 
-    fun setSpkDsSideGainLow(v: Int) {
-        _uiState.update { it.copy(spkDsSideGainLow = v, spkDsPresetId = null) }
+    fun setSpkDsSideGainLow(value: Int) {
+        _uiState.update {
+            it.copy(
+                dynamicSystem = it.dynamicSystem.copy(
+                    spkSideGainLow = value,
+                    spkPresetId = null
+                )
+            )
+        }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN}_low",
-                v
+                value
             )
             repository.setIntPreference("spk_${ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID}", -1)
         }
         spkDispatchDynamicSystem()
     }
 
-    fun setSpkDsSideGainHigh(v: Int) {
-        _uiState.update { it.copy(spkDsSideGainHigh = v, spkDsPresetId = null) }
+    fun setSpkDsSideGainHigh(value: Int) {
+        _uiState.update {
+            it.copy(
+                dynamicSystem = it.dynamicSystem.copy(
+                    spkSideGainHigh = value,
+                    spkPresetId = null
+                )
+            )
+        }
         viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN}_high",
-                v
+                value
             )
             repository.setIntPreference("spk_${ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID}", -1)
         }
@@ -2856,16 +2895,19 @@ class MainViewModel @Inject constructor(
     }
 
     fun addSpkDsPreset(name: String) {
-        val s = _uiState.value
+        val state = _uiState.value
         val preset = DsPreset(
             name = name,
-            xLow = s.spkDsXLow, xHigh = s.spkDsXHigh,
-            yLow = s.spkDsYLow, yHigh = s.spkDsYHigh,
-            sideGainLow = s.spkDsSideGainLow, sideGainHigh = s.spkDsSideGainHigh
+            xLow = state.dynamicSystem.spkXLow,
+            xHigh = state.dynamicSystem.spkXHigh,
+            yLow = state.dynamicSystem.spkYLow,
+            yHigh = state.dynamicSystem.spkYHigh,
+            sideGainLow = state.dynamicSystem.spkSideGainLow,
+            sideGainHigh = state.dynamicSystem.spkSideGainHigh
         )
         viewModelScope.launch {
             val id = repository.saveDsPreset(preset)
-            _uiState.update { it.copy(spkDsPresetId = id) }
+            _uiState.update { it.copy(dynamicSystem = it.dynamicSystem.copy(spkPresetId = id)) }
             repository.setIntPreference(
                 "spk_${ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID}",
                 id.toInt()
@@ -2876,8 +2918,8 @@ class MainViewModel @Inject constructor(
     fun deleteSpkDsPreset(presetId: Long) {
         viewModelScope.launch {
             repository.deleteDsPresetById(presetId)
-            if (_uiState.value.spkDsPresetId == presetId) {
-                _uiState.update { it.copy(spkDsPresetId = null) }
+            if (_uiState.value.dynamicSystem.spkPresetId == presetId) {
+                _uiState.update { it.copy(dynamicSystem = it.dynamicSystem.copy(spkPresetId = null)) }
                 repository.setIntPreference("spk_${ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID}", -1)
             }
         }
@@ -2886,10 +2928,12 @@ class MainViewModel @Inject constructor(
     fun resetSpkDsCoefficients() {
         _uiState.update {
             it.copy(
-                spkDsXLow = 100, spkDsXHigh = 5600,
-                spkDsYLow = 40, spkDsYHigh = 80,
-                spkDsSideGainLow = 50, spkDsSideGainHigh = 50,
-                spkDsPresetId = null
+                dynamicSystem = it.dynamicSystem.copy(
+                    spkXLow = 100, spkXHigh = 5600,
+                    spkYLow = 40, spkYHigh = 80,
+                    spkSideGainLow = 50, spkSideGainHigh = 50,
+                    spkPresetId = null
+                )
             )
         }
         viewModelScope.launch {
@@ -2903,7 +2947,7 @@ class MainViewModel @Inject constructor(
 
     fun setSpkTubeSimulatorEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] Tube Simulator: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkTubeSimulatorEnabled = enabled) }
+        _uiState.update { it.copy(tube = it.tube.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "spk_${ViperParams.PARAM_SPK_TUBE_SIMULATOR_ENABLE}",
@@ -2924,30 +2968,30 @@ class MainViewModel @Inject constructor(
 
     fun setSpkBassEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] Bass: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkBassEnabled = enabled) }
+        _uiState.update { it.copy(bass = it.bass.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("spk_${ViperParams.PARAM_SPK_BASS_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
                         ViperParams.PARAM_SPK_BASS_ENABLE,
                         intArrayOf(if (enabled) 1 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_SPK_BASS_MODE, intArrayOf(s.spkBassMode)),
+                    ParamEntry(ViperParams.PARAM_SPK_BASS_MODE, intArrayOf(state.bass.spkMode)),
                     ParamEntry(
                         ViperParams.PARAM_SPK_BASS_FREQUENCY,
-                        intArrayOf(s.spkBassFrequency + 15)
+                        intArrayOf(state.bass.spkFrequency + 15)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_BASS_GAIN,
-                        intArrayOf(s.spkBassGain * 50 + 50)
+                        intArrayOf(state.bass.spkGain * 50 + 50)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_BASS_ANTI_POP,
-                        intArrayOf(if (s.spkBassAntiPop) 1 else 0)
+                        intArrayOf(if (state.bass.spkAntiPop) 1 else 0)
                     )
                 )
             )
@@ -2955,33 +2999,38 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkBassMode(mode: Int) {
-        _uiState.update { it.copy(spkBassMode = mode) }; spkSaveAndDispatchInt(
+        _uiState.update { it.copy(bass = it.bass.copy(spkMode = mode)) }
+        spkSaveAndDispatchInt(
             "spk_${ViperParams.PARAM_SPK_BASS_MODE}",
             ViperParams.PARAM_SPK_BASS_MODE,
             mode
         )
     }
 
-    fun setSpkBassFrequency(v: Int) {
-        _uiState.update { it.copy(spkBassFrequency = v) }; viewModelScope.launch {
+    fun setSpkBassFrequency(value: Int) {
+        _uiState.update { it.copy(bass = it.bass.copy(spkFrequency = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_SPK_BASS_FREQUENCY}",
-                v
+                value
             )
-        }; spkDispatchInt(ViperParams.PARAM_SPK_BASS_FREQUENCY, v + 15)
+        }
+        spkDispatchInt(ViperParams.PARAM_SPK_BASS_FREQUENCY, value + 15)
     }
 
-    fun setSpkBassGain(v: Int) {
-        _uiState.update { it.copy(spkBassGain = v) }; viewModelScope.launch {
+    fun setSpkBassGain(value: Int) {
+        _uiState.update { it.copy(bass = it.bass.copy(spkGain = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_SPK_BASS_GAIN}",
-                v
+                value
             )
-        }; spkDispatchInt(ViperParams.PARAM_SPK_BASS_GAIN, v * 50 + 50)
+        }
+        spkDispatchInt(ViperParams.PARAM_SPK_BASS_GAIN, value * 50 + 50)
     }
 
     fun setSpkBassAntiPop(enabled: Boolean) {
-        _uiState.update { it.copy(spkBassAntiPop = enabled) }
+        _uiState.update { it.copy(bass = it.bass.copy(spkAntiPop = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("spk_${ViperParams.PARAM_SPK_BASS_ANTI_POP}", enabled)
         }
@@ -2990,7 +3039,7 @@ class MainViewModel @Inject constructor(
 
     fun setSpkBassMonoEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] Bass Mono: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkBassMonoEnabled = enabled) }
+        _uiState.update { it.copy(bassMono = it.bassMono.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "spk_${ViperParams.PARAM_SPK_BASS_MONO_ENABLE}",
@@ -2998,25 +3047,28 @@ class MainViewModel @Inject constructor(
             )
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
                         ViperParams.PARAM_SPK_BASS_MONO_ENABLE,
                         intArrayOf(if (enabled) 1 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_SPK_BASS_MONO_MODE, intArrayOf(s.spkBassMonoMode)),
+                    ParamEntry(
+                        ViperParams.PARAM_SPK_BASS_MONO_MODE,
+                        intArrayOf(state.bassMono.spkMode)
+                    ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_BASS_MONO_FREQUENCY,
-                        intArrayOf(s.spkBassMonoFrequency + 15)
+                        intArrayOf(state.bassMono.spkFrequency + 15)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_BASS_MONO_GAIN,
-                        intArrayOf(s.spkBassMonoGain * 50 + 50)
+                        intArrayOf(state.bassMono.spkGain * 50 + 50)
                     ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_BASS_MONO_ANTI_POP,
-                        intArrayOf(if (s.spkBassMonoAntiPop) 1 else 0)
+                        intArrayOf(if (state.bassMono.spkAntiPop) 1 else 0)
                     )
                 )
             )
@@ -3024,33 +3076,38 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkBassMonoMode(mode: Int) {
-        _uiState.update { it.copy(spkBassMonoMode = mode) }; spkSaveAndDispatchInt(
+        _uiState.update { it.copy(bassMono = it.bassMono.copy(spkMode = mode)) }
+        spkSaveAndDispatchInt(
             "spk_${ViperParams.PARAM_SPK_BASS_MONO_MODE}",
             ViperParams.PARAM_SPK_BASS_MONO_MODE,
             mode
         )
     }
 
-    fun setSpkBassMonoFrequency(v: Int) {
-        _uiState.update { it.copy(spkBassMonoFrequency = v) }; viewModelScope.launch {
+    fun setSpkBassMonoFrequency(value: Int) {
+        _uiState.update { it.copy(bassMono = it.bassMono.copy(spkFrequency = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_SPK_BASS_MONO_FREQUENCY}",
-                v
+                value
             )
-        }; spkDispatchInt(ViperParams.PARAM_SPK_BASS_MONO_FREQUENCY, v + 15)
+        }
+        spkDispatchInt(ViperParams.PARAM_SPK_BASS_MONO_FREQUENCY, value + 15)
     }
 
-    fun setSpkBassMonoGain(v: Int) {
-        _uiState.update { it.copy(spkBassMonoGain = v) }; viewModelScope.launch {
+    fun setSpkBassMonoGain(value: Int) {
+        _uiState.update { it.copy(bassMono = it.bassMono.copy(spkGain = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_SPK_BASS_MONO_GAIN}",
-                v
+                value
             )
-        }; spkDispatchInt(ViperParams.PARAM_SPK_BASS_MONO_GAIN, v * 50 + 50)
+        }
+        spkDispatchInt(ViperParams.PARAM_SPK_BASS_MONO_GAIN, value * 50 + 50)
     }
 
     fun setSpkBassMonoAntiPop(enabled: Boolean) {
-        _uiState.update { it.copy(spkBassMonoAntiPop = enabled) }
+        _uiState.update { it.copy(bassMono = it.bassMono.copy(spkAntiPop = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference(
                 "spk_${ViperParams.PARAM_SPK_BASS_MONO_ANTI_POP}",
@@ -3062,22 +3119,25 @@ class MainViewModel @Inject constructor(
 
     fun setSpkClarityEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] Clarity: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkClarityEnabled = enabled) }
+        _uiState.update { it.copy(clarity = it.clarity.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("spk_${ViperParams.PARAM_SPK_CLARITY_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
                         ViperParams.PARAM_SPK_CLARITY_ENABLE,
                         intArrayOf(if (enabled) 1 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_SPK_CLARITY_MODE, intArrayOf(s.spkClarityMode)),
+                    ParamEntry(
+                        ViperParams.PARAM_SPK_CLARITY_MODE,
+                        intArrayOf(state.clarity.spkMode)
+                    ),
                     ParamEntry(
                         ViperParams.PARAM_SPK_CLARITY_GAIN,
-                        intArrayOf(s.spkClarityGain * 50)
+                        intArrayOf(state.clarity.spkGain * 50)
                     )
                 )
             )
@@ -3085,72 +3145,80 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkClarityMode(mode: Int) {
-        _uiState.update { it.copy(spkClarityMode = mode) }; spkSaveAndDispatchInt(
+        _uiState.update { it.copy(clarity = it.clarity.copy(spkMode = mode)) }
+        spkSaveAndDispatchInt(
             "spk_${ViperParams.PARAM_SPK_CLARITY_MODE}",
             ViperParams.PARAM_SPK_CLARITY_MODE,
             mode
         )
     }
 
-    fun setSpkClarityGain(v: Int) {
-        _uiState.update { it.copy(spkClarityGain = v) }; viewModelScope.launch {
+    fun setSpkClarityGain(value: Int) {
+        _uiState.update { it.copy(clarity = it.clarity.copy(spkGain = value)) }
+        viewModelScope.launch {
             repository.setIntPreference(
                 "spk_${ViperParams.PARAM_SPK_CLARITY_GAIN}",
-                v
+                value
             )
-        }; spkDispatchInt(ViperParams.PARAM_SPK_CLARITY_GAIN, v * 50)
+        }
+        spkDispatchInt(ViperParams.PARAM_SPK_CLARITY_GAIN, value * 50)
     }
 
     fun setSpkCureEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] Cure: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkCureEnabled = enabled) }
+        _uiState.update { it.copy(cure = it.cure.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("spk_${ViperParams.PARAM_SPK_CURE_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
                         ViperParams.PARAM_SPK_CURE_ENABLE,
                         intArrayOf(if (enabled) 1 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_SPK_CURE_STRENGTH, intArrayOf(s.spkCureStrength))
+                    ParamEntry(
+                        ViperParams.PARAM_SPK_CURE_STRENGTH,
+                        intArrayOf(state.cure.spkStrength)
+                    )
                 )
             )
         }
     }
 
-    fun setSpkCureStrength(v: Int) {
-        _uiState.update { it.copy(spkCureStrength = v) }; spkSaveAndDispatchInt(
+    fun setSpkCureStrength(value: Int) {
+        _uiState.update { it.copy(cure = it.cure.copy(spkStrength = value)) }
+        spkSaveAndDispatchInt(
             "spk_${ViperParams.PARAM_SPK_CURE_STRENGTH}",
             ViperParams.PARAM_SPK_CURE_STRENGTH,
-            v
+            value
         )
     }
 
     fun setSpkAnalogxEnabled(enabled: Boolean) {
         FileLogger.i("ViewModel", "[Spk] AnalogX: ${if (enabled) "ON" else "OFF"}")
-        _uiState.update { it.copy(spkAnalogxEnabled = enabled) }
+        _uiState.update { it.copy(analog = it.analog.copy(spkEnabled = enabled)) }
         viewModelScope.launch {
             repository.setBooleanPreference("spk_${ViperParams.PARAM_SPK_ANALOGX_ENABLE}", enabled)
         }
         if (activeDeviceType == ViperParams.FX_TYPE_SPEAKER) {
-            val s = _uiState.value
+            val state = _uiState.value
             viperService?.dispatchParamsBatch(
                 listOf(
                     ParamEntry(
                         ViperParams.PARAM_SPK_ANALOGX_ENABLE,
                         intArrayOf(if (enabled) 1 else 0)
                     ),
-                    ParamEntry(ViperParams.PARAM_SPK_ANALOGX_MODE, intArrayOf(s.spkAnalogxMode))
+                    ParamEntry(ViperParams.PARAM_SPK_ANALOGX_MODE, intArrayOf(state.analog.spkMode))
                 )
             )
         }
     }
 
     fun setSpkAnalogxMode(mode: Int) {
-        _uiState.update { it.copy(spkAnalogxMode = mode) }; spkSaveAndDispatchInt(
+        _uiState.update { it.copy(analog = it.analog.copy(spkMode = mode)) }
+        spkSaveAndDispatchInt(
             "spk_${ViperParams.PARAM_SPK_ANALOGX_MODE}",
             ViperParams.PARAM_SPK_ANALOGX_MODE,
             mode
@@ -3158,7 +3226,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setSpkChannelPan(value: Int) {
-        _uiState.update { it.copy(spkChannelPan = value) }
+        _uiState.update { it.copy(out = it.out.copy(spkChannelPan = value)) }
         spkSaveAndDispatchInt(
             "spk_${ViperParams.PARAM_SPK_CHANNEL_PAN}",
             ViperParams.PARAM_SPK_CHANNEL_PAN,
@@ -3349,8 +3417,8 @@ class MainViewModel @Inject constructor(
             if (!file.exists()) return false
             file.delete()
             val state = _uiState.value
-            if (state.ddcDevice == name) {
-                _uiState.update { it.copy(ddcDevice = "") }
+            if (state.ddc.device == name) {
+                _uiState.update { it.copy(ddc = it.ddc.copy(device = "")) }
                 viewModelScope.launch {
                     repository.setStringPreference(
                         ViperRepository.PREF_DDC_DEVICE,
@@ -3358,8 +3426,8 @@ class MainViewModel @Inject constructor(
                     )
                 }
             }
-            if (state.spkDdcDevice == name) {
-                _uiState.update { it.copy(spkDdcDevice = "") }
+            if (state.ddc.spkDevice == name) {
+                _uiState.update { it.copy(ddc = it.ddc.copy(spkDevice = "")) }
                 viewModelScope.launch {
                     repository.setStringPreference(
                         "spk_${ViperRepository.PREF_DDC_DEVICE}",
@@ -3381,8 +3449,8 @@ class MainViewModel @Inject constructor(
             if (!file.exists()) return false
             file.delete()
             val state = _uiState.value
-            if (state.convolverKernel == fileName) {
-                _uiState.update { it.copy(convolverKernel = "") }
+            if (state.convolver.kernel == fileName) {
+                _uiState.update { it.copy(convolver = it.convolver.copy(kernel = "")) }
                 viewModelScope.launch {
                     repository.setStringPreference(
                         "${ViperParams.PARAM_HP_CONVOLVER_SET_KERNEL}",
@@ -3390,8 +3458,8 @@ class MainViewModel @Inject constructor(
                     )
                 }
             }
-            if (state.spkConvolverKernel == fileName) {
-                _uiState.update { it.copy(spkConvolverKernel = "") }
+            if (state.convolver.spkKernel == fileName) {
+                _uiState.update { it.copy(convolver = it.convolver.copy(spkKernel = "")) }
                 viewModelScope.launch {
                     repository.setStringPreference(
                         "spk_${ViperParams.PARAM_HP_CONVOLVER_SET_KERNEL}",
@@ -3642,15 +3710,15 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun persistStateForMode(fxType: Int) {
-        val s = _uiState.value
+        val state = _uiState.value
         val isSpk = fxType != ViperParams.FX_TYPE_HEADPHONE
-        saveEffectPrefs(repository, s, isSpk)
+        saveEffectPrefs(repository, state, isSpk)
         if (isSpk) {
-            for ((bc, bands) in s.spkEqBandsMap) {
+            for ((bc, bands) in state.eq.spkBandsMap) {
                 repository.setStringPreference("spk_eq_bands_$bc", bands)
             }
         } else {
-            for ((bc, bands) in s.eqBandsMap) {
+            for ((bc, bands) in state.eq.bandsMap) {
                 repository.setStringPreference("eq_bands_$bc", bands)
             }
         }
