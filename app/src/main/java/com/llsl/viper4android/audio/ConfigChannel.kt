@@ -47,7 +47,6 @@ object ConfigChannel {
     private const val SHM_SPK_PATH = "/data/local/tmp/v4a/shm_spk.bin"
     private const val SHM_MAGIC = 0x56344D53
     private const val FORMAT_VERSION = 4
-    private const val STREAMING_TIMEOUT_MS = 250L
     private const val STATUS_SHM_SIZE = 256
     private const val PARAM_SHM_SIZE = 32784
     private const val PARAMS_OFFSET = 16
@@ -59,6 +58,7 @@ object ConfigChannel {
     private var spkBuffer: MappedByteBuffer? = null
     private val initDone = AtomicBoolean(false)
     private var lastStatusSeq = 0
+    private var lastProcessedFrames = 0L
     private var cachedStatus: FileDriverStatus? = null
     private val writeLock = Any()
     private val hpCurrentParams = linkedMapOf<Long, ParamEntry>()
@@ -336,9 +336,9 @@ object ConfigChannel {
         val base = STATUS_DATA_OFFSET
         val enabled = buf.getInt(base) != 0
         val configured = buf.getInt(base + 4) != 0
-        val processTimeMs = buf.getLong(base + 8)
-        val streaming = processTimeMs > 0 &&
-                System.currentTimeMillis() - processTimeMs < STREAMING_TIMEOUT_MS
+        val processedFrames = buf.getLong(base + 8)
+        val streaming = processedFrames > 0 && processedFrames != lastProcessedFrames
+        lastProcessedFrames = processedFrames
         val sampleRate = buf.getInt(base + 16)
         val versionCode = buf.getInt(base + 20)
 
@@ -381,9 +381,9 @@ object ConfigChannel {
             val buf = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
             val enabled = buf.getInt(0) != 0
             val configured = buf.getInt(4) != 0
-            val processTimeMs = buf.getLong(8)
-            val streaming = processTimeMs > 0 &&
-                    System.currentTimeMillis() - processTimeMs < STREAMING_TIMEOUT_MS
+            val processedFrames = buf.getLong(8)
+            val streaming = processedFrames > 0 && processedFrames != lastProcessedFrames
+            lastProcessedFrames = processedFrames
             val sampleRate = buf.getInt(16)
             val versionCode = buf.getInt(20)
 
