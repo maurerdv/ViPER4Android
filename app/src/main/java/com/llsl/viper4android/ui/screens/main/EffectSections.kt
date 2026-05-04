@@ -528,9 +528,13 @@ fun DiffSurroundSection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
     val enabled = vals.enabled
     val delay = vals.delay
     val reverse = vals.reverse
+    val wetDryMix = vals.wetDryMix
+    val lpCutoff = vals.lpCutoff
     val onEnabledChange = viewModel::setDiffSurroundEnabled
     val onDelayChange = viewModel::setDiffSurroundDelay
     val onReverseChange = viewModel::setDiffSurroundReverse
+    val onWetDryMixChange = viewModel::setDiffSurroundWetDryMix
+    val onLpCutoffChange = viewModel::setDiffSurroundLpCutoff
 
     EffectSection(
         title = stringResource(R.string.section_differential_surround),
@@ -550,6 +554,21 @@ fun DiffSurroundSection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
             label = stringResource(R.string.label_diff_surround_reverse),
             checked = reverse,
             onCheckedChange = onReverseChange
+        )
+        LabeledSlider(
+            label = stringResource(R.string.label_wet_dry_mix),
+            value = wetDryMix.toFloat(),
+            onValueChange = { onWetDryMixChange(it.roundToInt()) },
+            valueRange = 0f..100f,
+            valueLabel = "${wetDryMix}%"
+        )
+        LabeledSlider(
+            label = stringResource(R.string.label_lp_cutoff),
+            value = lpCutoff.toFloat(),
+            onValueChange = { onLpCutoffChange(it.roundToInt()) },
+            valueRange = 0f..20000f,
+            steps = 3999,
+            valueLabel = if (lpCutoff == 0) stringResource(R.string.value_off) else "${lpCutoff} Hz"
         )
     }
 }

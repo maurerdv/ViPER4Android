@@ -582,6 +582,28 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         getSp = { it.diffSurround.spk.reverse },
         setSp = { copy(diffSurround = diffSurround.copy(spk = diffSurround.spk.copy(reverse = it))) }
     ),
+    IntPref(
+        hpPrefKey = "${ViperParams.PARAM_HP_DIFF_SURROUND_WET_DRY_MIX}",
+        spkPrefKey = "${ViperParams.PARAM_SPK_DIFF_SURROUND_WET_DRY_MIX}",
+        jsonKey = "diffSurroundWetDryMix",
+        spkJsonKey = "spkDiffSurroundWetDryMix",
+        defaultValue = 100,
+        getHp = { it.diffSurround.hp.wetDryMix },
+        setHp = { copy(diffSurround = diffSurround.copy(hp = diffSurround.hp.copy(wetDryMix = it))) },
+        getSp = { it.diffSurround.spk.wetDryMix },
+        setSp = { copy(diffSurround = diffSurround.copy(spk = diffSurround.spk.copy(wetDryMix = it))) }
+    ),
+    IntPref(
+        hpPrefKey = "${ViperParams.PARAM_HP_DIFF_SURROUND_LP_CUTOFF}",
+        spkPrefKey = "${ViperParams.PARAM_SPK_DIFF_SURROUND_LP_CUTOFF}",
+        jsonKey = "diffSurroundLpCutoff",
+        spkJsonKey = "spkDiffSurroundLpCutoff",
+        defaultValue = 0,
+        getHp = { it.diffSurround.hp.lpCutoff },
+        setHp = { copy(diffSurround = diffSurround.copy(hp = diffSurround.hp.copy(lpCutoff = it))) },
+        getSp = { it.diffSurround.spk.lpCutoff },
+        setSp = { copy(diffSurround = diffSurround.copy(spk = diffSurround.spk.copy(lpCutoff = it))) }
+    ),
 
     // VHE (Headphone Surround)
     BoolPref(

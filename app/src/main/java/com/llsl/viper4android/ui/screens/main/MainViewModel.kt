@@ -1278,6 +1278,18 @@ class MainViewModel @Inject constructor(
                         ViperParams.PARAM_HP_DIFF_SURROUND_REVERSE,
                         ViperParams.PARAM_SPK_DIFF_SURROUND_REVERSE
                     ), intArrayOf(if (vals.reverse) 1 else 0)
+                ),
+                ParamEntry(
+                    p(
+                        ViperParams.PARAM_HP_DIFF_SURROUND_WET_DRY_MIX,
+                        ViperParams.PARAM_SPK_DIFF_SURROUND_WET_DRY_MIX
+                    ), intArrayOf(vals.wetDryMix)
+                ),
+                ParamEntry(
+                    p(
+                        ViperParams.PARAM_HP_DIFF_SURROUND_LP_CUTOFF,
+                        ViperParams.PARAM_SPK_DIFF_SURROUND_LP_CUTOFF
+                    ), intArrayOf(vals.lpCutoff)
                 )
             )
         )
@@ -1311,6 +1323,34 @@ class MainViewModel @Inject constructor(
         val param =
             if (isSpk) ViperParams.PARAM_SPK_DIFF_SURROUND_REVERSE else ViperParams.PARAM_HP_DIFF_SURROUND_REVERSE
         dispatchInt(param, if (reverse) 1 else 0)
+    }
+
+    fun setDiffSurroundWetDryMix(v: Int) {
+        _uiState.update {
+            it.copy(diffSurround = it.diffSurround.updateType(activeDeviceType) {
+                copy(wetDryMix = v)
+            })
+        }
+        val isSpk = activeDeviceType == ViperParams.FX_TYPE_SPEAKER
+        val prefKey =
+            if (isSpk) "${ViperParams.PARAM_SPK_DIFF_SURROUND_WET_DRY_MIX}" else "${ViperParams.PARAM_HP_DIFF_SURROUND_WET_DRY_MIX}"
+        val param =
+            if (isSpk) ViperParams.PARAM_SPK_DIFF_SURROUND_WET_DRY_MIX else ViperParams.PARAM_HP_DIFF_SURROUND_WET_DRY_MIX
+        saveAndDispatchInt(prefKey, param, v)
+    }
+
+    fun setDiffSurroundLpCutoff(v: Int) {
+        _uiState.update {
+            it.copy(diffSurround = it.diffSurround.updateType(activeDeviceType) {
+                copy(lpCutoff = v)
+            })
+        }
+        val isSpk = activeDeviceType == ViperParams.FX_TYPE_SPEAKER
+        val prefKey =
+            if (isSpk) "${ViperParams.PARAM_SPK_DIFF_SURROUND_LP_CUTOFF}" else "${ViperParams.PARAM_HP_DIFF_SURROUND_LP_CUTOFF}"
+        val param =
+            if (isSpk) ViperParams.PARAM_SPK_DIFF_SURROUND_LP_CUTOFF else ViperParams.PARAM_HP_DIFF_SURROUND_LP_CUTOFF
+        saveAndDispatchInt(prefKey, param, v)
     }
 
     fun setVheEnabled(enabled: Boolean) {

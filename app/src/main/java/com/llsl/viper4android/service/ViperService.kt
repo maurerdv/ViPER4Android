@@ -785,6 +785,18 @@ class ViperService : LifecycleService() {
                 intArrayOf(if (state.diffSurround.hp.reverse) 1 else 0)
             )
         )
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_HP_DIFF_SURROUND_WET_DRY_MIX,
+                intArrayOf(state.diffSurround.hp.wetDryMix)
+            )
+        )
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_HP_DIFF_SURROUND_LP_CUTOFF,
+                intArrayOf(state.diffSurround.hp.lpCutoff)
+            )
+        )
 
         params.add(
             ParamEntry(
@@ -1221,6 +1233,18 @@ class ViperService : LifecycleService() {
             ParamEntry(
                 ViperParams.PARAM_SPK_DIFF_SURROUND_REVERSE,
                 intArrayOf(if (state.diffSurround.spk.reverse) 1 else 0)
+            )
+        )
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_SPK_DIFF_SURROUND_WET_DRY_MIX,
+                intArrayOf(state.diffSurround.spk.wetDryMix)
+            )
+        )
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_SPK_DIFF_SURROUND_LP_CUTOFF,
+                intArrayOf(state.diffSurround.spk.lpCutoff)
             )
         )
 

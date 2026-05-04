@@ -81,6 +81,9 @@
     <string name="section_differential_surround">Differential Surround</string>
     <string name="label_ds_delay">Delay</string>
     <string name="label_diff_surround_reverse">Reverse</string>
+    <string name="label_wet_dry_mix">Wet/Dry Mix</string>
+    <string name="label_lp_cutoff">LP Cutoff</string>
+    <string name="value_off">Off</string>
 
     <!-- Headphone Surround -->
     <string name="section_headphone_surround">Headphone Surround+</string>

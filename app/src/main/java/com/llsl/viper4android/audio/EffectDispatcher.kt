@@ -474,6 +474,14 @@ object EffectDispatcher {
             ViperParams.PARAM_HP_DIFF_SURROUND_REVERSE,
             if (state.diffSurround.hp.reverse) 1 else 0
         )
+        effect.setParameter(
+            ViperParams.PARAM_HP_DIFF_SURROUND_WET_DRY_MIX,
+            state.diffSurround.hp.wetDryMix
+        )
+        effect.setParameter(
+            ViperParams.PARAM_HP_DIFF_SURROUND_LP_CUTOFF,
+            state.diffSurround.hp.lpCutoff
+        )
 
         effect.setParameter(
             ViperParams.PARAM_HP_HEADPHONE_SURROUND_ENABLE,
@@ -727,6 +735,14 @@ object EffectDispatcher {
         effect.setParameter(
             ViperParams.PARAM_SPK_DIFF_SURROUND_REVERSE,
             if (state.diffSurround.spk.reverse) 1 else 0
+        )
+        effect.setParameter(
+            ViperParams.PARAM_SPK_DIFF_SURROUND_WET_DRY_MIX,
+            state.diffSurround.spk.wetDryMix
+        )
+        effect.setParameter(
+            ViperParams.PARAM_SPK_DIFF_SURROUND_LP_CUTOFF,
+            state.diffSurround.spk.lpCutoff
         )
 
         effect.setParameter(
