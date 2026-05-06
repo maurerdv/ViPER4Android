@@ -17,40 +17,54 @@
     <string name="menu_settings">Settings</string>
     <string name="menu_devices">Devices</string>
 
+    <!-- Common -->
+    <string name="label_max_gain">Max Gain</string>
+    <string name="label_threshold">Threshold</string>
+    <string name="label_gain">Gain</string>
+    <string name="label_attack">Attack</string>
+    <string name="label_release">Release</string>
+    <string name="label_strength">Strength</string>
+    <string name="label_frequency">Frequency</string>
+    <string name="label_width">Width</string>
+    <string name="label_depth">Depth</string>
+    <string name="label_delay">Delay</string>
+    <string name="label_mode">Mode</string>
+    <string name="label_off">Off</string>
+    <string name="label_preset">Preset</string>
+    <string name="label_custom">Custom</string>
+    <string name="label_none">None</string>
+    <string name="label_mild">Mild</string>
+    <string name="label_medium">Medium</string>
+    <string name="label_strong">Strong</string>
+    <string name="label_deleted">Deleted</string>
+
     <!-- Output / Master limiter -->
     <string name="section_output">Master Limiter</string>
-    <string name="label_volume">Output Gain</string>
-    <string name="label_pan">Output Pan</string>
-    <string name="label_limiter">Threshold Limit</string>
+    <string name="label_output_volume">Output Gain</string>
+    <string name="label_output_pan">Output Pan</string>
+    <string name="label_output_limiter">Threshold Limit</string>
 
     <!-- AGC -->
     <string name="section_agc">Playback Gain Control</string>
-    <string name="label_agc_strength">Strength</string>
-    <string name="label_agc_max_gain">Max Gain</string>
     <string name="label_agc_output_threshold">Output Threshold</string>
 
     <!-- LUFS Targeting -->
     <string name="section_lufs_targeting">LUFS Targeting</string>
-    <string name="label_target_lufs">Target LUFS</string>
-    <string name="label_max_gain">Max Gain</string>
-    <string name="label_speed">Speed</string>
-    <string name="speed_slow">Slow</string>
-    <string name="speed_medium">Medium</string>
-    <string name="speed_fast">Fast</string>
+    <string name="label_lufs_target_lufs">Target LUFS</string>
+    <string name="label_lufs_speed">Speed</string>
+    <string name="label_lufs_speed_slow">Slow</string>
+    <string name="label_lufs_speed_medium">Medium</string>
+    <string name="label_lufs_speed_fast">Fast</string>
 
     <!-- FET Compressor -->
     <string name="section_fet_compressor">FET Compressor</string>
-    <string name="label_fet_threshold">Threshold</string>
     <string name="label_fet_ratio">Ratio</string>
     <string name="label_fet_knee">Knee</string>
     <string name="label_fet_auto_knee">Auto Knee</string>
     <string name="label_fet_knee_multi">Knee Multi</string>
-    <string name="label_fet_gain">Gain</string>
     <string name="label_fet_auto_gain">Auto Gain</string>
-    <string name="label_fet_attack">Attack</string>
     <string name="label_fet_auto_attack">Auto Attack</string>
     <string name="label_fet_max_attack">Max Attack</string>
-    <string name="label_fet_release">Release</string>
     <string name="label_fet_auto_release">Auto Release</string>
     <string name="label_fet_max_release">Max Release</string>
     <string name="label_fet_crest">Crest</string>
@@ -61,111 +75,85 @@
     <string name="section_multiband_compressor">Multiband Compressor</string>
     <string name="label_band_enabled">Band Enabled</string>
     <string name="label_upper_crossover">Upper Crossover</string>
-    <string name="label_threshold">Threshold</string>
-    <string name="label_gain">Gain</string>
-    <string name="label_attack">Attack</string>
-    <string name="label_release">Release</string>
 
     <!-- DDC -->
     <string name="section_ddc">ViPER-DDC</string>
     <string name="label_ddc_device">Headset Correction</string>
-    <string name="label_ddc_none">None</string>
 
     <!-- Spectrum Extension -->
     <string name="section_spectrum_extension">Spectrum Extension</string>
-    <string name="label_vse_strength">Strength</string>
     <string name="label_vse_exciter">Exciter</string>
 
     <!-- Equalizer -->
     <string name="section_equalizer">FIR Equalizer</string>
-    <string name="label_eq_preset">Preset</string>
-    <string name="label_eq_custom">Custom</string>
     <string name="label_eq_bands">Band Count</string>
     <string name="label_eq_n_bands">%d Bands</string>
 
     <!-- Dynamic EQ -->
     <string name="section_dynamic_eq">Dynamic EQ</string>
-    <string name="label_frequency">Frequency</string>
-    <string name="label_q_factor">Q Factor</string>
-    <string name="label_target_gain">Target Gain</string>
-    <string name="label_filter_type">Filter Type</string>
-    <string name="filter_peak">Peak</string>
-    <string name="filter_low_shelf">Low Shelf</string>
-    <string name="filter_high_shelf">High Shelf</string>
+    <string name="label_dynamic_eq_q_factor">Q Factor</string>
+    <string name="label_dynamic_eq_target_gain">Target Gain</string>
+    <string name="label_dynamic_eq_filter_type">Filter Type</string>
     <string name="dialog_delete_band">Delete Band</string>
 
     <!-- Convolver -->
     <string name="section_convolver">Convolver</string>
     <string name="label_convolver_kernel">Kernel File</string>
-    <string name="label_convolver_none">None</string>
     <string name="label_convolver_cross_channel">Cross-Channel</string>
 
     <!-- Field Surround -->
     <string name="section_field_surround">Field Surround</string>
-    <string name="label_fs_widening">Surround Strength</string>
-    <string name="label_fs_mid_image">Mid Image Strength</string>
-    <string name="label_fs_depth">Depth</string>
+    <string name="label_field_surround_widening">Surround Strength</string>
+    <string name="label_field_surround_mid_image">Mid Image Strength</string>
 
     <!-- Differential Surround -->
-    <string name="section_differential_surround">Differential Surround</string>
-    <string name="label_ds_delay">Delay</string>
+    <string name="section_diff_surround">Differential Surround</string>
     <string name="label_diff_surround_reverse">Reverse</string>
-    <string name="label_wet_dry_mix">Wet/Dry Mix</string>
-    <string name="label_lp_cutoff">LP Cutoff</string>
-    <string name="value_off">Off</string>
+    <string name="label_diff_surround_wet_dry_mix">Wet/Dry Mix</string>
+    <string name="label_diff_surround_lp_cutoff">LP Cutoff</string>
 
     <!-- Stereo Imager -->
     <string name="section_stereo_imager">Stereo Imager</string>
-    <string name="label_low_width">Low Width</string>
-    <string name="label_mid_width">Mid Width</string>
-    <string name="label_high_width">High Width</string>
-    <string name="label_low_crossover">Low Crossover</string>
-    <string name="label_high_crossover">High Crossover</string>
+    <string name="label_stereo_imager_low_width">Low Width</string>
+    <string name="label_stereo_imager_mid_width">Mid Width</string>
+    <string name="label_stereo_imager_high_width">High Width</string>
+    <string name="label_stereo_imager_low_crossover">Low Crossover</string>
+    <string name="label_stereo_imager_high_crossover">High Crossover</string>
 
     <!-- Headphone Surround -->
     <string name="section_headphone_surround">Headphone Surround+</string>
     <string name="label_vhe_quality">Quality Level</string>
 
     <!-- Reverberation -->
-    <string name="section_reverberation">Reverberation</string>
+    <string name="section_reverb">Reverberation</string>
     <string name="label_reverb_room_size">Room Size</string>
-    <string name="label_reverb_width">Width</string>
     <string name="label_reverb_dampening">Dampening</string>
     <string name="label_reverb_wet">Wet Signal</string>
     <string name="label_reverb_dry">Dry Signal</string>
 
     <!-- Dynamic System -->
     <string name="section_dynamic_system">Dynamic System</string>
-    <string name="label_ds_device">Device</string>
-    <string name="label_ds_strength">Dynamic Bass Strength</string>
-    <string name="label_ds_preset">Preset</string>
-    <string name="label_ds_custom">Custom</string>
-    <string name="label_ds_x_low_freq">X Low Freq</string>
-    <string name="label_ds_x_high_freq">X High Freq</string>
-    <string name="label_ds_y_low_freq">Y Low Freq</string>
-    <string name="label_ds_y_high_freq">Y High Freq</string>
-    <string name="label_ds_side_gain_low">Side Gain Low</string>
-    <string name="label_ds_side_gain_high">Side Gain High</string>
+    <string name="label_dynamic_system_device">Device</string>
+    <string name="label_dynamic_system_strength">Dynamic Bass Strength</string>
+    <string name="label_dynamic_system_x_low_freq">X Low Freq</string>
+    <string name="label_dynamic_system_x_high_freq">X High Freq</string>
+    <string name="label_dynamic_system_y_low_freq">Y Low Freq</string>
+    <string name="label_dynamic_system_y_high_freq">Y High Freq</string>
+    <string name="label_dynamic_system_side_gain_low">Side Gain Low</string>
+    <string name="label_dynamic_system_side_gain_high">Side Gain High</string>
 
     <!-- Tube Simulator -->
     <string name="section_tube_simulator">Tube Simulator (6N1J)</string>
 
     <!-- Psychoacoustic Bass -->
-    <string name="section_psychoacoustic_bass">Psychoacoustic Bass</string>
-    <string name="label_cutoff">Cutoff</string>
-    <string name="label_intensity">Intensity</string>
-    <string name="label_harmonic_order">Harmonic Order</string>
-    <string name="label_original_bass_level">Original Bass Level</string>
-    <string name="harmonic_2nd">2nd</string>
-    <string name="harmonic_3rd">3rd</string>
-    <string name="harmonic_4th">4th</string>
-    <string name="harmonic_5th">5th</string>
+    <string name="section_psycho_bass">Psychoacoustic Bass</string>
+    <string name="label_psycho_bass_cutoff">Cutoff</string>
+    <string name="label_psycho_bass_intensity">Intensity</string>
+    <string name="label_psycho_bass_harmonic_order">Harmonic Order</string>
+    <string name="label_psycho_bass_ori_bass_level">Original Bass Level</string>
 
     <!-- ViPER Bass -->
     <string name="section_viper_bass">ViPER Bass</string>
-    <string name="label_bass_mode">Mode</string>
-    <string name="label_bass_frequency">Frequency</string>
-    <string name="label_bass_gain">Gain</string>
     <string name="label_bass_anti_pop">Fade-in</string>
 
     <!-- ViPER Bass Mono -->
@@ -173,8 +161,6 @@
 
     <!-- ViPER Clarity -->
     <string name="section_viper_clarity">ViPER Clarity</string>
-    <string name="label_clarity_mode">Mode</string>
-    <string name="label_clarity_gain">Gain</string>
 
     <!-- Cure -->
     <string name="section_cure">Auditory System Protection</string>
@@ -182,10 +168,20 @@
 
     <!-- AnalogX -->
     <string name="section_analogx">AnalogX</string>
-    <string name="label_analogx_mode">Mode</string>
 
     <!-- Speaker Optimization -->
     <string name="section_speaker_optimization">Speaker Optimization</string>
+
+    <!-- Filter Type -->
+    <string name="filter_peak">Peak</string>
+    <string name="filter_low_shelf">Low Shelf</string>
+    <string name="filter_high_shelf">High Shelf</string>
+
+    <!-- Harmonic Order -->
+    <string name="harmonic_2nd">2nd</string>
+    <string name="harmonic_3rd">3rd</string>
+    <string name="harmonic_4th">4th</string>
+    <string name="harmonic_5th">5th</string>
 
     <!-- Bass modes -->
     <string name="bass_mode_natural">Natural Bass</string>
@@ -197,22 +193,11 @@
     <string name="clarity_mode_ozone">OZone+</string>
     <string name="clarity_mode_xhifi">XHiFi</string>
 
-    <!-- Cure levels -->
-    <string name="cure_level_mild">Mild</string>
-    <string name="cure_level_medium">Medium</string>
-    <string name="cure_level_strong">Strong</string>
-
-    <!-- AnalogX modes -->
-    <string name="analogx_mode_mild">Mild</string>
-    <string name="analogx_mode_medium">Medium</string>
-    <string name="analogx_mode_strong">Strong</string>
-
     <!-- Presets -->
     <string name="preset_save_title">Save Preset</string>
     <string name="preset_rename_title">Rename Preset</string>
     <string name="preset_name_hint">Preset name</string>
     <string name="preset_empty">No saved presets</string>
-    <string name="preset_deleted">Deleted</string>
     <string name="preset_save_current">Save Current</string>
 
     <!-- Driver Status -->
@@ -249,14 +234,10 @@
     <string name="device_mode_speaker">Speaker</string>
     <string name="device_label_type">Type</string>
     <string name="device_label_address">Address</string>
-    <string name="device_label_mode">Mode</string>
     <string name="device_label_last_conn">Last Connected</string>
     <string name="device_no_devices">No saved devices</string>
     <string name="device_rename_title">Rename Device</string>
     <string name="device_rename_hint">Device name</string>
-    <string name="device_action_load">Load</string>
-    <string name="device_action_update">Update</string>
-    <string name="device_action_delete">Delete</string>
 
     <!-- Actions -->
     <string name="action_save">Save</string>
@@ -264,13 +245,16 @@
     <string name="action_close">Close</string>
     <string name="action_rename">Rename</string>
     <string name="action_reset">Reset</string>
+    <string name="action_load">Load</string>
+    <string name="action_update">Update</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_clear">Clear</string>
 
     <!-- Debug -->
     <string name="debug_log_title">Debug Log</string>
     <string name="debug_mode_enabled">Debug mode enabled</string>
     <string name="debug_search_hint">Filter logs\u2026</string>
-    <string name="action_clear">Clear</string>
-    <string name="action_disable_debug">Disable Debug</string>
+    <string name="debug_disable_debug">Disable Debug</string>
 
     <!-- Debug filters -->
     <string name="debug_filter_all">All</string>
@@ -285,8 +269,6 @@
     <string name="debug_filter_command">Command</string>
     <string name="delete_file_title">Delete File</string>
     <string name="delete_file_message">Delete "%1$s"?</string>
-    <string name="action_delete">Delete</string>
-    <string name="file_deleted">Deleted</string>
 
     <!-- EQ presets -->
     <string name="eq_preset_acoustic">Acoustic</string>

@@ -260,7 +260,7 @@ private fun DeletedPresetItem(
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
             )
             Text(
-                text = stringResource(R.string.preset_deleted),
+                text = stringResource(R.string.label_deleted),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
             )

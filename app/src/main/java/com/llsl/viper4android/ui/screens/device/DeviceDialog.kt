@@ -267,7 +267,7 @@ private fun DeviceDetailView(
         )
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         StatusRow(
-            label = stringResource(R.string.device_label_mode),
+            label = stringResource(R.string.label_mode),
             value = if (device.isHeadphone) stringResource(R.string.device_mode_headphone)
             else stringResource(R.string.device_mode_speaker)
         )
@@ -285,17 +285,17 @@ private fun DeviceDetailView(
         ) {
             ActionItem(
                 icon = Icons.Default.SettingsBackupRestore,
-                label = stringResource(R.string.device_action_load),
+                label = stringResource(R.string.action_load),
                 onClick = onLoad
             )
             ActionItem(
                 icon = Icons.Default.Sync,
-                label = stringResource(R.string.device_action_update),
+                label = stringResource(R.string.action_update),
                 onClick = onSave
             )
             ActionItem(
                 icon = Icons.Default.Delete,
-                label = stringResource(R.string.device_action_delete),
+                label = stringResource(R.string.action_delete),
                 onClick = onDelete,
                 enabled = canDelete,
                 tint = if (!canDelete) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)

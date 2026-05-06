@@ -17,104 +17,143 @@
     <string name="menu_settings">Настройки</string>
     <string name="menu_devices">Устройства</string>
 
+    <!-- Common -->
+    <string name="label_max_gain">Максимальное усиление</string>
+    <string name="label_threshold">Порог</string>
+    <string name="label_gain">Усиление</string>
+    <string name="label_attack">Атака</string>
+    <string name="label_release">Восстановление</string>
+    <string name="label_strength">Сила</string>
+    <string name="label_frequency">Frequency</string>
+    <string name="label_width">Ширина</string>
+    <string name="label_depth">Глубина</string>
+    <string name="label_delay">Задержка</string>
+    <string name="label_mode">Режим</string>
+    <string name="label_off">Off</string>
+    <string name="label_preset">Профиль</string>
+    <string name="label_custom">Пользовательский</string>
+    <string name="label_none">Фаил не выбран</string>
+    <string name="label_mild">Слабо</string>
+    <string name="label_medium">Средне</string>
+    <string name="label_strong">Сильно</string>
+    <string name="label_deleted">Удалено</string>
+
     <!-- Output / Master limiter -->
     <string name="section_output">Мастер-лимитер</string>
-    <string name="label_volume">Выходное усиление</string>
-    <string name="label_pan">Панорама на выходе</string>
-    <string name="label_limiter">Порог лимитера</string>
+    <string name="label_output_volume">Выходное усиление</string>
+    <string name="label_output_pan">Панорама на выходе</string>
+    <string name="label_output_limiter">Порог лимитера</string>
 
     <!-- AGC -->
     <string name="section_agc">Автоусиление(AGC)</string>
-    <string name="label_agc_strength">Сила</string>
-    <string name="label_agc_max_gain">Максимальное усиление</string>
     <string name="label_agc_output_threshold">Порог вывода</string>
+
+    <!-- LUFS Targeting -->
+    <string name="section_lufs_targeting">LUFS Targeting</string>
+    <string name="label_lufs_target_lufs">Target LUFS</string>
+    <string name="label_lufs_speed">Speed</string>
+    <string name="label_lufs_speed_slow">Slow</string>
+    <string name="label_lufs_speed_medium">Medium</string>
+    <string name="label_lufs_speed_fast">Fast</string>
 
     <!-- FET Compressor -->
     <string name="section_fet_compressor">FET Компрессор</string>
-    <string name="label_fet_threshold">Порог</string>
     <string name="label_fet_ratio">Степень сжатия</string>
     <string name="label_fet_knee">Колено</string>
     <string name="label_fet_auto_knee">Автоколено</string>
     <string name="label_fet_knee_multi">Мульти колено</string>
-    <string name="label_fet_gain">Усиление</string>
     <string name="label_fet_auto_gain">Автоусиление</string>
-    <string name="label_fet_attack">Атака</string>
     <string name="label_fet_auto_attack">Автоатака</string>
     <string name="label_fet_max_attack">Время атаки</string>
-    <string name="label_fet_release">Восстановление</string>
     <string name="label_fet_auto_release">Автовосстановление</string>
     <string name="label_fet_max_release">Время восстановления</string>
     <string name="label_fet_crest">Крест-фактор</string>
     <string name="label_fet_adapt">Адаптивный</string>
     <string name="label_fet_no_clip">Предотвращение перезапуска</string>
 
+    <!-- Multiband Compressor -->
+    <string name="section_multiband_compressor">Multiband Compressor</string>
+    <string name="label_band_enabled">Band Enabled</string>
+    <string name="label_upper_crossover">Upper Crossover</string>
+
     <!-- DDC -->
     <string name="section_ddc">Цифровая коррекция</string>
     <string name="label_ddc_device">Корекция звука(DDC)</string>
-    <string name="label_ddc_none">Фаил не выбран</string>
 
     <!-- Spectrum Extension -->
     <string name="section_spectrum_extension">Расширение спектра</string>
-    <string name="label_vse_strength">Интенсивность</string>
     <string name="label_vse_exciter">Эксайтер</string>
 
     <!-- Equalizer -->
     <string name="section_equalizer">FIR Эквалайзер</string>
-    <string name="label_eq_preset">Профиль</string>
-    <string name="label_eq_custom">Пользовательский</string>
     <string name="label_eq_bands">Количество полос</string>
     <string name="label_eq_n_bands">%d Полос</string>
+
+    <!-- Dynamic EQ -->
+    <string name="section_dynamic_eq">Dynamic EQ</string>
+    <string name="label_dynamic_eq_q_factor">Q Factor</string>
+    <string name="label_dynamic_eq_target_gain">Target Gain</string>
+    <string name="label_dynamic_eq_filter_type">Filter Type</string>
+    <string name="dialog_delete_band">Delete Band</string>
 
     <!-- Convolver -->
     <string name="section_convolver">Конвольвер</string>
     <string name="label_convolver_kernel">Файл ядра</string>
-    <string name="label_convolver_none">Фаил не выбран</string>
     <string name="label_convolver_cross_channel">Смешивание каналов</string>
 
     <!-- Field Surround -->
     <string name="section_field_surround">Объемный звук</string>
-    <string name="label_fs_widening">Интенсивность объемного звучания</string>
-    <string name="label_fs_mid_image">Интенсивность центрального образа</string>
-    <string name="label_fs_depth">Глубина</string>
+    <string name="label_field_surround_widening">Интенсивность объемного звучания</string>
+    <string name="label_field_surround_mid_image">Интенсивность центрального образа</string>
 
     <!-- Differential Surround -->
-    <string name="section_differential_surround">Дифференциальное окружение</string>
-    <string name="label_ds_delay">Задержка</string>
+    <string name="section_diff_surround">Дифференциальное окружение</string>
     <string name="label_diff_surround_reverse">Инверсия</string>
+    <string name="label_diff_surround_wet_dry_mix">Wet/Dry Mix</string>
+    <string name="label_diff_surround_lp_cutoff">LP Cutoff</string>
+
+    <!-- Stereo Imager -->
+    <string name="section_stereo_imager">Stereo Imager</string>
+    <string name="label_stereo_imager_low_width">Low Width</string>
+    <string name="label_stereo_imager_mid_width">Mid Width</string>
+    <string name="label_stereo_imager_high_width">High Width</string>
+    <string name="label_stereo_imager_low_crossover">Low Crossover</string>
+    <string name="label_stereo_imager_high_crossover">High Crossover</string>
 
     <!-- Headphone Surround -->
     <string name="section_headphone_surround">Объемный звук в наушниках</string>
     <string name="label_vhe_quality">Уровень качества</string>
 
     <!-- Reverberation -->
-    <string name="section_reverberation">Реверберация</string>
+    <string name="section_reverb">Реверберация</string>
     <string name="label_reverb_room_size">Размер комнаты</string>
-    <string name="label_reverb_width">Ширина</string>
     <string name="label_reverb_dampening">Поглощение высоких частот</string>
     <string name="label_reverb_wet">Обработанный сигнал</string>
     <string name="label_reverb_dry">Необработанный сигнал</string>
 
     <!-- Dynamic System -->
     <string name="section_dynamic_system">Динамическая система</string>
-    <string name="label_ds_device">Устройство</string>
-    <string name="label_ds_strength">Интенсивность динамического усиления басов</string>
-    <string name="label_ds_preset">Профиль</string>
-    <string name="label_ds_custom">Пользовательский</string>
-    <string name="label_ds_x_low_freq">X Низкая частота</string>
-    <string name="label_ds_x_high_freq">X Высокая частота</string>
-    <string name="label_ds_y_low_freq">Y Низкая частота</string>
-    <string name="label_ds_y_high_freq">Y Высокая частота</string>
-    <string name="label_ds_side_gain_low">Усиление боковых каналов для низких частот</string>
-    <string name="label_ds_side_gain_high">Усиление боковых каналов для высоких частот</string>
+    <string name="label_dynamic_system_device">Устройство</string>
+    <string name="label_dynamic_system_strength">Интенсивность динамического усиления басов</string>
+    <string name="label_dynamic_system_x_low_freq">X Низкая частота</string>
+    <string name="label_dynamic_system_x_high_freq">X Высокая частота</string>
+    <string name="label_dynamic_system_y_low_freq">Y Низкая частота</string>
+    <string name="label_dynamic_system_y_high_freq">Y Высокая частота</string>
+    <string name="label_dynamic_system_side_gain_low">Усиление боковых каналов для низких частот</string>
+    <string name="label_dynamic_system_side_gain_high">Усиление боковых каналов для высоких частот</string>
 
     <!-- Tube Simulator -->
     <string name="section_tube_simulator">Ламповый усилитель (6N1J)</string>
 
+    <!-- Psychoacoustic Bass -->
+    <string name="section_psycho_bass">Psychoacoustic Bass</string>
+    <string name="label_psycho_bass_cutoff">Cutoff</string>
+    <string name="label_psycho_bass_intensity">Intensity</string>
+    <string name="label_psycho_bass_harmonic_order">Harmonic Order</string>
+    <string name="label_psycho_bass_ori_bass_level">Original Bass Level</string>
+
     <!-- ViPER Bass -->
     <string name="section_viper_bass">ViPER Bass</string>
-    <string name="label_bass_mode">Режим</string>
-    <string name="label_bass_frequency">Частота</string>
-    <string name="label_bass_gain">Усиление</string>
     <string name="label_bass_anti_pop">Плавное нарастание</string>
 
     <!-- ViPER Bass Mono -->
@@ -122,8 +161,6 @@
 
     <!-- ViPER Clarity -->
     <string name="section_viper_clarity">ViPER Clarity</string>
-    <string name="label_clarity_mode">Режим</string>
-    <string name="label_clarity_gain">Усиление</string>
 
     <!-- Cure -->
     <string name="section_cure">Защита слуха</string>
@@ -131,10 +168,20 @@
 
     <!-- AnalogX -->
     <string name="section_analogx">AnalogX</string>
-    <string name="label_analogx_mode">Режим</string>
 
     <!-- Speaker Optimization -->
     <string name="section_speaker_optimization">Оптимизация динамика</string>
+
+    <!-- Filter Type -->
+    <string name="filter_peak">Peak</string>
+    <string name="filter_low_shelf">Low Shelf</string>
+    <string name="filter_high_shelf">High Shelf</string>
+
+    <!-- Harmonic Order -->
+    <string name="harmonic_2nd">2nd</string>
+    <string name="harmonic_3rd">3rd</string>
+    <string name="harmonic_4th">4th</string>
+    <string name="harmonic_5th">5th</string>
 
     <!-- Bass modes -->
     <string name="bass_mode_natural">Естественный бас</string>
@@ -146,22 +193,11 @@
     <string name="clarity_mode_ozone">OZone+</string>
     <string name="clarity_mode_xhifi">XHiFi</string>
 
-    <!-- Cure levels -->
-    <string name="cure_level_mild">Слабо</string>
-    <string name="cure_level_medium">Средне</string>
-    <string name="cure_level_strong">Сильно</string>
-
-    <!-- AnalogX modes -->
-    <string name="analogx_mode_mild">Слабо</string>
-    <string name="analogx_mode_medium">Средне</string>
-    <string name="analogx_mode_strong">Сильно</string>
-
     <!-- Presets -->
     <string name="preset_save_title">Созранить профиль</string>
     <string name="preset_rename_title">Переименовать профиль</string>
     <string name="preset_name_hint">Имя профиля</string>
     <string name="preset_empty">Нет сохраненных профилей</string>
-    <string name="preset_deleted">Удалено</string>
     <string name="preset_save_current">Сохранить текущий</string>
 
     <!-- Driver Status -->
@@ -198,14 +234,10 @@
     <string name="device_mode_speaker">Динамик</string>
     <string name="device_label_type">Тип</string>
     <string name="device_label_address">Адрес</string>
-    <string name="device_label_mode">Режим</string>
     <string name="device_label_last_conn">Последнее подключение</string>
     <string name="device_no_devices">Нет сохранённых устройств</string>
     <string name="device_rename_title">Переименовать устройство</string>
     <string name="device_rename_hint">Имя устройства</string>
-    <string name="device_action_load">Загрузить</string>
-    <string name="device_action_update">Обновить</string>
-    <string name="device_action_delete">Удалить</string>
 
     <!-- Actions -->
     <string name="action_save">Сохранить</string>
@@ -213,13 +245,16 @@
     <string name="action_close">Закрыть</string>
     <string name="action_rename">Переименовать</string>
     <string name="action_reset">Сброс</string>
+    <string name="action_load">Загрузить</string>
+    <string name="action_update">Обновить</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_clear">Очистить</string>
 
     <!-- Debug -->
     <string name="debug_log_title">Лог отладки</string>
     <string name="debug_mode_enabled">Режим отладки включен</string>
     <string name="debug_search_hint">Фильтр логов…</string>
-    <string name="action_clear">Очистить</string>
-    <string name="action_disable_debug">Выключить отладку</string>
+    <string name="debug_disable_debug">Выключить отладку</string>
 
     <!-- Debug filters -->
     <string name="debug_filter_all">Все</string>
@@ -234,8 +269,6 @@
     <string name="debug_filter_command">Команда</string>
     <string name="delete_file_title">Удалить Фаил</string>
     <string name="delete_file_message">Удалить %1$s?</string>
-    <string name="action_delete">Удалить</string>
-    <string name="file_deleted">Фаил удалён</string>
 
     <!-- EQ presets -->
     <string name="eq_preset_acoustic">Акустика</string>

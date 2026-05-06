@@ -333,7 +333,7 @@ fun DebugLogDialog(
         dismissButton = {
             Row {
                 TextButton(onClick = onDisableDebug) {
-                    Text(stringResource(R.string.action_disable_debug))
+                    Text(stringResource(R.string.debug_disable_debug))
                 }
                 TextButton(onClick = {
                     scope.launch {

@@ -313,10 +313,10 @@ fun EqEditDialog(
 
                 val presetNames = presets.map { it.name }
                 val selectedPresetName = presets.find { it.id == presetId }?.name
-                    ?: stringResource(R.string.label_eq_custom)
+                    ?: stringResource(R.string.label_custom)
 
                 LabeledDropdown(
-                    label = stringResource(R.string.label_eq_preset),
+                    label = stringResource(R.string.label_preset),
                     selectedValue = selectedPresetName,
                     options = presetNames,
                     onOptionSelected = { index, _ -> onPresetSelect(presets[index].id) }
