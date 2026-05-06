@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Hearing
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.SpatialAudio
 import androidx.compose.material.icons.filled.Speaker
@@ -1410,6 +1411,73 @@ fun TubeSimulatorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
         icon = Icons.Default.MusicNote,
         toggleOnly = true
     ) {}
+}
+
+@Composable
+fun PsychoacousticBassSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false
+) {
+    val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
+    val vals = state.psychoBass.forType(fxType)
+    val enabled = vals.enabled
+    val cutoff = vals.cutoff
+    val intensity = vals.intensity
+    val harmonicOrder = vals.harmonicOrder
+    val originalLevel = vals.originalLevel
+
+    val onEnabledChange = viewModel::setPsychoBassEnabled
+    val onCutoffChange = viewModel::setPsychoBassCutoff
+    val onIntensityChange = viewModel::setPsychoBassIntensity
+    val onHarmonicOrderChange = viewModel::setPsychoBassHarmonicOrder
+    val onOriginalLevelChange = viewModel::setPsychoBassOriginalLevel
+
+    val harmonicNames = listOf(
+        stringResource(R.string.harmonic_2nd),
+        stringResource(R.string.harmonic_3rd),
+        stringResource(R.string.harmonic_4th),
+        stringResource(R.string.harmonic_5th)
+    )
+    val harmonicValues = listOf(2, 3, 4, 5)
+    val harmonicIndex = harmonicValues.indexOf(harmonicOrder).coerceAtLeast(0)
+
+    EffectSection(
+        title = stringResource(R.string.section_psychoacoustic_bass),
+        enabled = enabled,
+        onEnabledChange = onEnabledChange,
+        icon = Icons.Default.Psychology
+    ) {
+        LabeledSlider(
+            label = stringResource(R.string.label_cutoff),
+            value = cutoff.toFloat(),
+            onValueChange = { onCutoffChange(it.roundToInt()) },
+            valueRange = 60f..150f,
+            valueLabel = "${cutoff} Hz"
+        )
+        LabeledSlider(
+            label = stringResource(R.string.label_intensity),
+            value = intensity.toFloat(),
+            onValueChange = { onIntensityChange(it.roundToInt()) },
+            valueRange = 0f..100f,
+            valueLabel = "${intensity}%"
+        )
+        LabeledSlider(
+            label = stringResource(R.string.label_harmonic_order),
+            value = harmonicOrder.toFloat(),
+            onValueChange = { onHarmonicOrderChange(it.roundToInt()) },
+            valueRange = 2f..5f,
+            steps = 2,
+            valueLabel = harmonicNames[harmonicIndex]
+        )
+        LabeledSlider(
+            label = stringResource(R.string.label_original_bass_level),
+            value = originalLevel.toFloat(),
+            onValueChange = { onOriginalLevelChange(it.roundToInt()) },
+            valueRange = 0f..100f,
+            valueLabel = "${originalLevel}%"
+        )
+    }
 }
 
 @Composable

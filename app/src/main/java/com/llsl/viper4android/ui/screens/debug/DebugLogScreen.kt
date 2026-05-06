@@ -55,7 +55,7 @@ private const val MAX_LOG_LINES = 500
 private const val APP_PREFIX = "[App] "
 private const val DRIVER_PREFIX = "[Driver] "
 
-private enum class LogLevel(@StringRes val labelRes: Int) {
+private enum class LogLevel(@param:StringRes val labelRes: Int) {
     ALL(R.string.debug_filter_all),
     INFO(R.string.debug_filter_info),
     DEBUG(R.string.debug_filter_debug),
@@ -69,7 +69,7 @@ private enum class LogLevel(@StringRes val labelRes: Int) {
     }
 }
 
-private enum class LogSource(@StringRes val labelRes: Int) {
+private enum class LogSource(@param:StringRes val labelRes: Int) {
     ALL(R.string.debug_filter_all),
     APP(R.string.debug_filter_app),
     DRIVER(R.string.debug_filter_driver);
@@ -81,7 +81,7 @@ private enum class LogSource(@StringRes val labelRes: Int) {
     }
 }
 
-private enum class LogCategory(@StringRes val labelRes: Int) {
+private enum class LogCategory(@param:StringRes val labelRes: Int) {
     ALL(R.string.debug_filter_all),
     EFFECT(R.string.debug_filter_effect),
     DISPATCH(R.string.debug_filter_dispatch),

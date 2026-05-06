@@ -335,6 +335,7 @@ private fun EffectList(
         item { ReverberationSection(state, viewModel, isSpkMode) }
         item { DynamicSystemSection(state, viewModel, isSpkMode) }
         item { TubeSimulatorSection(state, viewModel, isSpkMode) }
+        item { PsychoacousticBassSection(state, viewModel, isSpkMode) }
         item { ViperBassSection(state, viewModel, isSpkMode) }
         item { ViperBassMonoSection(state, viewModel, isSpkMode) }
         item { ViperClaritySection(state, viewModel, isSpkMode) }

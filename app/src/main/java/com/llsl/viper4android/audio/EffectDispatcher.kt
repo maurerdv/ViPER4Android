@@ -711,6 +711,25 @@ object EffectDispatcher {
             if (state.tube.hp.enabled) 1 else 0
         )
 
+        // Psycho Bass
+        effect.setParameter(
+            ViperParams.PARAM_HP_PSYCHO_BASS_ENABLE,
+            if (state.psychoBass.hp.enabled) 1 else 0
+        )
+        effect.setParameter(ViperParams.PARAM_HP_PSYCHO_BASS_CUTOFF, state.psychoBass.hp.cutoff)
+        effect.setParameter(
+            ViperParams.PARAM_HP_PSYCHO_BASS_INTENSITY,
+            state.psychoBass.hp.intensity
+        )
+        effect.setParameter(
+            ViperParams.PARAM_HP_PSYCHO_BASS_HARMONIC_ORDER,
+            state.psychoBass.hp.harmonicOrder
+        )
+        effect.setParameter(
+            ViperParams.PARAM_HP_PSYCHO_BASS_ORIGINAL_LEVEL,
+            state.psychoBass.hp.originalLevel
+        )
+
         // Bass
         effect.setParameter(ViperParams.PARAM_HP_BASS_ENABLE, if (state.bass.hp.enabled) 1 else 0)
         effect.setParameter(ViperParams.PARAM_HP_BASS_MODE, state.bass.hp.mode)
@@ -1145,6 +1164,25 @@ object EffectDispatcher {
         effect.setParameter(
             ViperParams.PARAM_SPK_TUBE_SIMULATOR_ENABLE,
             if (state.tube.spk.enabled) 1 else 0
+        )
+
+        // Psycho Bass
+        effect.setParameter(
+            ViperParams.PARAM_SPK_PSYCHO_BASS_ENABLE,
+            if (state.psychoBass.spk.enabled) 1 else 0
+        )
+        effect.setParameter(ViperParams.PARAM_SPK_PSYCHO_BASS_CUTOFF, state.psychoBass.spk.cutoff)
+        effect.setParameter(
+            ViperParams.PARAM_SPK_PSYCHO_BASS_INTENSITY,
+            state.psychoBass.spk.intensity
+        )
+        effect.setParameter(
+            ViperParams.PARAM_SPK_PSYCHO_BASS_HARMONIC_ORDER,
+            state.psychoBass.spk.harmonicOrder
+        )
+        effect.setParameter(
+            ViperParams.PARAM_SPK_PSYCHO_BASS_ORIGINAL_LEVEL,
+            state.psychoBass.spk.originalLevel
         )
 
         // Bass

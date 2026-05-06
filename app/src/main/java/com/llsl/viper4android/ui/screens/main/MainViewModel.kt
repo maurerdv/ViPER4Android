@@ -76,6 +76,7 @@ data class MainUiState(
     val vhe: VheState = VheState(),
     val reverb: ReverbState = ReverbState(),
     val dynamicSystem: DynamicSystemState = DynamicSystemState(),
+    val psychoBass: PsychoBassState = PsychoBassState(),
     val bass: BassState = BassState(),
     val bassMono: BassMonoState = BassMonoState(),
     val clarity: ClarityState = ClarityState(),
@@ -2932,6 +2933,100 @@ class MainViewModel @Inject constructor(
                 ParamEntry(param, intArrayOf(if (enabled) 1 else 0))
             )
         )
+    }
+
+    fun setPsychoBassEnabled(enabled: Boolean) {
+        val isSpk = activeDeviceType == ViperParams.FX_TYPE_SPEAKER
+        _uiState.update {
+            it.copy(psychoBass = it.psychoBass.updateType(activeDeviceType) { copy(enabled = enabled) })
+        }
+        val prefKey =
+            if (isSpk) "${ViperParams.PARAM_SPK_PSYCHO_BASS_ENABLE}" else "${ViperParams.PARAM_HP_PSYCHO_BASS_ENABLE}"
+        viewModelScope.launch { repository.setBooleanPreference(prefKey, enabled) }
+        val vals = _uiState.value.psychoBass.forType(activeDeviceType)
+        val p = { hp: Int, spk: Int -> if (isSpk) spk else hp }
+        viperService?.dispatchParamsBatch(
+            listOf(
+                ParamEntry(
+                    p(
+                        ViperParams.PARAM_HP_PSYCHO_BASS_ENABLE,
+                        ViperParams.PARAM_SPK_PSYCHO_BASS_ENABLE
+                    ), intArrayOf(if (enabled) 1 else 0)
+                ),
+                ParamEntry(
+                    p(
+                        ViperParams.PARAM_HP_PSYCHO_BASS_CUTOFF,
+                        ViperParams.PARAM_SPK_PSYCHO_BASS_CUTOFF
+                    ), intArrayOf(vals.cutoff)
+                ),
+                ParamEntry(
+                    p(
+                        ViperParams.PARAM_HP_PSYCHO_BASS_INTENSITY,
+                        ViperParams.PARAM_SPK_PSYCHO_BASS_INTENSITY
+                    ), intArrayOf(vals.intensity)
+                ),
+                ParamEntry(
+                    p(
+                        ViperParams.PARAM_HP_PSYCHO_BASS_HARMONIC_ORDER,
+                        ViperParams.PARAM_SPK_PSYCHO_BASS_HARMONIC_ORDER
+                    ), intArrayOf(vals.harmonicOrder)
+                ),
+                ParamEntry(
+                    p(
+                        ViperParams.PARAM_HP_PSYCHO_BASS_ORIGINAL_LEVEL,
+                        ViperParams.PARAM_SPK_PSYCHO_BASS_ORIGINAL_LEVEL
+                    ), intArrayOf(vals.originalLevel)
+                )
+            )
+        )
+    }
+
+    fun setPsychoBassCutoff(v: Int) {
+        val isSpk = activeDeviceType == ViperParams.FX_TYPE_SPEAKER
+        _uiState.update {
+            it.copy(psychoBass = it.psychoBass.updateType(activeDeviceType) { copy(cutoff = v) })
+        }
+        val prefKey =
+            if (isSpk) "${ViperParams.PARAM_SPK_PSYCHO_BASS_CUTOFF}" else "${ViperParams.PARAM_HP_PSYCHO_BASS_CUTOFF}"
+        val param =
+            if (isSpk) ViperParams.PARAM_SPK_PSYCHO_BASS_CUTOFF else ViperParams.PARAM_HP_PSYCHO_BASS_CUTOFF
+        saveAndDispatchInt(prefKey, param, v)
+    }
+
+    fun setPsychoBassIntensity(v: Int) {
+        val isSpk = activeDeviceType == ViperParams.FX_TYPE_SPEAKER
+        _uiState.update {
+            it.copy(psychoBass = it.psychoBass.updateType(activeDeviceType) { copy(intensity = v) })
+        }
+        val prefKey =
+            if (isSpk) "${ViperParams.PARAM_SPK_PSYCHO_BASS_INTENSITY}" else "${ViperParams.PARAM_HP_PSYCHO_BASS_INTENSITY}"
+        val param =
+            if (isSpk) ViperParams.PARAM_SPK_PSYCHO_BASS_INTENSITY else ViperParams.PARAM_HP_PSYCHO_BASS_INTENSITY
+        saveAndDispatchInt(prefKey, param, v)
+    }
+
+    fun setPsychoBassHarmonicOrder(v: Int) {
+        val isSpk = activeDeviceType == ViperParams.FX_TYPE_SPEAKER
+        _uiState.update {
+            it.copy(psychoBass = it.psychoBass.updateType(activeDeviceType) { copy(harmonicOrder = v) })
+        }
+        val prefKey =
+            if (isSpk) "${ViperParams.PARAM_SPK_PSYCHO_BASS_HARMONIC_ORDER}" else "${ViperParams.PARAM_HP_PSYCHO_BASS_HARMONIC_ORDER}"
+        val param =
+            if (isSpk) ViperParams.PARAM_SPK_PSYCHO_BASS_HARMONIC_ORDER else ViperParams.PARAM_HP_PSYCHO_BASS_HARMONIC_ORDER
+        saveAndDispatchInt(prefKey, param, v)
+    }
+
+    fun setPsychoBassOriginalLevel(v: Int) {
+        val isSpk = activeDeviceType == ViperParams.FX_TYPE_SPEAKER
+        _uiState.update {
+            it.copy(psychoBass = it.psychoBass.updateType(activeDeviceType) { copy(originalLevel = v) })
+        }
+        val prefKey =
+            if (isSpk) "${ViperParams.PARAM_SPK_PSYCHO_BASS_ORIGINAL_LEVEL}" else "${ViperParams.PARAM_HP_PSYCHO_BASS_ORIGINAL_LEVEL}"
+        val param =
+            if (isSpk) ViperParams.PARAM_SPK_PSYCHO_BASS_ORIGINAL_LEVEL else ViperParams.PARAM_HP_PSYCHO_BASS_ORIGINAL_LEVEL
+        saveAndDispatchInt(prefKey, param, v)
     }
 
     fun setBassEnabled(enabled: Boolean) {

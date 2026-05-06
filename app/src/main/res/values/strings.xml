@@ -150,6 +150,17 @@
     <!-- Tube Simulator -->
     <string name="section_tube_simulator">Tube Simulator (6N1J)</string>
 
+    <!-- Psychoacoustic Bass -->
+    <string name="section_psychoacoustic_bass">Psychoacoustic Bass</string>
+    <string name="label_cutoff">Cutoff</string>
+    <string name="label_intensity">Intensity</string>
+    <string name="label_harmonic_order">Harmonic Order</string>
+    <string name="label_original_bass_level">Original Bass Level</string>
+    <string name="harmonic_2nd">2nd</string>
+    <string name="harmonic_3rd">3rd</string>
+    <string name="harmonic_4th">4th</string>
+    <string name="harmonic_5th">5th</string>
+
     <!-- ViPER Bass -->
     <string name="section_viper_bass">ViPER Bass</string>
     <string name="label_bass_mode">Mode</string>

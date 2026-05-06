@@ -1210,6 +1210,38 @@ class ViperService : LifecycleService() {
             )
         )
 
+        // Psycho Bass
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_HP_PSYCHO_BASS_ENABLE,
+                intArrayOf(if (state.psychoBass.hp.enabled) 1 else 0)
+            )
+        )
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_HP_PSYCHO_BASS_CUTOFF,
+                intArrayOf(state.psychoBass.hp.cutoff)
+            )
+        )
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_HP_PSYCHO_BASS_INTENSITY,
+                intArrayOf(state.psychoBass.hp.intensity)
+            )
+        )
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_HP_PSYCHO_BASS_HARMONIC_ORDER,
+                intArrayOf(state.psychoBass.hp.harmonicOrder)
+            )
+        )
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_HP_PSYCHO_BASS_ORIGINAL_LEVEL,
+                intArrayOf(state.psychoBass.hp.originalLevel)
+            )
+        )
+
         // Bass
         params.add(
             ParamEntry(
@@ -1960,6 +1992,38 @@ class ViperService : LifecycleService() {
             ParamEntry(
                 ViperParams.PARAM_SPK_TUBE_SIMULATOR_ENABLE,
                 intArrayOf(if (state.tube.spk.enabled) 1 else 0)
+            )
+        )
+
+        // Psycho Bass
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_SPK_PSYCHO_BASS_ENABLE,
+                intArrayOf(if (state.psychoBass.spk.enabled) 1 else 0)
+            )
+        )
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_SPK_PSYCHO_BASS_CUTOFF,
+                intArrayOf(state.psychoBass.spk.cutoff)
+            )
+        )
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_SPK_PSYCHO_BASS_INTENSITY,
+                intArrayOf(state.psychoBass.spk.intensity)
+            )
+        )
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_SPK_PSYCHO_BASS_HARMONIC_ORDER,
+                intArrayOf(state.psychoBass.spk.harmonicOrder)
+            )
+        )
+        params.add(
+            ParamEntry(
+                ViperParams.PARAM_SPK_PSYCHO_BASS_ORIGINAL_LEVEL,
+                intArrayOf(state.psychoBass.spk.originalLevel)
             )
         )
 

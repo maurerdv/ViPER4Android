@@ -1247,6 +1247,63 @@ val EFFECT_PREFS: List<EffectPref<*>> = listOf(
         setSp = { copy(tube = tube.copy(spk = tube.spk.copy(enabled = it))) }
     ),
 
+    // Psycho Bass
+    BoolPref(
+        hpPrefKey = "${ViperParams.PARAM_HP_PSYCHO_BASS_ENABLE}",
+        spkPrefKey = "${ViperParams.PARAM_SPK_PSYCHO_BASS_ENABLE}",
+        jsonKey = "psychoBassEnabled",
+        spkJsonKey = "spkPsychoBassEnabled",
+        defaultValue = false,
+        getHp = { it.psychoBass.hp.enabled },
+        setHp = { copy(psychoBass = psychoBass.copy(hp = psychoBass.hp.copy(enabled = it))) },
+        getSp = { it.psychoBass.spk.enabled },
+        setSp = { copy(psychoBass = psychoBass.copy(spk = psychoBass.spk.copy(enabled = it))) }
+    ),
+    IntPref(
+        hpPrefKey = "${ViperParams.PARAM_HP_PSYCHO_BASS_CUTOFF}",
+        spkPrefKey = "${ViperParams.PARAM_SPK_PSYCHO_BASS_CUTOFF}",
+        jsonKey = "psychoBassCutoff",
+        spkJsonKey = "spkPsychoBassCutoff",
+        defaultValue = 80,
+        getHp = { it.psychoBass.hp.cutoff },
+        setHp = { copy(psychoBass = psychoBass.copy(hp = psychoBass.hp.copy(cutoff = it))) },
+        getSp = { it.psychoBass.spk.cutoff },
+        setSp = { copy(psychoBass = psychoBass.copy(spk = psychoBass.spk.copy(cutoff = it))) }
+    ),
+    IntPref(
+        hpPrefKey = "${ViperParams.PARAM_HP_PSYCHO_BASS_INTENSITY}",
+        spkPrefKey = "${ViperParams.PARAM_SPK_PSYCHO_BASS_INTENSITY}",
+        jsonKey = "psychoBassIntensity",
+        spkJsonKey = "spkPsychoBassIntensity",
+        defaultValue = 50,
+        getHp = { it.psychoBass.hp.intensity },
+        setHp = { copy(psychoBass = psychoBass.copy(hp = psychoBass.hp.copy(intensity = it))) },
+        getSp = { it.psychoBass.spk.intensity },
+        setSp = { copy(psychoBass = psychoBass.copy(spk = psychoBass.spk.copy(intensity = it))) }
+    ),
+    IntPref(
+        hpPrefKey = "${ViperParams.PARAM_HP_PSYCHO_BASS_HARMONIC_ORDER}",
+        spkPrefKey = "${ViperParams.PARAM_SPK_PSYCHO_BASS_HARMONIC_ORDER}",
+        jsonKey = "psychoBassHarmonicOrder",
+        spkJsonKey = "spkPsychoBassHarmonicOrder",
+        defaultValue = 3,
+        getHp = { it.psychoBass.hp.harmonicOrder },
+        setHp = { copy(psychoBass = psychoBass.copy(hp = psychoBass.hp.copy(harmonicOrder = it))) },
+        getSp = { it.psychoBass.spk.harmonicOrder },
+        setSp = { copy(psychoBass = psychoBass.copy(spk = psychoBass.spk.copy(harmonicOrder = it))) }
+    ),
+    IntPref(
+        hpPrefKey = "${ViperParams.PARAM_HP_PSYCHO_BASS_ORIGINAL_LEVEL}",
+        spkPrefKey = "${ViperParams.PARAM_SPK_PSYCHO_BASS_ORIGINAL_LEVEL}",
+        jsonKey = "psychoBassOriginalLevel",
+        spkJsonKey = "spkPsychoBassOriginalLevel",
+        defaultValue = 100,
+        getHp = { it.psychoBass.hp.originalLevel },
+        setHp = { copy(psychoBass = psychoBass.copy(hp = psychoBass.hp.copy(originalLevel = it))) },
+        getSp = { it.psychoBass.spk.originalLevel },
+        setSp = { copy(psychoBass = psychoBass.copy(spk = psychoBass.spk.copy(originalLevel = it))) }
+    ),
+
     // Bass
     BoolPref(
         hpPrefKey = "${ViperParams.PARAM_HP_BASS_ENABLE}",

@@ -360,6 +360,29 @@ data class DynamicSystemState(
         else copy(hp = hp.transform())
 }
 
+data class PsychoBassValues(
+    val enabled: Boolean = false,
+    val cutoff: Int = 80,
+    val intensity: Int = 50,
+    val harmonicOrder: Int = 3,
+    val originalLevel: Int = 100
+)
+
+data class PsychoBassState(
+    val hp: PsychoBassValues = PsychoBassValues(),
+    val spk: PsychoBassValues = PsychoBassValues()
+) {
+    fun forType(fxType: Int): PsychoBassValues =
+        if (fxType == ViperParams.FX_TYPE_SPEAKER) spk else hp
+
+    fun updateType(
+        fxType: Int,
+        transform: PsychoBassValues.() -> PsychoBassValues
+    ): PsychoBassState =
+        if (fxType == ViperParams.FX_TYPE_SPEAKER) copy(spk = spk.transform())
+        else copy(hp = hp.transform())
+}
+
 data class BassValues(
     val enabled: Boolean = false,
     val mode: Int = 0,
