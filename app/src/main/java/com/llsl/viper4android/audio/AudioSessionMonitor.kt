@@ -11,22 +11,25 @@ import com.llsl.viper4android.utils.RootShell
 class AudioSessionMonitor(
     context: Context,
     private val onSessionOpen: (sessionId: Int, packageName: String) -> Unit,
-    private val onSessionClose: (sessionId: Int) -> Unit
+    private val onSessionClose: (sessionId: Int) -> Unit,
 ) {
-
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private val mainHandler = Handler(Looper.getMainLooper())
     private val activePiids = mutableMapOf<Int, SessionInfo>()
     private var registered = false
     private var pendingResolve = false
 
-    private data class SessionInfo(val sessionId: Int, val packageName: String)
+    private data class SessionInfo(
+        val sessionId: Int,
+        val packageName: String,
+    )
 
-    private val playbackCallback = object : AudioManager.AudioPlaybackCallback() {
-        override fun onPlaybackConfigChanged(configs: MutableList<AudioPlaybackConfiguration>) {
-            handlePlaybackChange()
+    private val playbackCallback =
+        object : AudioManager.AudioPlaybackCallback() {
+            override fun onPlaybackConfigChanged(configs: MutableList<AudioPlaybackConfiguration>) {
+                handlePlaybackChange()
+            }
         }
-    }
 
     fun start() {
         if (registered) return
@@ -77,7 +80,7 @@ class AudioSessionMonitor(
                 activePiids[piid] = info
                 FileLogger.i(
                     TAG,
-                    "New session piid=$piid session=${info.sessionId} (${info.packageName})"
+                    "New session piid=$piid session=${info.sessionId} (${info.packageName})",
                 )
                 onSessionOpen(info.sessionId, info.packageName)
             }
@@ -87,7 +90,7 @@ class AudioSessionMonitor(
                 if (info.sessionId > 0) {
                     FileLogger.i(
                         TAG,
-                        "Session ended piid=$piid session=${info.sessionId} (${info.packageName})"
+                        "Session ended piid=$piid session=${info.sessionId} (${info.packageName})",
                     )
                     onSessionClose(info.sessionId)
                 }
@@ -95,20 +98,30 @@ class AudioSessionMonitor(
         }
     }
 
-    private fun queryActivePlayers(): Map<Int, SessionInfo>? {
-        return try {
-            val process = RootShell.exec(
-                "dumpsys audio | grep -E 'state:started|new player'",
-                timeoutSec = DUMPSYS_TIMEOUT_SEC
-            )
+    private fun queryActivePlayers(): Map<Int, SessionInfo>? =
+        try {
+            val process =
+                RootShell.exec(
+                    "dumpsys audio | grep -E 'state:started|new player'",
+                    timeoutSec = DUMPSYS_TIMEOUT_SEC,
+                )
             val text = process.inputStream.bufferedReader().readText()
 
             val playerSessions = mutableMapOf<Int, SessionInfo>()
             for (line in text.lineSequence()) {
                 val trimmed = line.trim()
                 val piid =
-                    PIID_PATTERN.find(trimmed)?.groupValues?.get(1)?.toIntOrNull() ?: continue
-                val sid = SESSION_PATTERN.find(trimmed)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+                    PIID_PATTERN
+                        .find(trimmed)
+                        ?.groupValues
+                        ?.get(1)
+                        ?.toIntOrNull() ?: continue
+                val sid =
+                    SESSION_PATTERN
+                        .find(trimmed)
+                        ?.groupValues
+                        ?.get(1)
+                        ?.toIntOrNull() ?: 0
                 val pkg = PACKAGE_PATTERN.find(trimmed)?.groupValues?.get(1) ?: ""
                 if (sid > 0 && (piid !in playerSessions || pkg.isNotEmpty())) {
                     playerSessions[piid] = SessionInfo(sid, pkg)
@@ -118,7 +131,12 @@ class AudioSessionMonitor(
             val activePiidSet = mutableSetOf<Int>()
             for (line in text.lineSequence()) {
                 if (!line.contains("state:started")) continue
-                val piid = PIID_PATTERN.find(line)?.groupValues?.get(1)?.toIntOrNull() ?: continue
+                val piid =
+                    PIID_PATTERN
+                        .find(line)
+                        ?.groupValues
+                        ?.get(1)
+                        ?.toIntOrNull() ?: continue
                 activePiidSet.add(piid)
             }
 
@@ -132,7 +150,6 @@ class AudioSessionMonitor(
             FileLogger.e(TAG, "dumpsys query failed", e)
             null
         }
-    }
 
     companion object {
         private const val TAG = "SessionMonitor"

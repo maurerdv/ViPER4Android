@@ -20,7 +20,7 @@ import com.llsl.viper4android.ui.screens.main.DriverStatus
 @Composable
 fun DriverStatusDialog(
     driverStatus: DriverStatus,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -30,39 +30,43 @@ fun DriverStatusDialog(
                 Text(
                     text = stringResource(R.string.driver_not_found),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
                 )
             } else {
                 Column {
                     StatusRow(
                         label = stringResource(R.string.driver_version_code),
-                        value = driverStatus.versionCode.toString()
+                        value = driverStatus.versionCode.toString(),
                     )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     StatusRow(
                         label = stringResource(R.string.driver_version_name),
-                        value = driverStatus.versionName
+                        value = driverStatus.versionName,
                     )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     StatusRow(
                         label = stringResource(R.string.driver_architecture),
-                        value = driverStatus.architecture
+                        value = driverStatus.architecture,
                     )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     StatusRow(
                         label = stringResource(R.string.driver_streaming),
-                        value = if (driverStatus.streaming)
-                            stringResource(R.string.status_active)
-                        else
-                            stringResource(R.string.status_inactive)
+                        value =
+                            if (driverStatus.streaming) {
+                                stringResource(R.string.status_active)
+                            } else {
+                                stringResource(R.string.status_inactive)
+                            },
                     )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     StatusRow(
                         label = stringResource(R.string.driver_sampling_rate),
-                        value = if (driverStatus.samplingRate > 0)
-                            "${driverStatus.samplingRate} Hz"
-                        else
-                            stringResource(R.string.status_unknown)
+                        value =
+                            if (driverStatus.samplingRate > 0) {
+                                "${driverStatus.samplingRate} Hz"
+                            } else {
+                                stringResource(R.string.status_unknown)
+                            },
                     )
                 }
             }
@@ -71,26 +75,30 @@ fun DriverStatusDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.action_close))
             }
-        }
+        },
     )
 }
 
 @Composable
-private fun StatusRow(label: String, value: String) {
+private fun StatusRow(
+    label: String,
+    value: String,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }

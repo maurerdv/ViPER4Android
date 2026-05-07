@@ -10,7 +10,10 @@ import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.util.concurrent.atomic.AtomicBoolean
 
-data class ParamEntry(val paramId: Int, val values: IntArray) {
+data class ParamEntry(
+    val paramId: Int,
+    val values: IntArray,
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ParamEntry) return false
@@ -20,7 +23,10 @@ data class ParamEntry(val paramId: Int, val values: IntArray) {
     override fun hashCode(): Int = 31 * paramId + values.contentHashCode()
 }
 
-data class ByteArrayParam(val paramId: Int, val data: ByteArray) {
+data class ByteArrayParam(
+    val paramId: Int,
+    val data: ByteArray,
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ByteArrayParam) return false
@@ -37,11 +43,10 @@ data class FileDriverStatus(
     val sampleRate: Int = 0,
     val versionCode: Int = -1,
     val versionName: String = "",
-    val architecture: String = ""
+    val architecture: String = "",
 )
 
 object ConfigChannel {
-
     private const val SHM_STATUS_PATH = "/data/local/tmp/v4a/shm_status.bin"
     private const val SHM_HP_PATH = "/data/local/tmp/v4a/shm_hp.bin"
     private const val SHM_SPK_PATH = "/data/local/tmp/v4a/shm_spk.bin"
@@ -64,6 +69,7 @@ object ConfigChannel {
     private val hpCurrentParams = linkedMapOf<Long, ParamEntry>()
     private val spkCurrentParams = linkedMapOf<Long, ParamEntry>()
     private var activeFxType: Int = 0
+
     private fun shmFxType(viperFxType: Int): Int = if (viperFxType == 2) 1 else 0
 
     fun ensureInitialized() {
@@ -89,17 +95,17 @@ object ConfigChannel {
     private fun createShmViaSu() {
         RootShell.exec(
             "mkdir -p /data/local/tmp/v4a/hp /data/local/tmp/v4a/spk && " +
-                    "[ ! -f $SHM_STATUS_PATH ] && dd if=/dev/zero of=$SHM_STATUS_PATH bs=$STATUS_SHM_SIZE count=1 2>/dev/null; " +
-                    "[ ! -f $SHM_HP_PATH ] && dd if=/dev/zero of=$SHM_HP_PATH bs=$PARAM_SHM_SIZE count=1 2>/dev/null; " +
-                    "[ ! -f $SHM_SPK_PATH ] && dd if=/dev/zero of=$SHM_SPK_PATH bs=$PARAM_SHM_SIZE count=1 2>/dev/null; " +
-                    "chmod 666 $SHM_STATUS_PATH $SHM_HP_PATH $SHM_SPK_PATH; " +
-                    "chcon u:object_r:shell_data_file:s0 $SHM_STATUS_PATH $SHM_HP_PATH $SHM_SPK_PATH 2>/dev/null; " +
-                    "echo ok"
+                "[ ! -f $SHM_STATUS_PATH ] && dd if=/dev/zero of=$SHM_STATUS_PATH bs=$STATUS_SHM_SIZE count=1 2>/dev/null; " +
+                "[ ! -f $SHM_HP_PATH ] && dd if=/dev/zero of=$SHM_HP_PATH bs=$PARAM_SHM_SIZE count=1 2>/dev/null; " +
+                "[ ! -f $SHM_SPK_PATH ] && dd if=/dev/zero of=$SHM_SPK_PATH bs=$PARAM_SHM_SIZE count=1 2>/dev/null; " +
+                "chmod 666 $SHM_STATUS_PATH $SHM_HP_PATH $SHM_SPK_PATH; " +
+                "chcon u:object_r:shell_data_file:s0 $SHM_STATUS_PATH $SHM_HP_PATH $SHM_SPK_PATH 2>/dev/null; " +
+                "echo ok",
         )
     }
 
-    private fun mapShm(): Boolean {
-        return try {
+    private fun mapShm(): Boolean =
+        try {
             statusBuffer = mapSingleShm(SHM_STATUS_PATH, STATUS_SHM_SIZE)
             hpBuffer = mapSingleShm(SHM_HP_PATH, PARAM_SHM_SIZE)
             spkBuffer = mapSingleShm(SHM_SPK_PATH, PARAM_SHM_SIZE)
@@ -108,14 +114,16 @@ object ConfigChannel {
             FileLogger.e("ConfigChannel", "mmap failed, will use su fallback", e)
             false
         }
-    }
 
-    private fun mapSingleShm(path: String, size: Int): MappedByteBuffer? {
+    private fun mapSingleShm(
+        path: String,
+        size: Int,
+    ): MappedByteBuffer? {
         val file = File(path)
         if (!file.exists() || file.length() < size) {
             FileLogger.w(
                 "ConfigChannel",
-                "SHM file not ready: $path exists=${file.exists()} size=${file.length()}"
+                "SHM file not ready: $path exists=${file.exists()} size=${file.length()}",
             )
             return null
         }
@@ -138,27 +146,24 @@ object ConfigChannel {
     private fun paramKey(entry: ParamEntry): Long {
         val id = entry.paramId.toLong()
         if (
-            entry.values.size >= 2
-            && (entry.paramId == ViperParams.PARAM_HP_EQ_BAND_LEVEL || entry.paramId == ViperParams.PARAM_SPK_EQ_BAND_LEVEL)
+            entry.values.size >= 2 &&
+            (entry.paramId == ViperParams.PARAM_HP_EQ_BAND_LEVEL || entry.paramId == ViperParams.PARAM_SPK_EQ_BAND_LEVEL)
         ) {
             return (id shl 32) or (entry.values[0].toLong() and 0xFFFFFFFFL)
         }
         return id shl 32
     }
 
-    private fun activeParamBuffer(): MappedByteBuffer? {
-        return if (shmFxType(activeFxType) == 0) hpBuffer else spkBuffer
-    }
+    private fun activeParamBuffer(): MappedByteBuffer? = if (shmFxType(activeFxType) == 0) hpBuffer else spkBuffer
 
-    private fun activeCurrentParams(): LinkedHashMap<Long, ParamEntry> {
-        return if (shmFxType(activeFxType) == 0) hpCurrentParams else spkCurrentParams
-    }
+    private fun activeCurrentParams(): LinkedHashMap<Long, ParamEntry> =
+        if (shmFxType(activeFxType) == 0) hpCurrentParams else spkCurrentParams
 
     fun setActiveFxType(fxType: Int) {
         synchronized(writeLock) {
             FileLogger.i(
                 "ConfigChannel",
-                "setActiveFxType: $fxType (was $activeFxType) statusBuf=${if (statusBuffer != null) "OK" else "NULL"}"
+                "setActiveFxType: $fxType (was $activeFxType) statusBuf=${if (statusBuffer != null) "OK" else "NULL"}",
             )
             activeFxType = fxType
             val shmType = shmFxType(fxType)
@@ -175,7 +180,7 @@ object ConfigChannel {
     fun writeFullState(
         params: List<ParamEntry>,
         byteArrayParams: List<ByteArrayParam>? = null,
-        fxType: Int = activeFxType
+        fxType: Int = activeFxType,
     ) {
         if (params.isEmpty() && byteArrayParams.isNullOrEmpty()) return
         ensureInitialized()
@@ -191,12 +196,12 @@ object ConfigChannel {
             val ba = byteArrayParams ?: emptyList()
             FileLogger.i(
                 "ConfigChannel",
-                "writeFullState: channel=$channel intParams=${targetParams.size} byteArrays=${ba.size} buf=${if (targetBuffer != null) "OK" else "NULL"}"
+                "writeFullState: channel=$channel intParams=${targetParams.size} byteArrays=${ba.size} buf=${if (targetBuffer != null) "OK" else "NULL"}",
             )
             for (b in ba) {
                 FileLogger.i(
                     "ConfigChannel",
-                    "  byteArray: paramId=${b.paramId} size=${b.data.size}"
+                    "  byteArray: paramId=${b.paramId} size=${b.data.size}",
                 )
             }
             writeParamsToShm(targetParams.values.toList(), byteArrayParams, targetBuffer)
@@ -215,7 +220,11 @@ object ConfigChannel {
         }
     }
 
-    fun writeParamsByteArray(paramId: Int, data: ByteArray, extraParams: List<ParamEntry>? = null) {
+    fun writeParamsByteArray(
+        paramId: Int,
+        data: ByteArray,
+        extraParams: List<ParamEntry>? = null,
+    ) {
         ensureInitialized()
         synchronized(writeLock) {
             val buf = activeParamBuffer()
@@ -257,7 +266,7 @@ object ConfigChannel {
     private fun writeParamsToShm(
         params: List<ParamEntry>,
         byteArrayParams: List<ByteArrayParam>? = null,
-        buffer: MappedByteBuffer? = null
+        buffer: MappedByteBuffer? = null,
     ) {
         val buf = buffer ?: activeParamBuffer()
         if (buf != null) {
@@ -301,7 +310,7 @@ object ConfigChannel {
             incrementParamsSeq(buf)
             FileLogger.i(
                 "ConfigChannel",
-                "writeParamsToShm: count=$totalCount dataSize=$dataSize seq=${prevSeq + 1}"
+                "writeParamsToShm: count=$totalCount dataSize=$dataSize seq=${prevSeq + 1}",
             )
         } else {
             FileLogger.w("ConfigChannel", "writeParamsToShm: buffer is NULL, using su fallback")
@@ -361,17 +370,23 @@ object ConfigChannel {
             sampleRate = sampleRate,
             versionCode = versionCode,
             versionName = versionName,
-            architecture = architecture
+            architecture = architecture,
         )
     }
 
     private fun readStatusViaSu(): FileDriverStatus? {
         try {
             val statusRegionSize = 128
-            val process = RootShell.exec(
-                "xxd -p -l $statusRegionSize -s $STATUS_DATA_OFFSET $SHM_STATUS_PATH"
-            )
-            val hex = process.inputStream.bufferedReader().readText().trim().replace("\n", "")
+            val process =
+                RootShell.exec(
+                    "xxd -p -l $statusRegionSize -s $STATUS_DATA_OFFSET $SHM_STATUS_PATH",
+                )
+            val hex =
+                process.inputStream
+                    .bufferedReader()
+                    .readText()
+                    .trim()
+                    .replace("\n", "")
             if (hex.length < 256) return null
 
             val bytes = ByteArray(128)
@@ -400,15 +415,16 @@ object ConfigChannel {
             val architecture =
                 if (archEnd >= 0) String(archBytes, 0, archEnd) else String(archBytes)
 
-            val status = FileDriverStatus(
-                enabled = enabled,
-                configured = configured,
-                streaming = streaming,
-                sampleRate = sampleRate,
-                versionCode = versionCode,
-                versionName = versionName,
-                architecture = architecture
-            )
+            val status =
+                FileDriverStatus(
+                    enabled = enabled,
+                    configured = configured,
+                    streaming = streaming,
+                    sampleRate = sampleRate,
+                    versionCode = versionCode,
+                    versionName = versionName,
+                    architecture = architecture,
+                )
             cachedStatus = status
             return status
         } catch (e: Exception) {
@@ -453,7 +469,10 @@ object ConfigChannel {
         }
     }
 
-    private fun writeByteArrayViaSu(paramId: Int, data: ByteArray) {
+    private fun writeByteArrayViaSu(
+        paramId: Int,
+        data: ByteArray,
+    ) {
         val magic = 0x56345041
         val version = 1
         val byteCount = data.size

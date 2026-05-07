@@ -13,16 +13,19 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class BootCompletedReceiver : BroadcastReceiver() {
-
     @Inject
     lateinit var repository: ViperRepository
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
 
-        val autoStart = runBlocking {
-            repository.getBooleanPreference("auto_start", true).first()
-        }
+        val autoStart =
+            runBlocking {
+                repository.getBooleanPreference("auto_start", true).first()
+            }
         if (!autoStart) return
 
         try {
@@ -31,7 +34,7 @@ class BootCompletedReceiver : BroadcastReceiver() {
             FileLogger.e(
                 "BootReceiver",
                 "Cannot start FGS from boot, will start on next app open",
-                e
+                e,
             )
         }
     }

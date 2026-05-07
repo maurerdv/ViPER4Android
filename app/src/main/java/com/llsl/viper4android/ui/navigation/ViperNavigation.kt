@@ -12,7 +12,7 @@ fun ViperNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = "main"
+        startDestination = "main",
     ) {
         composable("main") {
             MainScreen()

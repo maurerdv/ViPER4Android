@@ -70,7 +70,11 @@ import kotlin.math.log10
 import kotlin.math.roundToInt
 
 @Composable
-fun MasterLimiterSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun MasterLimiterSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.out.forType(fxType)
     val outputVolume = vals.volume
@@ -89,7 +93,7 @@ fun MasterLimiterSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
         enabled = masterEnabled,
         onEnabledChange = onMasterEnabledChange,
         icon = Icons.AutoMirrored.Filled.VolumeUp,
-        initiallyExpanded = true
+        initiallyExpanded = true,
     ) {
         val gainDb = if (outputVolume > 0) 20.0 * log10(outputVolume / 100.0) else -99.9
         LabeledSlider(
@@ -97,7 +101,7 @@ fun MasterLimiterSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             value = outputVolume.toFloat(),
             onValueChange = { onOutputVolumeChange(it.roundToInt()) },
             valueRange = 1f..200f,
-            valueLabel = "${"%.1f".format(gainDb)}dB"
+            valueLabel = "${"%.1f".format(gainDb)}dB",
         )
         if (!isSpkMode) {
             val left = 50 - channelPan / 2
@@ -107,7 +111,7 @@ fun MasterLimiterSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
                 value = channelPan.toFloat(),
                 onValueChange = { onChannelPanChange(it.roundToInt()) },
                 valueRange = -100f..100f,
-                valueLabel = "$left:$right"
+                valueLabel = "$left:$right",
             )
         }
         val limDb = if (limiter > 0) 20.0 * log10(limiter / 100.0) else -99.9
@@ -116,13 +120,17 @@ fun MasterLimiterSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             value = limiter.toFloat(),
             onValueChange = { onLimiterChange(it.roundToInt()) },
             valueRange = 30f..100f,
-            valueLabel = "${"%.1f".format(limDb)}dB"
+            valueLabel = "${"%.1f".format(limDb)}dB",
         )
     }
 }
 
 @Composable
-fun PlaybackGainSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun PlaybackGainSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.agc.forType(fxType)
     val enabled = vals.enabled
@@ -139,21 +147,21 @@ fun PlaybackGainSection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
         title = stringResource(R.string.section_agc),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.AutoMirrored.Filled.TrendingUp
+        icon = Icons.AutoMirrored.Filled.TrendingUp,
     ) {
         LabeledSlider(
             label = stringResource(R.string.label_strength),
             value = strength.toFloat(),
             onValueChange = { onStrengthChange(it.roundToInt()) },
             valueRange = 50f..300f,
-            valueLabel = "${"%.1f".format(strength / 100.0)}x"
+            valueLabel = "${"%.1f".format(strength / 100.0)}x",
         )
         LabeledSlider(
             label = stringResource(R.string.label_max_gain),
             value = maxGain.toFloat(),
             onValueChange = { onMaxGainChange(it.roundToInt()) },
             valueRange = 100f..1000f,
-            valueLabel = "${"%.1f".format(maxGain / 100.0)}x"
+            valueLabel = "${"%.1f".format(maxGain / 100.0)}x",
         )
         val threshDb = if (threshold > 0) 20.0 * log10(threshold / 100.0) else -99.9
         LabeledSlider(
@@ -161,13 +169,17 @@ fun PlaybackGainSection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
             value = threshold.toFloat(),
             onValueChange = { onThresholdChange(it.roundToInt()) },
             valueRange = 30f..100f,
-            valueLabel = "${"%.1f".format(threshDb)}dB"
+            valueLabel = "${"%.1f".format(threshDb)}dB",
         )
     }
 }
 
 @Composable
-fun LUFSTargetingSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun LUFSTargetingSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.lufs.forType(fxType)
     val enabled = vals.enabled
@@ -180,31 +192,32 @@ fun LUFSTargetingSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
     val onMaxGainChange = viewModel::setLufsMaxGain
     val onSpeedChange = viewModel::setLufsSpeed
 
-    val speedNames = listOf(
-        stringResource(R.string.label_lufs_speed_slow),
-        stringResource(R.string.label_lufs_speed_medium),
-        stringResource(R.string.label_lufs_speed_fast)
-    )
+    val speedNames =
+        listOf(
+            stringResource(R.string.label_lufs_speed_slow),
+            stringResource(R.string.label_lufs_speed_medium),
+            stringResource(R.string.label_lufs_speed_fast),
+        )
 
     EffectSection(
         title = stringResource(R.string.section_lufs_targeting),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.CrisisAlert
+        icon = Icons.Default.CrisisAlert,
     ) {
         LabeledSlider(
             label = stringResource(R.string.label_lufs_target_lufs),
             value = target.toFloat(),
             onValueChange = { onTargetChange(it.roundToInt()) },
             valueRange = 80f..240f,
-            valueLabel = String.format(Locale.US, "%.1f LUFS", target / -10f)
+            valueLabel = String.format(Locale.US, "%.1f LUFS", target / -10f),
         )
         LabeledSlider(
             label = stringResource(R.string.label_max_gain),
             value = maxGain.toFloat(),
             onValueChange = { onMaxGainChange(it.roundToInt()) },
             valueRange = 0f..120f,
-            valueLabel = String.format(Locale.US, "%.1f dB", maxGain / 10f)
+            valueLabel = String.format(Locale.US, "%.1f dB", maxGain / 10f),
         )
         LabeledSlider(
             label = stringResource(R.string.label_lufs_speed),
@@ -212,13 +225,17 @@ fun LUFSTargetingSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             onValueChange = { onSpeedChange(it.roundToInt()) },
             valueRange = 0f..2f,
             steps = 1,
-            valueLabel = speedNames.getOrElse(speed) { speedNames[1] }
+            valueLabel = speedNames.getOrElse(speed) { speedNames[1] },
         )
     }
 }
 
 @Composable
-fun FetCompressorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun FetCompressorSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.fet.forType(fxType)
     val enabled = vals.enabled
@@ -261,26 +278,26 @@ fun FetCompressorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
         title = stringResource(R.string.section_fet_compressor),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.VerticalAlignCenter
+        icon = Icons.Default.VerticalAlignCenter,
     ) {
         LabeledSlider(
             label = stringResource(R.string.label_threshold),
             value = threshold.toFloat(),
             onValueChange = { onThresholdChange(it.roundToInt()) },
             valueRange = -48f..0f,
-            valueLabel = "$threshold dB"
+            valueLabel = "$threshold dB",
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_ratio),
             value = ratio / 100f,
             onValueChange = { onRatioChange((it * 100f).roundToInt()) },
             valueRange = 0f..2f,
-            valueLabel = String.format(Locale.US, "%.1f", ratio / 100.0)
+            valueLabel = String.format(Locale.US, "%.1f", ratio / 100.0),
         )
         LabeledSwitch(
             label = stringResource(R.string.label_fet_auto_knee),
             checked = autoKnee,
-            onCheckedChange = onAutoKneeChange
+            onCheckedChange = onAutoKneeChange,
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_knee),
@@ -288,19 +305,19 @@ fun FetCompressorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             onValueChange = { onKneeChange(it.roundToInt()) },
             valueRange = 0f..12f,
             enabled = !autoKnee,
-            valueLabel = "$knee dB"
+            valueLabel = "$knee dB",
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_knee_multi),
             value = (kneeMulti / 100f * 4f),
             onValueChange = { onKneeMultiChange((it / 4f * 100f).roundToInt()) },
             valueRange = 0f..4f,
-            valueLabel = String.format(Locale.US, "%.1fx", kneeMulti / 100.0 * 4.0)
+            valueLabel = String.format(Locale.US, "%.1fx", kneeMulti / 100.0 * 4.0),
         )
         LabeledSwitch(
             label = stringResource(R.string.label_fet_auto_gain),
             checked = autoGain,
-            onCheckedChange = onAutoGainChange
+            onCheckedChange = onAutoGainChange,
         )
         LabeledSlider(
             label = stringResource(R.string.label_gain),
@@ -308,12 +325,12 @@ fun FetCompressorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             onValueChange = { onGainChange(it.roundToInt()) },
             valueRange = 0f..24f,
             enabled = !autoGain,
-            valueLabel = "$gain dB"
+            valueLabel = "$gain dB",
         )
         LabeledSwitch(
             label = stringResource(R.string.label_fet_auto_attack),
             checked = autoAttack,
-            onCheckedChange = onAutoAttackChange
+            onCheckedChange = onAutoAttackChange,
         )
         LabeledSlider(
             label = stringResource(R.string.label_attack),
@@ -321,19 +338,19 @@ fun FetCompressorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             onValueChange = { onAttackChange(it.roundToInt()) },
             valueRange = 1f..100f,
             enabled = !autoAttack,
-            valueLabel = "$attack ms"
+            valueLabel = "$attack ms",
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_max_attack),
             value = maxAttack.toFloat().coerceIn(1f, 100f),
             onValueChange = { onMaxAttackChange(it.roundToInt()) },
             valueRange = 1f..100f,
-            valueLabel = "$maxAttack ms"
+            valueLabel = "$maxAttack ms",
         )
         LabeledSwitch(
             label = stringResource(R.string.label_fet_auto_release),
             checked = autoRelease,
-            onCheckedChange = onAutoReleaseChange
+            onCheckedChange = onAutoReleaseChange,
         )
         LabeledSlider(
             label = stringResource(R.string.label_release),
@@ -341,33 +358,33 @@ fun FetCompressorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             onValueChange = { onReleaseChange(it.roundToInt()) },
             valueRange = 5f..500f,
             enabled = !autoRelease,
-            valueLabel = "$release ms"
+            valueLabel = "$release ms",
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_max_release),
             value = maxRelease.toFloat().coerceIn(5f, 500f),
             onValueChange = { onMaxReleaseChange(it.roundToInt()) },
             valueRange = 5f..500f,
-            valueLabel = "$maxRelease ms"
+            valueLabel = "$maxRelease ms",
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_crest),
             value = crest.toFloat().coerceIn(5f, 300f),
             onValueChange = { onCrestChange(it.roundToInt()) },
             valueRange = 5f..300f,
-            valueLabel = "$crest ms"
+            valueLabel = "$crest ms",
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_adapt),
             value = adapt.toFloat(),
             onValueChange = { onAdaptChange(it.roundToInt()) },
             valueRange = 0f..200f,
-            valueLabel = "$adapt%"
+            valueLabel = "$adapt%",
         )
         LabeledSwitch(
             label = stringResource(R.string.label_fet_no_clip),
             checked = noClip,
-            onCheckedChange = onNoClipChange
+            onCheckedChange = onNoClipChange,
         )
     }
 }
@@ -376,9 +393,13 @@ fun FetCompressorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
 fun MultibandCompressorSection(
     state: MainUiState,
     viewModel: MainViewModel,
-    isSpkMode: Boolean = false
+    isSpkMode: Boolean = false,
 ) {
-    fun parseInts(s: String, def: Int) = s.split(";").map { it.toIntOrNull() ?: def }
+    fun parseInts(
+        s: String,
+        def: Int,
+    ) = s.split(";").map { it.toIntOrNull() ?: def }
+
     fun parseBools(s: String) = s.split(";").map { (it.toIntOrNull() ?: 1) != 0 }
 
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
@@ -388,8 +409,10 @@ fun MultibandCompressorSection(
 
     val crossoverDefaults = listOf(120, 500, 4000, 8000)
     val bandEnables = parseBools(mbcVals.bandEnables)
-    val crossovers = mbcVals.crossovers.split(";")
-        .mapIndexed { i, v -> v.toIntOrNull() ?: crossoverDefaults.getOrElse(i) { 0 } }
+    val crossovers =
+        mbcVals.crossovers
+            .split(";")
+            .mapIndexed { i, v -> v.toIntOrNull() ?: crossoverDefaults.getOrElse(i) { 0 } }
 
     val thresholds = parseInts(mbcVals.thresholds, -18)
     val ratios = parseInts(mbcVals.ratios, 50)
@@ -453,14 +476,14 @@ fun MultibandCompressorSection(
         title = stringResource(R.string.section_multiband_compressor),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.Compress
+        icon = Icons.Default.Compress,
     ) {
         PrimaryTabRow(selectedTabIndex = selectedTab) {
             tabNames.forEachIndexed { index, title ->
                 Tab(
                     selected = selectedTab == index,
                     onClick = { selectedTab = index },
-                    text = { Text(title) }
+                    text = { Text(title) },
                 )
             }
         }
@@ -473,13 +496,13 @@ fun MultibandCompressorSection(
             text = "$lowFreq - ${if (b < 4) "$highFreq" else "20000+"} Hz",
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp),
         )
 
         LabeledSwitch(
             label = stringResource(R.string.label_band_enabled),
             checked = bandEnabled,
-            onCheckedChange = onBandEnableChange
+            onCheckedChange = onBandEnableChange,
         )
 
         if (b < 4) {
@@ -493,12 +516,15 @@ fun MultibandCompressorSection(
             val maxCrossover = minOf(crossoverHardMax[b], neighborMax)
             LabeledSlider(
                 label = stringResource(R.string.label_upper_crossover),
-                value = crossovers.getOrElse(b) { crossoverDefaults[b] }.toFloat()
-                    .coerceIn(minCrossover.toFloat(), maxCrossover.toFloat()),
+                value =
+                    crossovers
+                        .getOrElse(b) { crossoverDefaults[b] }
+                        .toFloat()
+                        .coerceIn(minCrossover.toFloat(), maxCrossover.toFloat()),
                 onValueChange = { onCrossoverChange(it.roundToInt()) },
                 valueRange = minCrossover.toFloat()..maxCrossover.toFloat(),
                 steps = ((maxCrossover - minCrossover) / 5).coerceAtLeast(1) - 1,
-                valueLabel = "${crossovers.getOrElse(b) { crossoverDefaults[b] }} Hz"
+                valueLabel = "${crossovers.getOrElse(b) { crossoverDefaults[b] }} Hz",
             )
         }
 
@@ -508,19 +534,19 @@ fun MultibandCompressorSection(
             onValueChange = { onThresholdChange(it.roundToInt()) },
             valueRange = -48f..0f,
             enabled = bandEnabled,
-            valueLabel = "$threshold dB"
+            valueLabel = "$threshold dB",
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_ratio),
             value = ratio / 100f,
             onValueChange = { onRatioChange((it * 100f).roundToInt()) },
             valueRange = 0f..2f,
-            valueLabel = String.format(Locale.US, "%.1f", ratio / 100.0)
+            valueLabel = String.format(Locale.US, "%.1f", ratio / 100.0),
         )
         LabeledSwitch(
             label = stringResource(R.string.label_fet_auto_knee),
             checked = autoKnee,
-            onCheckedChange = onAutoKneeChange
+            onCheckedChange = onAutoKneeChange,
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_knee),
@@ -528,19 +554,19 @@ fun MultibandCompressorSection(
             onValueChange = { onKneeChange(it.roundToInt()) },
             valueRange = 0f..12f,
             enabled = !autoKnee,
-            valueLabel = "$knee dB"
+            valueLabel = "$knee dB",
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_knee_multi),
             value = (kneeMulti / 100f * 4f),
             onValueChange = { onKneeMultiChange((it / 4f * 100f).roundToInt()) },
             valueRange = 0f..4f,
-            valueLabel = String.format(Locale.US, "%.1fx", kneeMulti / 100.0 * 4.0)
+            valueLabel = String.format(Locale.US, "%.1fx", kneeMulti / 100.0 * 4.0),
         )
         LabeledSwitch(
             label = stringResource(R.string.label_fet_auto_gain),
             checked = autoGain,
-            onCheckedChange = onAutoGainChange
+            onCheckedChange = onAutoGainChange,
         )
         LabeledSlider(
             label = stringResource(R.string.label_gain),
@@ -548,12 +574,12 @@ fun MultibandCompressorSection(
             onValueChange = { onGainChange(it.roundToInt()) },
             valueRange = 0f..24f,
             enabled = !autoGain,
-            valueLabel = "$gain dB"
+            valueLabel = "$gain dB",
         )
         LabeledSwitch(
             label = stringResource(R.string.label_fet_auto_attack),
             checked = autoAttack,
-            onCheckedChange = onAutoAttackChange
+            onCheckedChange = onAutoAttackChange,
         )
         LabeledSlider(
             label = stringResource(R.string.label_attack),
@@ -561,19 +587,19 @@ fun MultibandCompressorSection(
             onValueChange = { onAttackChange(it.roundToInt()) },
             valueRange = 1f..100f,
             enabled = !autoAttack,
-            valueLabel = "$attack ms"
+            valueLabel = "$attack ms",
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_max_attack),
             value = maxAttack.toFloat().coerceIn(1f, 100f),
             onValueChange = { onMaxAttackChange(it.roundToInt()) },
             valueRange = 1f..100f,
-            valueLabel = "$maxAttack ms"
+            valueLabel = "$maxAttack ms",
         )
         LabeledSwitch(
             label = stringResource(R.string.label_fet_auto_release),
             checked = autoRelease,
-            onCheckedChange = onAutoReleaseChange
+            onCheckedChange = onAutoReleaseChange,
         )
         LabeledSlider(
             label = stringResource(R.string.label_release),
@@ -581,39 +607,43 @@ fun MultibandCompressorSection(
             onValueChange = { onReleaseChange(it.roundToInt()) },
             valueRange = 5f..500f,
             enabled = !autoRelease,
-            valueLabel = "$release ms"
+            valueLabel = "$release ms",
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_max_release),
             value = maxRelease.toFloat().coerceIn(5f, 500f),
             onValueChange = { onMaxReleaseChange(it.roundToInt()) },
             valueRange = 5f..500f,
-            valueLabel = "$maxRelease ms"
+            valueLabel = "$maxRelease ms",
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_crest),
             value = crest.toFloat().coerceIn(5f, 300f),
             onValueChange = { onCrestChange(it.roundToInt()) },
             valueRange = 5f..300f,
-            valueLabel = "$crest ms"
+            valueLabel = "$crest ms",
         )
         LabeledSlider(
             label = stringResource(R.string.label_fet_adapt),
             value = adapt.toFloat(),
             onValueChange = { onAdaptChange(it.roundToInt()) },
             valueRange = 0f..200f,
-            valueLabel = "$adapt%"
+            valueLabel = "$adapt%",
         )
         LabeledSwitch(
             label = stringResource(R.string.label_fet_no_clip),
             checked = noClip,
-            onCheckedChange = onNoClipChange
+            onCheckedChange = onNoClipChange,
         )
     }
 }
 
 @Composable
-fun DdcSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun DdcSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.ddc.forType(fxType)
     val enabled = vals.enabled
@@ -630,7 +660,7 @@ fun DdcSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean 
         title = stringResource(R.string.section_ddc),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.SettingsInputComponent
+        icon = Icons.Default.SettingsInputComponent,
     ) {
         LabeledDropdown(
             label = stringResource(R.string.label_ddc_device),
@@ -639,7 +669,7 @@ fun DdcSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean 
             onOptionSelected = { index, value ->
                 onDeviceChange(if (index == 0) "" else value)
             },
-            onDeleteOption = { _, name -> viewModel.deleteVdcFile(name) }
+            onDeleteOption = { _, name -> viewModel.deleteVdcFile(name) },
         )
     }
 }
@@ -648,7 +678,7 @@ fun DdcSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean 
 fun SpectrumExtensionSection(
     state: MainUiState,
     viewModel: MainViewModel,
-    isSpkMode: Boolean = false
+    isSpkMode: Boolean = false,
 ) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.vse.forType(fxType)
@@ -664,7 +694,7 @@ fun SpectrumExtensionSection(
         title = stringResource(R.string.section_spectrum_extension),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.Waves
+        icon = Icons.Default.Waves,
     ) {
         LabeledSlider(
             label = stringResource(R.string.label_strength),
@@ -672,20 +702,24 @@ fun SpectrumExtensionSection(
             onValueChange = { onStrengthChange(it.roundToInt()) },
             valueRange = 2200f..8200f,
             steps = 1199,
-            valueLabel = "$strength Hz"
+            valueLabel = "$strength Hz",
         )
         LabeledSlider(
             label = stringResource(R.string.label_vse_exciter),
             value = exciter.toFloat(),
             onValueChange = { onExciterChange(it.roundToInt()) },
             valueRange = 0f..100f,
-            valueLabel = "$exciter%"
+            valueLabel = "$exciter%",
         )
     }
 }
 
 @Composable
-fun EqualizerSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun EqualizerSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val eqVals = state.eq.forType(fxType)
     val enabled = eqVals.enabled
@@ -694,9 +728,10 @@ fun EqualizerSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
     val eqBands = eqVals.bands
     val eqPresets = eqVals.presets
 
-    val bands = remember(eqBands) {
-        eqBands.split(";").mapNotNull { it.toFloatOrNull() }
-    }
+    val bands =
+        remember(eqBands) {
+            eqBands.split(";").mapNotNull { it.toFloatOrNull() }
+        }
 
     val onEnabledChange = viewModel::setEqEnabled
     val onBandCountChange = viewModel::setEqBandCount
@@ -710,27 +745,31 @@ fun EqualizerSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
         title = stringResource(R.string.section_equalizer),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.Equalizer
+        icon = Icons.Default.Equalizer,
     ) {
         var showEqDialog by remember { mutableStateOf(false) }
 
         val bandCounts = listOf(10, 15, 25, 31)
         val bandCountOptions = bandCounts.map { stringResource(R.string.label_eq_n_bands, it) }
-        val bandCountIndex = when (bandCount) {
-            15 -> 1; 25 -> 2; 31 -> 3; else -> 0
-        }
+        val bandCountIndex =
+            when (bandCount) {
+                15 -> 1
+                25 -> 2
+                31 -> 3
+                else -> 0
+            }
         LabeledDropdown(
             label = stringResource(R.string.label_eq_bands),
             selectedValue = bandCountOptions[bandCountIndex],
             options = bandCountOptions,
-            onOptionSelected = { index, _ -> onBandCountChange(bandCounts[index]) }
+            onOptionSelected = { index, _ -> onBandCountChange(bandCounts[index]) },
         )
 
         if (bands.size >= bandCount) {
             EqCurveGraph(
                 bands = bands,
                 onClick = { showEqDialog = true },
-                bandCount = bandCount
+                bandCount = bandCount,
             )
         }
 
@@ -745,21 +784,28 @@ fun EqualizerSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
                 onPresetDelete = onPresetDelete,
                 onReset = onReset,
                 onDismiss = { showEqDialog = false },
-                bandCount = bandCount
+                bandCount = bandCount,
             )
         }
     }
 }
 
 @Composable
-fun DynamicEqSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun DynamicEqSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val dynVals = state.dynamicEq.forType(fxType)
     val enabled = dynVals.enabled
     val onEnabledChange = viewModel::setDynamicEqEnabled
     val bandCount = dynVals.bandCount
 
-    fun parseInts(s: String, def: Int) = s.split(";").map { it.toIntOrNull() ?: def }
+    fun parseInts(
+        s: String,
+        def: Int,
+    ) = s.split(";").map { it.toIntOrNull() ?: def }
 
     val freqs = parseInts(dynVals.freqs, 1000).take(bandCount)
     val qs = parseInts(dynVals.qs, 150).take(bandCount)
@@ -773,10 +819,11 @@ fun DynamicEqSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
     val safeTab = if (bandCount > 0) selectedTab.coerceIn(0, bandCount - 1) else 0
     var deleteBandIndex by remember { mutableIntStateOf(-1) }
 
-    fun formatFreq(hz: Int): String = when {
-        hz >= 1000 -> "${hz / 1000}kHz"
-        else -> "${hz}Hz"
-    }
+    fun formatFreq(hz: Int): String =
+        when {
+            hz >= 1000 -> "${hz / 1000}kHz"
+            else -> "${hz}Hz"
+        }
 
     if (deleteBandIndex >= 0) {
         AlertDialog(
@@ -795,7 +842,7 @@ fun DynamicEqSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
                 TextButton(onClick = {
                     deleteBandIndex = -1
                 }) { Text(stringResource(R.string.action_cancel)) }
-            }
+            },
         )
     }
 
@@ -803,11 +850,11 @@ fun DynamicEqSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
         title = stringResource(R.string.section_dynamic_eq),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.Insights
+        icon = Icons.Default.Insights,
     ) {
         PrimaryScrollableTabRow(
             selectedTabIndex = safeTab,
-            edgePadding = 0.dp
+            edgePadding = 0.dp,
         ) {
             for (i in 0 until bandCount) {
                 val isSelected = safeTab == i
@@ -815,34 +862,34 @@ fun DynamicEqSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
                     if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .combinedClickable(
-                            onClick = { selectedTab = i },
-                            onLongClick = { if (bandCount > 1) deleteBandIndex = i }
-                        )
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                    modifier =
+                        Modifier
+                            .combinedClickable(
+                                onClick = { selectedTab = i },
+                                onLongClick = { if (bandCount > 1) deleteBandIndex = i },
+                            ).padding(horizontal = 16.dp, vertical = 12.dp),
                 ) {
                     Text(
                         text = formatFreq(freqs.getOrElse(i) { 1000 }),
                         color = color,
-                        style = MaterialTheme.typography.labelLarge
+                        style = MaterialTheme.typography.labelLarge,
                     )
                 }
             }
             if (bandCount < 8) {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .clickable {
-                            viewModel.addDynamicEqBand()
-                            selectedTab = bandCount
-                        }
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                    modifier =
+                        Modifier
+                            .clickable {
+                                viewModel.addDynamicEqBand()
+                                selectedTab = bandCount
+                            }.padding(horizontal = 16.dp, vertical = 12.dp),
                 ) {
                     Icon(
                         Icons.Default.Add,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                 }
             }
@@ -878,60 +925,65 @@ fun DynamicEqSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
                 onValueChange = { onFreqChange(it.roundToInt()) },
                 valueRange = minFreq..maxFreq,
                 steps = ((maxFreq - minFreq) / 5f).toInt().coerceAtLeast(1) - 1,
-                valueLabel = "$freq Hz"
+                valueLabel = "$freq Hz",
             )
             LabeledSlider(
                 label = stringResource(R.string.label_dynamic_eq_q_factor),
                 value = q.toFloat(),
                 onValueChange = { onQChange(it.roundToInt()) },
                 valueRange = 50f..800f,
-                valueLabel = String.format(Locale.US, "%.1f", q / 100f)
+                valueLabel = String.format(Locale.US, "%.1f", q / 100f),
             )
             LabeledSlider(
                 label = stringResource(R.string.label_dynamic_eq_target_gain),
                 value = gain.toFloat(),
                 onValueChange = { onGainChange(it.roundToInt()) },
                 valueRange = -120f..120f,
-                valueLabel = String.format(Locale.US, "%.1f dB", gain / 10f)
+                valueLabel = String.format(Locale.US, "%.1f dB", gain / 10f),
             )
             LabeledSlider(
                 label = stringResource(R.string.label_threshold),
                 value = threshold.toFloat(),
                 onValueChange = { onThresholdChange(it.roundToInt()) },
                 valueRange = -800f..0f,
-                valueLabel = "${threshold / 10} dB"
+                valueLabel = "${threshold / 10} dB",
             )
             LabeledSlider(
                 label = stringResource(R.string.label_attack),
                 value = attack.toFloat(),
                 onValueChange = { onAttackChange(it.roundToInt()) },
                 valueRange = 1f..100f,
-                valueLabel = "$attack ms"
+                valueLabel = "$attack ms",
             )
             LabeledSlider(
                 label = stringResource(R.string.label_release),
                 value = release.toFloat(),
                 onValueChange = { onReleaseChange(it.roundToInt()) },
                 valueRange = 10f..500f,
-                valueLabel = "$release ms"
+                valueLabel = "$release ms",
             )
-            val filterTypeNames = listOf(
-                stringResource(R.string.filter_peak),
-                stringResource(R.string.filter_low_shelf),
-                stringResource(R.string.filter_high_shelf)
-            )
+            val filterTypeNames =
+                listOf(
+                    stringResource(R.string.filter_peak),
+                    stringResource(R.string.filter_low_shelf),
+                    stringResource(R.string.filter_high_shelf),
+                )
             LabeledDropdown(
                 label = stringResource(R.string.label_dynamic_eq_filter_type),
                 selectedValue = filterTypeNames[filterType],
                 options = filterTypeNames,
-                onOptionSelected = { index, _ -> onFilterTypeChange(index) }
+                onOptionSelected = { index, _ -> onFilterTypeChange(index) },
             )
         }
     }
 }
 
 @Composable
-fun ConvolverSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun ConvolverSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.convolver.forType(fxType)
     val enabled = vals.enabled
@@ -950,7 +1002,7 @@ fun ConvolverSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
         title = stringResource(R.string.section_convolver),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.BlurCircular
+        icon = Icons.Default.BlurCircular,
     ) {
         LabeledDropdown(
             label = stringResource(R.string.label_convolver_kernel),
@@ -959,19 +1011,23 @@ fun ConvolverSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
             onOptionSelected = { index, value ->
                 onKernelChange(if (index == 0) "" else value)
             },
-            onDeleteOption = { _, name -> viewModel.deleteKernelFile(name) }
+            onDeleteOption = { _, name -> viewModel.deleteKernelFile(name) },
         )
         LabeledSlider(
             label = stringResource(R.string.label_convolver_cross_channel),
             value = crossChannel.toFloat(),
             onValueChange = { onCrossChannelChange(it.roundToInt()) },
-            valueRange = 0f..100f
+            valueRange = 0f..100f,
         )
     }
 }
 
 @Composable
-fun FieldSurroundSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun FieldSurroundSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.fieldSurround.forType(fxType)
     val enabled = vals.enabled
@@ -988,7 +1044,7 @@ fun FieldSurroundSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
         title = stringResource(R.string.section_field_surround),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.SurroundSound
+        icon = Icons.Default.SurroundSound,
     ) {
         LabeledSlider(
             label = stringResource(R.string.label_field_surround_widening),
@@ -996,27 +1052,31 @@ fun FieldSurroundSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             onValueChange = { onWideningChange(it.roundToInt()) },
             valueRange = 0f..8f,
             steps = 7,
-            valueLabel = "$widening"
+            valueLabel = "$widening",
         )
         LabeledSlider(
             label = stringResource(R.string.label_field_surround_mid_image),
             value = midImage.toFloat(),
             onValueChange = { onMidImageChange(it.roundToInt()) },
             valueRange = 0f..10f,
-            steps = 9
+            steps = 9,
         )
         LabeledSlider(
             label = stringResource(R.string.label_depth),
             value = depth.toFloat(),
             onValueChange = { onDepthChange(it.roundToInt()) },
             valueRange = 0f..10f,
-            steps = 9
+            steps = 9,
         )
     }
 }
 
 @Composable
-fun DiffSurroundSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun DiffSurroundSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.diffSurround.forType(fxType)
     val enabled = vals.enabled
@@ -1035,7 +1095,7 @@ fun DiffSurroundSection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
         title = stringResource(R.string.section_diff_surround),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.SpatialAudio
+        icon = Icons.Default.SpatialAudio,
     ) {
         LabeledSlider(
             label = stringResource(R.string.label_delay),
@@ -1043,19 +1103,19 @@ fun DiffSurroundSection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
             onValueChange = { onDelayChange(it.roundToInt()) },
             valueRange = 1f..20f,
             steps = 18,
-            valueLabel = "$delay ms"
+            valueLabel = "$delay ms",
         )
         LabeledSwitch(
             label = stringResource(R.string.label_diff_surround_reverse),
             checked = reverse,
-            onCheckedChange = onReverseChange
+            onCheckedChange = onReverseChange,
         )
         LabeledSlider(
             label = stringResource(R.string.label_diff_surround_wet_dry_mix),
             value = wetDryMix.toFloat(),
             onValueChange = { onWetDryMixChange(it.roundToInt()) },
             valueRange = 0f..100f,
-            valueLabel = "$wetDryMix%"
+            valueLabel = "$wetDryMix%",
         )
         LabeledSlider(
             label = stringResource(R.string.label_diff_surround_lp_cutoff),
@@ -1063,13 +1123,17 @@ fun DiffSurroundSection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
             onValueChange = { onLpCutoffChange(it.roundToInt()) },
             valueRange = 0f..20000f,
             steps = 3999,
-            valueLabel = if (lpCutoff == 0) stringResource(R.string.label_off) else "$lpCutoff Hz"
+            valueLabel = if (lpCutoff == 0) stringResource(R.string.label_off) else "$lpCutoff Hz",
         )
     }
 }
 
 @Composable
-fun StereoImagerSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun StereoImagerSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.stereoImg.forType(fxType)
     val enabled = vals.enabled
@@ -1090,28 +1154,28 @@ fun StereoImagerSection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
         title = stringResource(R.string.section_stereo_imager),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.AspectRatio
+        icon = Icons.Default.AspectRatio,
     ) {
         LabeledSlider(
             label = stringResource(R.string.label_stereo_imager_low_width),
             value = lowWidth.toFloat(),
             onValueChange = { onLowWidthChange(it.roundToInt()) },
             valueRange = 0f..200f,
-            valueLabel = "$lowWidth%"
+            valueLabel = "$lowWidth%",
         )
         LabeledSlider(
             label = stringResource(R.string.label_stereo_imager_mid_width),
             value = midWidth.toFloat(),
             onValueChange = { onMidWidthChange(it.roundToInt()) },
             valueRange = 0f..200f,
-            valueLabel = "$midWidth%"
+            valueLabel = "$midWidth%",
         )
         LabeledSlider(
             label = stringResource(R.string.label_stereo_imager_high_width),
             value = highWidth.toFloat(),
             onValueChange = { onHighWidthChange(it.roundToInt()) },
             valueRange = 0f..200f,
-            valueLabel = "$highWidth%"
+            valueLabel = "$highWidth%",
         )
         LabeledSlider(
             label = stringResource(R.string.label_stereo_imager_low_crossover),
@@ -1119,7 +1183,7 @@ fun StereoImagerSection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
             onValueChange = { onLowCrossoverChange(it.roundToInt()) },
             valueRange = 80f..400f,
             steps = 63,
-            valueLabel = "$lowCrossover Hz"
+            valueLabel = "$lowCrossover Hz",
         )
         LabeledSlider(
             label = stringResource(R.string.label_stereo_imager_high_crossover),
@@ -1127,7 +1191,7 @@ fun StereoImagerSection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
             onValueChange = { onHighCrossoverChange(it.roundToInt()) },
             valueRange = 2000f..8000f,
             steps = 1199,
-            valueLabel = "$highCrossover Hz"
+            valueLabel = "$highCrossover Hz",
         )
     }
 }
@@ -1136,7 +1200,7 @@ fun StereoImagerSection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
 fun HeadphoneSurroundSection(
     state: MainUiState,
     viewModel: MainViewModel,
-    isSpkMode: Boolean = false
+    isSpkMode: Boolean = false,
 ) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.vhe.forType(fxType)
@@ -1150,20 +1214,24 @@ fun HeadphoneSurroundSection(
         title = stringResource(R.string.section_headphone_surround),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.Headphones
+        icon = Icons.Default.Headphones,
     ) {
         LabeledSlider(
             label = stringResource(R.string.label_vhe_quality),
             value = quality.toFloat(),
             onValueChange = { onQualityChange(it.roundToInt()) },
             valueRange = 0f..4f,
-            steps = 3
+            steps = 3,
         )
     }
 }
 
 @Composable
-fun ReverberationSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun ReverberationSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.reverb.forType(fxType)
     val enabled = vals.enabled
@@ -1184,48 +1252,52 @@ fun ReverberationSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
         title = stringResource(R.string.section_reverb),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.BlurOn
+        icon = Icons.Default.BlurOn,
     ) {
         LabeledSlider(
             label = stringResource(R.string.label_reverb_room_size),
             value = roomSize.toFloat(),
             onValueChange = { onRoomSizeChange(it.roundToInt()) },
             valueRange = 0f..10f,
-            steps = 9
+            steps = 9,
         )
         LabeledSlider(
             label = stringResource(R.string.label_width),
             value = width.toFloat(),
             onValueChange = { onWidthChange(it.roundToInt()) },
             valueRange = 0f..10f,
-            steps = 9
+            steps = 9,
         )
         LabeledSlider(
             label = stringResource(R.string.label_reverb_dampening),
             value = dampening.toFloat(),
             onValueChange = { onDampeningChange(it.roundToInt()) },
             valueRange = 0f..10f,
-            steps = 9
+            steps = 9,
         )
         LabeledSlider(
             label = stringResource(R.string.label_reverb_wet),
             value = wet.toFloat(),
             onValueChange = { onWetChange(it.roundToInt()) },
             valueRange = 0f..100f,
-            valueLabel = "$wet%"
+            valueLabel = "$wet%",
         )
         LabeledSlider(
             label = stringResource(R.string.label_reverb_dry),
             value = dry.toFloat(),
             onValueChange = { onDryChange(it.roundToInt()) },
             valueRange = 0f..100f,
-            valueLabel = "$dry%"
+            valueLabel = "$dry%",
         )
     }
 }
 
 @Composable
-fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun DynamicSystemSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.dynamicSystem.forType(fxType)
     val enabled = vals.enabled
@@ -1259,7 +1331,7 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
         title = stringResource(R.string.section_dynamic_system),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.CandlestickChart
+        icon = Icons.Default.CandlestickChart,
     ) {
         val presetName =
             dsPresets.find { it.id == dsPresetId }?.name ?: stringResource(R.string.label_custom)
@@ -1267,12 +1339,12 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             label = stringResource(R.string.label_preset),
             selectedValue = presetName,
             options = dsPresets.map { it.name },
-            onOptionSelected = { index, _ -> onPresetSelect(dsPresets[index].id) }
+            onOptionSelected = { index, _ -> onPresetSelect(dsPresets[index].id) },
         )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             TextButton(onClick = { showSaveDialog = true }) {
                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -1281,12 +1353,12 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             }
             TextButton(
                 onClick = { dsPresetId?.let { onPresetDelete(it) } },
-                enabled = dsPresetId != null
+                enabled = dsPresetId != null,
             ) {
                 Icon(
                     Icons.Default.Delete,
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp),
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(stringResource(R.string.action_delete))
@@ -1295,7 +1367,7 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
                 Icon(
                     Icons.Default.RestartAlt,
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp),
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(stringResource(R.string.action_reset))
@@ -1307,7 +1379,7 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             value = strength.toFloat(),
             onValueChange = { onStrengthChange(it.roundToInt()) },
             valueRange = 0f..100f,
-            valueLabel = "$strength%"
+            valueLabel = "$strength%",
         )
 
         LabeledSlider(
@@ -1316,7 +1388,7 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             onValueChange = { onXLowChange(it.roundToInt()) },
             valueRange = 0f..2400f,
             steps = (2400 / 5) - 1,
-            valueLabel = "$xLow Hz"
+            valueLabel = "$xLow Hz",
         )
 
         LabeledSlider(
@@ -1325,7 +1397,7 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             onValueChange = { onXHighChange(it.roundToInt()) },
             valueRange = 0f..12000f,
             steps = (12000 / 5) - 1,
-            valueLabel = "$xHigh Hz"
+            valueLabel = "$xHigh Hz",
         )
 
         LabeledSlider(
@@ -1334,7 +1406,7 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             onValueChange = { onYLowChange(it.roundToInt()) },
             valueRange = 0f..200f,
             steps = 199,
-            valueLabel = "$yLow Hz"
+            valueLabel = "$yLow Hz",
         )
 
         LabeledSlider(
@@ -1343,7 +1415,7 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             onValueChange = { onYHighChange(it.roundToInt()) },
             valueRange = 0f..300f,
             steps = (300 / 5) - 1,
-            valueLabel = "$yHigh Hz"
+            valueLabel = "$yHigh Hz",
         )
 
         LabeledSlider(
@@ -1351,7 +1423,7 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             value = sideGainLow.toFloat(),
             onValueChange = { onSideGainLowChange(it.roundToInt()) },
             valueRange = 0f..100f,
-            valueLabel = "$sideGainLow%"
+            valueLabel = "$sideGainLow%",
         )
 
         LabeledSlider(
@@ -1359,7 +1431,7 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             value = sideGainHigh.toFloat(),
             onValueChange = { onSideGainHighChange(it.roundToInt()) },
             valueRange = 0f..100f,
-            valueLabel = "$sideGainHigh%"
+            valueLabel = "$sideGainHigh%",
         )
     }
 
@@ -1373,7 +1445,7 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
                     onValueChange = { presetNameInput = it },
                     label = { Text(stringResource(R.string.preset_name_hint)) },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             },
             confirmButton = {
@@ -1384,7 +1456,7 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
                             presetNameInput = ""
                             showSaveDialog = false
                         }
-                    }
+                    },
                 ) {
                     Text(stringResource(android.R.string.ok))
                 }
@@ -1393,13 +1465,17 @@ fun DynamicSystemSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
                 TextButton(onClick = { showSaveDialog = false }) {
                     Text(stringResource(android.R.string.cancel))
                 }
-            }
+            },
         )
     }
 }
 
 @Composable
-fun TubeSimulatorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun TubeSimulatorSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.tube.forType(fxType)
     val enabled = vals.enabled
@@ -1411,7 +1487,7 @@ fun TubeSimulatorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
         enabled = enabled,
         onEnabledChange = onEnabledChange,
         icon = Icons.Default.MusicNote,
-        toggleOnly = true
+        toggleOnly = true,
     ) {}
 }
 
@@ -1419,7 +1495,7 @@ fun TubeSimulatorSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
 fun PsychoacousticBassSection(
     state: MainUiState,
     viewModel: MainViewModel,
-    isSpkMode: Boolean = false
+    isSpkMode: Boolean = false,
 ) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.psychoBass.forType(fxType)
@@ -1435,12 +1511,13 @@ fun PsychoacousticBassSection(
     val onHarmonicOrderChange = viewModel::setPsychoBassHarmonicOrder
     val onOriginalLevelChange = viewModel::setPsychoBassOriginalLevel
 
-    val harmonicNames = listOf(
-        stringResource(R.string.harmonic_2nd),
-        stringResource(R.string.harmonic_3rd),
-        stringResource(R.string.harmonic_4th),
-        stringResource(R.string.harmonic_5th)
-    )
+    val harmonicNames =
+        listOf(
+            stringResource(R.string.harmonic_2nd),
+            stringResource(R.string.harmonic_3rd),
+            stringResource(R.string.harmonic_4th),
+            stringResource(R.string.harmonic_5th),
+        )
     val harmonicValues = listOf(2, 3, 4, 5)
     val harmonicIndex = harmonicValues.indexOf(harmonicOrder).coerceAtLeast(0)
 
@@ -1448,21 +1525,21 @@ fun PsychoacousticBassSection(
         title = stringResource(R.string.section_psycho_bass),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.Psychology
+        icon = Icons.Default.Psychology,
     ) {
         LabeledSlider(
             label = stringResource(R.string.label_psycho_bass_cutoff),
             value = cutoff.toFloat(),
             onValueChange = { onCutoffChange(it.roundToInt()) },
             valueRange = 60f..150f,
-            valueLabel = "${cutoff} Hz"
+            valueLabel = "$cutoff Hz",
         )
         LabeledSlider(
             label = stringResource(R.string.label_psycho_bass_intensity),
             value = intensity.toFloat(),
             onValueChange = { onIntensityChange(it.roundToInt()) },
             valueRange = 0f..100f,
-            valueLabel = "${intensity}%"
+            valueLabel = "$intensity%",
         )
         LabeledSlider(
             label = stringResource(R.string.label_psycho_bass_harmonic_order),
@@ -1470,20 +1547,24 @@ fun PsychoacousticBassSection(
             onValueChange = { onHarmonicOrderChange(it.roundToInt()) },
             valueRange = 2f..5f,
             steps = 2,
-            valueLabel = harmonicNames[harmonicIndex]
+            valueLabel = harmonicNames[harmonicIndex],
         )
         LabeledSlider(
             label = stringResource(R.string.label_psycho_bass_ori_bass_level),
             value = originalLevel.toFloat(),
             onValueChange = { onOriginalLevelChange(it.roundToInt()) },
             valueRange = 0f..100f,
-            valueLabel = "${originalLevel}%"
+            valueLabel = "$originalLevel%",
         )
     }
 }
 
 @Composable
-fun ViperBassSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun ViperBassSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.bass.forType(fxType)
     val enabled = vals.enabled
@@ -1498,23 +1579,24 @@ fun ViperBassSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
     val onGainChange = viewModel::setBassGain
     val onAntiPopChange = viewModel::setBassAntiPop
 
-    val modeNames = listOf(
-        stringResource(R.string.bass_mode_natural),
-        stringResource(R.string.bass_mode_pure),
-        stringResource(R.string.bass_mode_subwoofer)
-    )
+    val modeNames =
+        listOf(
+            stringResource(R.string.bass_mode_natural),
+            stringResource(R.string.bass_mode_pure),
+            stringResource(R.string.bass_mode_subwoofer),
+        )
 
     EffectSection(
         title = stringResource(R.string.section_viper_bass),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.GraphicEq
+        icon = Icons.Default.GraphicEq,
     ) {
         LabeledDropdown(
             label = stringResource(R.string.label_mode),
             selectedValue = modeNames.getOrElse(mode) { modeNames[0] },
             options = modeNames,
-            onOptionSelected = { index, _ -> onModeChange(index) }
+            onOptionSelected = { index, _ -> onModeChange(index) },
         )
         if (mode != 2) {
             LabeledSlider(
@@ -1523,7 +1605,7 @@ fun ViperBassSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
                 onValueChange = { onFrequencyChange(it.roundToInt()) },
                 valueRange = 0f..135f,
                 steps = 134,
-                valueLabel = "${frequency + 15}Hz"
+                valueLabel = "${frequency + 15}Hz",
             )
         }
         LabeledSlider(
@@ -1531,18 +1613,22 @@ fun ViperBassSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bo
             value = gain.toFloat(),
             onValueChange = { onGainChange(it.roundToInt()) },
             valueRange = 50f..1000f,
-            valueLabel = "${"%.1f".format(gain / 100.0)}x"
+            valueLabel = "${"%.1f".format(gain / 100.0)}x",
         )
         LabeledSwitch(
             label = stringResource(R.string.label_bass_anti_pop),
             checked = antiPop,
-            onCheckedChange = onAntiPopChange
+            onCheckedChange = onAntiPopChange,
         )
     }
 }
 
 @Composable
-fun ViperBassMonoSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun ViperBassMonoSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.bassMono.forType(fxType)
     val enabled = vals.enabled
@@ -1551,11 +1637,12 @@ fun ViperBassMonoSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
     val gain = vals.gain
     val antiPop = vals.antiPop
 
-    val modeNames = listOf(
-        stringResource(R.string.bass_mode_natural),
-        stringResource(R.string.bass_mode_pure),
-        stringResource(R.string.bass_mode_subwoofer)
-    )
+    val modeNames =
+        listOf(
+            stringResource(R.string.bass_mode_natural),
+            stringResource(R.string.bass_mode_pure),
+            stringResource(R.string.bass_mode_subwoofer),
+        )
 
     val onEnabledChange = viewModel::setBassMonoEnabled
     val onModeChange = viewModel::setBassMonoMode
@@ -1567,13 +1654,13 @@ fun ViperBassMonoSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
         title = stringResource(R.string.section_viper_bass_mono),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.GraphicEq
+        icon = Icons.Default.GraphicEq,
     ) {
         LabeledDropdown(
             label = stringResource(R.string.label_mode),
             selectedValue = modeNames.getOrElse(mode) { modeNames[0] },
             options = modeNames,
-            onOptionSelected = { index, _ -> onModeChange(index) }
+            onOptionSelected = { index, _ -> onModeChange(index) },
         )
         if (mode != 2) {
             LabeledSlider(
@@ -1582,7 +1669,7 @@ fun ViperBassMonoSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
                 onValueChange = { onFrequencyChange(it.roundToInt()) },
                 valueRange = 0f..135f,
                 steps = 134,
-                valueLabel = "${frequency + 15}Hz"
+                valueLabel = "${frequency + 15}Hz",
             )
         }
         LabeledSlider(
@@ -1590,29 +1677,34 @@ fun ViperBassMonoSection(state: MainUiState, viewModel: MainViewModel, isSpkMode
             value = gain.toFloat(),
             onValueChange = { onGainChange(it.roundToInt()) },
             valueRange = 50f..1000f,
-            valueLabel = "${"%.1f".format(gain / 100.0)}x"
+            valueLabel = "${"%.1f".format(gain / 100.0)}x",
         )
         LabeledSwitch(
             label = stringResource(R.string.label_bass_anti_pop),
             checked = antiPop,
-            onCheckedChange = onAntiPopChange
+            onCheckedChange = onAntiPopChange,
         )
     }
 }
 
 @Composable
-fun ViperClaritySection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun ViperClaritySection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.clarity.forType(fxType)
     val enabled = vals.enabled
     val mode = vals.mode
     val gain = vals.gain
 
-    val modeNames = listOf(
-        stringResource(R.string.clarity_mode_natural),
-        stringResource(R.string.clarity_mode_ozone),
-        stringResource(R.string.clarity_mode_xhifi)
-    )
+    val modeNames =
+        listOf(
+            stringResource(R.string.clarity_mode_natural),
+            stringResource(R.string.clarity_mode_ozone),
+            stringResource(R.string.clarity_mode_xhifi),
+        )
 
     val onEnabledChange = viewModel::setClarityEnabled
     val onModeChange = viewModel::setClarityMode
@@ -1622,20 +1714,20 @@ fun ViperClaritySection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
         title = stringResource(R.string.section_viper_clarity),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.Hearing
+        icon = Icons.Default.Hearing,
     ) {
         LabeledDropdown(
             label = stringResource(R.string.label_mode),
             selectedValue = modeNames.getOrElse(mode) { modeNames[0] },
             options = modeNames,
-            onOptionSelected = { index, _ -> onModeChange(index) }
+            onOptionSelected = { index, _ -> onModeChange(index) },
         )
         LabeledSlider(
             label = stringResource(R.string.label_gain),
             value = gain.toFloat(),
             onValueChange = { onGainChange(it.roundToInt()) },
             valueRange = 0f..450f,
-            valueLabel = "${"%.1f".format(gain / 100.0)}x"
+            valueLabel = "${"%.1f".format(gain / 100.0)}x",
         )
     }
 }
@@ -1644,7 +1736,7 @@ fun ViperClaritySection(state: MainUiState, viewModel: MainViewModel, isSpkMode:
 fun AuditoryProtectionSection(
     state: MainUiState,
     viewModel: MainViewModel,
-    isSpkMode: Boolean = false
+    isSpkMode: Boolean = false,
 ) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.cure.forType(fxType)
@@ -1654,39 +1746,45 @@ fun AuditoryProtectionSection(
     val onEnabledChange = viewModel::setCureEnabled
     val onStrengthChange = viewModel::setCureStrength
 
-    val strengthNames = listOf(
-        stringResource(R.string.label_mild),
-        stringResource(R.string.label_medium),
-        stringResource(R.string.label_strong)
-    )
+    val strengthNames =
+        listOf(
+            stringResource(R.string.label_mild),
+            stringResource(R.string.label_medium),
+            stringResource(R.string.label_strong),
+        )
 
     EffectSection(
         title = stringResource(R.string.section_cure),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.HealthAndSafety
+        icon = Icons.Default.HealthAndSafety,
     ) {
         LabeledDropdown(
             label = stringResource(R.string.label_cure_strength),
             selectedValue = strengthNames.getOrElse(strength) { strengthNames[0] },
             options = strengthNames,
-            onOptionSelected = { index, _ -> onStrengthChange(index) }
+            onOptionSelected = { index, _ -> onStrengthChange(index) },
         )
     }
 }
 
 @Composable
-fun AnalogXSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Boolean = false) {
+fun AnalogXSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+    isSpkMode: Boolean = false,
+) {
     val fxType = if (isSpkMode) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
     val vals = state.analog.forType(fxType)
     val enabled = vals.enabled
     val mode = vals.mode
 
-    val modeNames = listOf(
-        stringResource(R.string.label_mild),
-        stringResource(R.string.label_medium),
-        stringResource(R.string.label_strong)
-    )
+    val modeNames =
+        listOf(
+            stringResource(R.string.label_mild),
+            stringResource(R.string.label_medium),
+            stringResource(R.string.label_strong),
+        )
 
     val onEnabledChange = viewModel::setAnalogXEnabled
     val onModeChange = viewModel::setAnalogXMode
@@ -1695,24 +1793,27 @@ fun AnalogXSection(state: MainUiState, viewModel: MainViewModel, isSpkMode: Bool
         title = stringResource(R.string.section_analogx),
         enabled = enabled,
         onEnabledChange = onEnabledChange,
-        icon = Icons.Default.Memory
+        icon = Icons.Default.Memory,
     ) {
         LabeledDropdown(
             label = stringResource(R.string.label_mode),
             selectedValue = modeNames.getOrElse(mode) { modeNames[0] },
             options = modeNames,
-            onOptionSelected = { index, _ -> onModeChange(index) }
+            onOptionSelected = { index, _ -> onModeChange(index) },
         )
     }
 }
 
 @Composable
-fun SpeakerOptSection(state: MainUiState, viewModel: MainViewModel) {
+fun SpeakerOptSection(
+    state: MainUiState,
+    viewModel: MainViewModel,
+) {
     EffectSection(
         title = stringResource(R.string.section_speaker_optimization),
         enabled = state.speakerCorrection.spk.enabled,
         onEnabledChange = viewModel::setSpeakerOptEnabled,
         icon = Icons.Default.SpeakerPhone,
-        toggleOnly = true
+        toggleOnly = true,
     ) {}
 }

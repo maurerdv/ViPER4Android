@@ -4,7 +4,7 @@ data class AudioDevice(
     val id: String,
     val name: String,
     val type: Int,
-    val isHeadphone: Boolean
+    val isHeadphone: Boolean,
 ) {
     companion object {
         const val ID_SPEAKER = "speaker"

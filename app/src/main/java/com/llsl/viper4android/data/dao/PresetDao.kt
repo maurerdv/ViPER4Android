@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PresetDao {
-
     @Query("SELECT * FROM presets ORDER BY name ASC")
     fun getAll(): Flow<List<Preset>>
 
@@ -22,7 +21,10 @@ interface PresetDao {
     fun getByFxType(fxType: Int): Flow<List<Preset>>
 
     @Query("SELECT * FROM presets WHERE name = :name AND fx_type = :fxType LIMIT 1")
-    suspend fun getByNameAndFxType(name: String, fxType: Int): Preset?
+    suspend fun getByNameAndFxType(
+        name: String,
+        fxType: Int,
+    ): Preset?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(preset: Preset): Long

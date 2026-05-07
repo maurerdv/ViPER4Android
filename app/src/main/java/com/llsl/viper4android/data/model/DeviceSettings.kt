@@ -16,5 +16,5 @@ data class DeviceSettings(
     @ColumnInfo(name = "settings_json")
     val settingsJson: String,
     @ColumnInfo(name = "last_connected")
-    val lastConnected: Long = System.currentTimeMillis()
+    val lastConnected: Long = System.currentTimeMillis(),
 )

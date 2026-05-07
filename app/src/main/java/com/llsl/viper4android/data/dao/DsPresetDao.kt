@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DsPresetDao {
-
     @Query("SELECT * FROM ds_presets ORDER BY id ASC")
     fun getAll(): Flow<List<DsPreset>>
 
@@ -23,7 +22,10 @@ interface DsPresetDao {
     suspend fun insertAll(presets: List<DsPreset>)
 
     @Query("UPDATE ds_presets SET name = :name WHERE id = :id")
-    suspend fun rename(id: Long, name: String)
+    suspend fun rename(
+        id: Long,
+        name: String,
+    )
 
     @Query("DELETE FROM ds_presets WHERE id = :id")
     suspend fun deleteById(id: Long)

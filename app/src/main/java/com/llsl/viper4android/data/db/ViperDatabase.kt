@@ -16,31 +16,36 @@ import com.llsl.viper4android.data.model.Preset
 @Database(
     entities = [Preset::class, EqPreset::class, DsPreset::class, DeviceSettings::class],
     version = 4,
-    exportSchema = true
+    exportSchema = true,
 )
 abstract class ViperDatabase : RoomDatabase() {
     abstract fun presetDao(): PresetDao
+
     abstract fun eqPresetDao(): EqPresetDao
+
     abstract fun dsPresetDao(): DsPresetDao
+
     abstract fun deviceSettingsDao(): DeviceSettingsDao
 
     companion object {
-        val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS `eq_presets` (" +
+        val MIGRATION_1_2 =
+            object : Migration(1, 2) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        "CREATE TABLE IF NOT EXISTS `eq_presets` (" +
                             "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                             "`name` TEXT NOT NULL, " +
                             "`band_count` INTEGER NOT NULL, " +
-                            "`bands` TEXT NOT NULL)"
-                )
+                            "`bands` TEXT NOT NULL)",
+                    )
+                }
             }
-        }
 
-        val MIGRATION_2_3 = object : Migration(2, 3) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS `ds_presets` (" +
+        val MIGRATION_2_3 =
+            object : Migration(2, 3) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        "CREATE TABLE IF NOT EXISTS `ds_presets` (" +
                             "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                             "`name` TEXT NOT NULL, " +
                             "`x_low` INTEGER NOT NULL, " +
@@ -48,22 +53,23 @@ abstract class ViperDatabase : RoomDatabase() {
                             "`y_low` INTEGER NOT NULL, " +
                             "`y_high` INTEGER NOT NULL, " +
                             "`side_gain_low` INTEGER NOT NULL, " +
-                            "`side_gain_high` INTEGER NOT NULL)"
-                )
+                            "`side_gain_high` INTEGER NOT NULL)",
+                    )
+                }
             }
-        }
 
-        val MIGRATION_3_4 = object : Migration(3, 4) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS `device_settings` (" +
+        val MIGRATION_3_4 =
+            object : Migration(3, 4) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL(
+                        "CREATE TABLE IF NOT EXISTS `device_settings` (" +
                             "`device_id` TEXT NOT NULL PRIMARY KEY, " +
                             "`device_name` TEXT NOT NULL, " +
                             "`is_headphone` INTEGER NOT NULL, " +
                             "`settings_json` TEXT NOT NULL, " +
-                            "`last_connected` INTEGER NOT NULL)"
-                )
+                            "`last_connected` INTEGER NOT NULL)",
+                    )
+                }
             }
-        }
     }
 }

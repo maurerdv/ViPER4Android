@@ -20,93 +20,116 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ViperRepository @Inject constructor(
-    private val presetDao: PresetDao,
-    private val eqPresetDao: EqPresetDao,
-    private val dsPresetDao: DsPresetDao,
-    private val deviceSettingsDao: DeviceSettingsDao,
-    private val dataStore: DataStore<Preferences>
-) {
+class ViperRepository
+    @Inject
+    constructor(
+        private val presetDao: PresetDao,
+        private val eqPresetDao: EqPresetDao,
+        private val dsPresetDao: DsPresetDao,
+        private val deviceSettingsDao: DeviceSettingsDao,
+        private val dataStore: DataStore<Preferences>,
+    ) {
+        fun getAllPresets(): Flow<List<Preset>> = presetDao.getAll()
 
-    fun getAllPresets(): Flow<List<Preset>> = presetDao.getAll()
+        suspend fun getPresetById(id: Long): Preset? = presetDao.getById(id)
 
-    suspend fun getPresetById(id: Long): Preset? = presetDao.getById(id)
+        suspend fun getPresetByNameAndFxType(
+            name: String,
+            fxType: Int,
+        ): Preset? = presetDao.getByNameAndFxType(name, fxType)
 
-    suspend fun getPresetByNameAndFxType(name: String, fxType: Int): Preset? =
-        presetDao.getByNameAndFxType(name, fxType)
+        suspend fun savePreset(preset: Preset): Long = presetDao.insert(preset)
 
-    suspend fun savePreset(preset: Preset): Long = presetDao.insert(preset)
+        suspend fun updatePreset(preset: Preset) = presetDao.update(preset)
 
-    suspend fun updatePreset(preset: Preset) = presetDao.update(preset)
+        suspend fun deletePreset(preset: Preset) = presetDao.delete(preset)
 
-    suspend fun deletePreset(preset: Preset) = presetDao.delete(preset)
+        suspend fun deletePresetById(id: Long) = presetDao.deleteById(id)
 
-    suspend fun deletePresetById(id: Long) = presetDao.deleteById(id)
+        fun getEqPresetsByBandCount(bandCount: Int): Flow<List<EqPreset>> = eqPresetDao.getByBandCount(bandCount)
 
-    fun getEqPresetsByBandCount(bandCount: Int): Flow<List<EqPreset>> =
-        eqPresetDao.getByBandCount(bandCount)
+        suspend fun getEqPresetById(id: Long): EqPreset? = eqPresetDao.getById(id)
 
-    suspend fun getEqPresetById(id: Long): EqPreset? = eqPresetDao.getById(id)
+        suspend fun saveEqPreset(preset: EqPreset): Long = eqPresetDao.insert(preset)
 
-    suspend fun saveEqPreset(preset: EqPreset): Long = eqPresetDao.insert(preset)
+        suspend fun renameEqPreset(
+            id: Long,
+            name: String,
+        ) = eqPresetDao.rename(id, name)
 
-    suspend fun renameEqPreset(id: Long, name: String) = eqPresetDao.rename(id, name)
+        suspend fun deleteEqPresetById(id: Long) = eqPresetDao.deleteById(id)
 
-    suspend fun deleteEqPresetById(id: Long) = eqPresetDao.deleteById(id)
+        fun getAllDsPresets(): Flow<List<DsPreset>> = dsPresetDao.getAll()
 
-    fun getAllDsPresets(): Flow<List<DsPreset>> = dsPresetDao.getAll()
+        suspend fun getDsPresetById(id: Long): DsPreset? = dsPresetDao.getById(id)
 
-    suspend fun getDsPresetById(id: Long): DsPreset? = dsPresetDao.getById(id)
+        suspend fun saveDsPreset(preset: DsPreset): Long = dsPresetDao.insert(preset)
 
-    suspend fun saveDsPreset(preset: DsPreset): Long = dsPresetDao.insert(preset)
+        suspend fun renameDsPreset(
+            id: Long,
+            name: String,
+        ) = dsPresetDao.rename(id, name)
 
-    suspend fun renameDsPreset(id: Long, name: String) = dsPresetDao.rename(id, name)
+        suspend fun deleteDsPresetById(id: Long) = dsPresetDao.deleteById(id)
 
-    suspend fun deleteDsPresetById(id: Long) = dsPresetDao.deleteById(id)
+        fun getAllDeviceSettings(): Flow<List<DeviceSettings>> = deviceSettingsDao.getAll()
 
-    fun getAllDeviceSettings(): Flow<List<DeviceSettings>> = deviceSettingsDao.getAll()
+        suspend fun getDeviceSettings(deviceId: String): DeviceSettings? = deviceSettingsDao.getByDeviceId(deviceId)
 
-    suspend fun getDeviceSettings(deviceId: String): DeviceSettings? =
-        deviceSettingsDao.getByDeviceId(deviceId)
+        suspend fun saveDeviceSettings(settings: DeviceSettings) = deviceSettingsDao.upsert(settings)
 
-    suspend fun saveDeviceSettings(settings: DeviceSettings) = deviceSettingsDao.upsert(settings)
+        suspend fun renameDevice(
+            deviceId: String,
+            name: String,
+        ) = deviceSettingsDao.rename(deviceId, name)
 
-    suspend fun renameDevice(deviceId: String, name: String) =
-        deviceSettingsDao.rename(deviceId, name)
+        suspend fun deleteDeviceSettings(deviceId: String) = deviceSettingsDao.deleteByDeviceId(deviceId)
 
-    suspend fun deleteDeviceSettings(deviceId: String) =
-        deviceSettingsDao.deleteByDeviceId(deviceId)
+        suspend fun updateDeviceLastConnected(deviceId: String) =
+            deviceSettingsDao.updateLastConnected(deviceId, System.currentTimeMillis())
 
-    suspend fun updateDeviceLastConnected(deviceId: String) =
-        deviceSettingsDao.updateLastConnected(deviceId, System.currentTimeMillis())
+        fun getBooleanPreference(
+            key: String,
+            default: Boolean = false,
+        ): Flow<Boolean> = dataStore.data.map { it[booleanPreferencesKey(key)] ?: default }
 
-    fun getBooleanPreference(key: String, default: Boolean = false): Flow<Boolean> =
-        dataStore.data.map { it[booleanPreferencesKey(key)] ?: default }
+        suspend fun setBooleanPreference(
+            key: String,
+            value: Boolean,
+        ) {
+            dataStore.edit { it[booleanPreferencesKey(key)] = value }
+        }
 
-    suspend fun setBooleanPreference(key: String, value: Boolean) {
-        dataStore.edit { it[booleanPreferencesKey(key)] = value }
+        fun getIntPreference(
+            key: String,
+            default: Int = 0,
+        ): Flow<Int> = dataStore.data.map { it[intPreferencesKey(key)] ?: default }
+
+        suspend fun setIntPreference(
+            key: String,
+            value: Int,
+        ) {
+            dataStore.edit { it[intPreferencesKey(key)] = value }
+        }
+
+        fun getStringPreference(
+            key: String,
+            default: String = "",
+        ): Flow<String> = dataStore.data.map { it[stringPreferencesKey(key)] ?: default }
+
+        suspend fun setStringPreference(
+            key: String,
+            value: String,
+        ) {
+            dataStore.edit { it[stringPreferencesKey(key)] = value }
+        }
+
+        companion object {
+            const val PREF_FX_TYPE = "fx_type"
+            const val PREF_MASTER_ENABLE = "master_enable"
+            const val PREF_DDC_DEVICE = "ddc_device"
+            const val PREF_EQ_PRESET_ID = "eq_preset_id"
+            const val PERF_DYNAMIC_SYS_DEVICE = "ds_device"
+            const val PERF_DYNAMIC_SYS_PRESET_ID = "ds_preset_id"
+        }
     }
-
-    fun getIntPreference(key: String, default: Int = 0): Flow<Int> =
-        dataStore.data.map { it[intPreferencesKey(key)] ?: default }
-
-    suspend fun setIntPreference(key: String, value: Int) {
-        dataStore.edit { it[intPreferencesKey(key)] = value }
-    }
-
-    fun getStringPreference(key: String, default: String = ""): Flow<String> =
-        dataStore.data.map { it[stringPreferencesKey(key)] ?: default }
-
-    suspend fun setStringPreference(key: String, value: String) {
-        dataStore.edit { it[stringPreferencesKey(key)] = value }
-    }
-
-    companion object {
-        const val PREF_FX_TYPE = "fx_type"
-        const val PREF_MASTER_ENABLE = "master_enable"
-        const val PREF_DDC_DEVICE = "ddc_device"
-        const val PREF_EQ_PRESET_ID = "eq_preset_id"
-        const val PERF_DYNAMIC_SYS_DEVICE = "ds_device"
-        const val PERF_DYNAMIC_SYS_PRESET_ID = "ds_preset_id"
-    }
-}

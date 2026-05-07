@@ -58,7 +58,7 @@ fun DeviceDialog(
     onLoad: (String) -> Unit,
     onSave: (String) -> Unit,
     onDelete: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     var selectedDeviceId by remember { mutableStateOf<String?>(null) }
     var renamingDeviceId by remember { mutableStateOf<String?>(null) }
@@ -76,7 +76,7 @@ fun DeviceDialog(
                     onValueChange = { renameInput = it },
                     label = { Text(stringResource(R.string.device_rename_hint)) },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             },
             confirmButton = {
@@ -87,7 +87,7 @@ fun DeviceDialog(
                             renamingDeviceId = null
                         }
                     },
-                    enabled = renameInput.isNotBlank()
+                    enabled = renameInput.isNotBlank(),
                 ) {
                     Text(stringResource(R.string.action_rename))
                 }
@@ -96,7 +96,7 @@ fun DeviceDialog(
                 TextButton(onClick = { renamingDeviceId = null }) {
                     Text(stringResource(R.string.action_cancel))
                 }
-            }
+            },
         )
         return
     }
@@ -107,7 +107,7 @@ fun DeviceDialog(
             if (selectedDevice != null) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     IconButton(onClick = { selectedDeviceId = null }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -117,7 +117,7 @@ fun DeviceDialog(
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.weight(1f),
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                     IconButton(onClick = {
                         renameInput = selectedDevice.deviceName
@@ -125,7 +125,7 @@ fun DeviceDialog(
                     }) {
                         Icon(
                             Icons.Default.Edit,
-                            contentDescription = stringResource(R.string.action_rename)
+                            contentDescription = stringResource(R.string.action_rename),
                         )
                     }
                 }
@@ -143,13 +143,13 @@ fun DeviceDialog(
                     onDelete = {
                         onDelete(selectedDevice.deviceId)
                         selectedDeviceId = null
-                    }
+                    },
                 )
             } else {
                 DeviceListView(
                     devices = devices,
                     activeDeviceId = activeDeviceId,
-                    onSelect = { selectedDeviceId = it.deviceId }
+                    onSelect = { selectedDeviceId = it.deviceId },
                 )
             }
         },
@@ -159,7 +159,7 @@ fun DeviceDialog(
                     Text(stringResource(R.string.action_close))
                 }
             }
-        }
+        },
     )
 }
 
@@ -167,44 +167,49 @@ fun DeviceDialog(
 private fun DeviceListView(
     devices: List<DeviceSettings>,
     activeDeviceId: String,
-    onSelect: (DeviceSettings) -> Unit
+    onSelect: (DeviceSettings) -> Unit,
 ) {
     if (devices.isEmpty()) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 24.dp),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 24.dp),
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = stringResource(R.string.device_no_devices),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         return
     }
 
-    val sorted = remember(devices, activeDeviceId) {
-        devices.sortedWith(compareByDescending<DeviceSettings> { it.deviceId == activeDeviceId }
-            .thenByDescending { it.lastConnected })
-    }
+    val sorted =
+        remember(devices, activeDeviceId) {
+            devices.sortedWith(
+                compareByDescending<DeviceSettings> { it.deviceId == activeDeviceId }
+                    .thenByDescending { it.lastConnected },
+            )
+        }
 
     LazyColumn {
         items(sorted, key = { it.deviceId }) { device ->
             val isActive = device.deviceId == activeDeviceId
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onSelect(device) }
-                    .padding(vertical = 8.dp, horizontal = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { onSelect(device) }
+                        .padding(vertical = 8.dp, horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = deviceIcon(device),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -219,18 +224,20 @@ private fun DeviceListView(
                             text = device.deviceName,
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                     if (!isActive) {
                         Text(
-                            text = DateUtils.getRelativeTimeSpanString(
-                                device.lastConnected,
-                                System.currentTimeMillis(),
-                                DateUtils.MINUTE_IN_MILLIS
-                            ).toString(),
+                            text =
+                                DateUtils
+                                    .getRelativeTimeSpanString(
+                                        device.lastConnected,
+                                        System.currentTimeMillis(),
+                                        DateUtils.MINUTE_IN_MILLIS,
+                                    ).toString(),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -251,76 +258,92 @@ private fun DeviceDetailView(
     isActive: Boolean,
     onLoad: () -> Unit,
     onSave: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
 ) {
     val isBuiltIn = device.deviceId in BUILTIN_DEVICE_IDS
     val canDelete = !isActive && !isBuiltIn
     Column {
         StatusRow(
             label = stringResource(R.string.device_label_type),
-            value = deviceTypeName(device)
+            value = deviceTypeName(device),
         )
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         StatusRow(
             label = stringResource(R.string.device_label_address),
-            value = if (device.deviceId == "speaker" || device.deviceId == "wired_headphone") "-" else device.deviceId
+            value = if (device.deviceId == "speaker" || device.deviceId == "wired_headphone") "-" else device.deviceId,
         )
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         StatusRow(
             label = stringResource(R.string.label_mode),
-            value = if (device.isHeadphone) stringResource(R.string.device_mode_headphone)
-            else stringResource(R.string.device_mode_speaker)
+            value =
+                if (device.isHeadphone) {
+                    stringResource(R.string.device_mode_headphone)
+                } else {
+                    stringResource(R.string.device_mode_speaker)
+                },
         )
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         StatusRow(
             label = stringResource(R.string.device_label_last_conn),
-            value = if (isActive) "-"
-            else SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-                .format(Date(device.lastConnected))
+            value =
+                if (isActive) {
+                    "-"
+                } else {
+                    SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+                        .format(Date(device.lastConnected))
+                },
         )
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             ActionItem(
                 icon = Icons.Default.SettingsBackupRestore,
                 label = stringResource(R.string.action_load),
-                onClick = onLoad
+                onClick = onLoad,
             )
             ActionItem(
                 icon = Icons.Default.Sync,
                 label = stringResource(R.string.action_update),
-                onClick = onSave
+                onClick = onSave,
             )
             ActionItem(
                 icon = Icons.Default.Delete,
                 label = stringResource(R.string.action_delete),
                 onClick = onDelete,
                 enabled = canDelete,
-                tint = if (!canDelete) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                else MaterialTheme.colorScheme.error
+                tint =
+                    if (!canDelete) {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                    } else {
+                        MaterialTheme.colorScheme.error
+                    },
             )
         }
     }
 }
 
 @Composable
-private fun StatusRow(label: String, value: String) {
+private fun StatusRow(
+    label: String,
+    value: String,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }
@@ -331,13 +354,14 @@ private fun ActionItem(
     label: String,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    tint: Color = MaterialTheme.colorScheme.onSurface
+    tint: Color = MaterialTheme.colorScheme.onSurface,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clickable(enabled = enabled) { onClick() }
-            .padding(8.dp)
+        modifier =
+            Modifier
+                .clickable(enabled = enabled) { onClick() }
+                .padding(8.dp),
     ) {
         Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp), tint = tint)
         Spacer(modifier = Modifier.height(4.dp))
@@ -345,15 +369,17 @@ private fun ActionItem(
     }
 }
 
-private fun deviceIcon(device: DeviceSettings) = when {
-    device.isHeadphone -> Icons.Default.Headphones
-    else -> Icons.Default.Speaker
-}
+private fun deviceIcon(device: DeviceSettings) =
+    when {
+        device.isHeadphone -> Icons.Default.Headphones
+        else -> Icons.Default.Speaker
+    }
 
 @Composable
-private fun deviceTypeName(device: DeviceSettings): String = when {
-    device.deviceId == "speaker" -> stringResource(R.string.device_type_speaker)
-    device.deviceId == "wired_headphone" -> stringResource(R.string.device_type_wired)
-    device.isHeadphone -> stringResource(R.string.device_type_bluetooth)
-    else -> stringResource(R.string.device_type_speaker)
-}
+private fun deviceTypeName(device: DeviceSettings): String =
+    when {
+        device.deviceId == "speaker" -> stringResource(R.string.device_type_speaker)
+        device.deviceId == "wired_headphone" -> stringResource(R.string.device_type_wired)
+        device.isHeadphone -> stringResource(R.string.device_type_bluetooth)
+        else -> stringResource(R.string.device_type_speaker)
+    }

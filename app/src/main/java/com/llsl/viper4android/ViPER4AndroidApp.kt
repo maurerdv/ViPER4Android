@@ -8,7 +8,6 @@ import java.lang.reflect.Method
 
 @HiltAndroidApp
 class ViPER4AndroidApp : Application() {
-
     override fun onCreate() {
         super.onCreate()
         FileLogger.init(this)
@@ -17,11 +16,13 @@ class ViPER4AndroidApp : Application() {
     companion object {
         init {
             try {
-                val methods = Property.of(
-                    Class::class.java,
-                    Array<Method>::class.java,
-                    "Methods"
-                ).get(Class.forName("dalvik.system.VMRuntime"))
+                val methods =
+                    Property
+                        .of(
+                            Class::class.java,
+                            Array<Method>::class.java,
+                            "Methods",
+                        ).get(Class.forName("dalvik.system.VMRuntime"))
                 var runtime: Any? = null
                 var exemptionMethod: Method? = null
                 for (method in methods) {
@@ -36,7 +37,7 @@ class ViPER4AndroidApp : Application() {
                 } else {
                     FileLogger.e(
                         "App",
-                        "unseal: methods not found (runtime=$runtime, exemption=$exemptionMethod)"
+                        "unseal: methods not found (runtime=$runtime, exemption=$exemptionMethod)",
                     )
                 }
             } catch (e: Exception) {

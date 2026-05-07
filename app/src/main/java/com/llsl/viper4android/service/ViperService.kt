@@ -40,7 +40,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ViperService : LifecycleService() {
-
     @Inject
     lateinit var repository: ViperRepository
 
@@ -52,9 +51,10 @@ class ViperService : LifecycleService() {
         const val ACTION_STOP = "com.llsl.viper4android.service.STOP"
 
         fun startService(context: Context) {
-            val intent = Intent(context, ViperService::class.java).apply {
-                action = ACTION_START
-            }
+            val intent =
+                Intent(context, ViperService::class.java).apply {
+                    action = ACTION_START
+                }
             context.startForegroundService(intent)
         }
     }
@@ -120,7 +120,7 @@ class ViperService : LifecycleService() {
                 if (device.id != currentServiceDeviceId) {
                     FileLogger.i(
                         "Service",
-                        "Device changed: $currentServiceDeviceId -> ${device.id} (${device.name})"
+                        "Device changed: $currentServiceDeviceId -> ${device.id} (${device.name})",
                     )
                     saveOldDeviceToDb()
                     currentServiceDeviceId = device.id
@@ -162,8 +162,8 @@ class ViperService : LifecycleService() {
                     deviceId = device.id,
                     deviceName = device.name,
                     isHeadphone = device.isHeadphone,
-                    settingsJson = json.toString()
-                )
+                    settingsJson = json.toString(),
+                ),
             )
         }
 
@@ -193,7 +193,10 @@ class ViperService : LifecycleService() {
         }
     }
 
-    private suspend fun applyFullStateToEffect(effect: ViperEffect, skipShmWrite: Boolean = false) {
+    private suspend fun applyFullStateToEffect(
+        effect: ViperEffect,
+        skipShmWrite: Boolean = false,
+    ) {
         val state = EffectDispatcher.loadFullStateFromPrefs(repository)
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         val headphoneConnected = AudioOutputDetector.isHeadphoneConnected(audioManager)
@@ -207,7 +210,7 @@ class ViperService : LifecycleService() {
             if (!skipShmWrite) {
                 FileLogger.d(
                     "Service",
-                    "AIDL shm apply full state (master=$isMasterOn fxType=$fxType)"
+                    "AIDL shm apply full state (master=$isMasterOn fxType=$fxType)",
                 )
                 dispatchFullStateViaFile(activeState)
             }
@@ -216,14 +219,24 @@ class ViperService : LifecycleService() {
         EffectDispatcher.dispatchFullState(effect, activeState, isMasterOn)
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         super.onStartCommand(intent, flags, startId)
 
         when (intent?.action) {
-            ACTION_START -> FileLogger.i("Service", "Service started")
+            ACTION_START -> {
+                FileLogger.i("Service", "Service started")
+            }
+
             ACTION_STOP -> {
                 releaseAllSessions()
-                globalEffect?.let { it.enabled = false; it.release() }
+                globalEffect?.let {
+                    it.enabled = false
+                    it.release()
+                }
                 globalEffect = null
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
@@ -236,7 +249,10 @@ class ViperService : LifecycleService() {
         stopSessionMonitor()
         audioOutputDetector?.stop()
         audioOutputDetector = null
-        globalEffect?.let { it.enabled = false; it.release() }
+        globalEffect?.let {
+            it.enabled = false
+            it.release()
+        }
         globalEffect = null
         releaseAllSessions()
         FileLogger.i("Service", "Service destroyed")
@@ -245,11 +261,12 @@ class ViperService : LifecycleService() {
 
     private fun startSessionMonitor() {
         stopSessionMonitor()
-        val monitor = AudioSessionMonitor(
-            context = this,
-            onSessionOpen = { sessionId, pkg -> openSession(sessionId, pkg) },
-            onSessionClose = { sessionId -> closeSession(sessionId) }
-        )
+        val monitor =
+            AudioSessionMonitor(
+                context = this,
+                onSessionOpen = { sessionId, pkg -> openSession(sessionId, pkg) },
+                onSessionClose = { sessionId -> closeSession(sessionId) },
+            )
         monitor.start()
         sessionMonitor = monitor
     }
@@ -259,11 +276,14 @@ class ViperService : LifecycleService() {
         sessionMonitor = null
     }
 
-    private fun openSession(sessionId: Int, packageName: String) {
+    private fun openSession(
+        sessionId: Int,
+        packageName: String,
+    ) {
         if (globalMode) {
             FileLogger.d(
                 "Service",
-                "Global mode: skipping per-app session $sessionId ($packageName)"
+                "Global mode: skipping per-app session $sessionId ($packageName)",
             )
             return
         }
@@ -306,7 +326,10 @@ class ViperService : LifecycleService() {
         sessions.clear()
     }
 
-    fun dispatchParam(param: Int, value: Int) {
+    fun dispatchParam(
+        param: Int,
+        value: Int,
+    ) {
         if (useAidlTypeUuid) {
             FileLogger.d("Service", "AIDL shm param=0x${param.toString(16)} value=$value")
             ConfigChannel.writeParams(listOf(ParamEntry(param, intArrayOf(value))))
@@ -319,11 +342,16 @@ class ViperService : LifecycleService() {
         }
     }
 
-    fun dispatchParam(param: Int, val1: Int, val2: Int, val3: Int) {
+    fun dispatchParam(
+        param: Int,
+        val1: Int,
+        val2: Int,
+        val3: Int,
+    ) {
         if (useAidlTypeUuid) {
             FileLogger.d(
                 "Service",
-                "AIDL shm param=0x${param.toString(16)} v1=$val1 v2=$val2 v3=$val3"
+                "AIDL shm param=0x${param.toString(16)} v1=$val1 v2=$val2 v3=$val3",
             )
             ConfigChannel.writeParams(listOf(ParamEntry(param, intArrayOf(val1, val2, val3))))
             return
@@ -335,7 +363,11 @@ class ViperService : LifecycleService() {
         }
     }
 
-    fun dispatchParam(param: Int, value: ByteArray, extraParams: List<ParamEntry>? = null) {
+    fun dispatchParam(
+        param: Int,
+        value: ByteArray,
+        extraParams: List<ParamEntry>? = null,
+    ) {
         if (useAidlTypeUuid) {
             FileLogger.d("Service", "AIDL shm param=0x${param.toString(16)} bytes=${value.size}")
             ConfigChannel.writeParamsByteArray(param, value, extraParams)
@@ -368,7 +400,8 @@ class ViperService : LifecycleService() {
                 2 -> {
                     globalEffect?.setParameter(entry.paramId, entry.values[0], entry.values[1])
                     for (i in 0 until sessions.size) {
-                        sessions.valueAt(i)
+                        sessions
+                            .valueAt(i)
                             .setParameter(entry.paramId, entry.values[0], entry.values[1])
                     }
                 }
@@ -378,14 +411,14 @@ class ViperService : LifecycleService() {
                         entry.paramId,
                         entry.values[0],
                         entry.values[1],
-                        entry.values[2]
+                        entry.values[2],
                     )
                     for (i in 0 until sessions.size) {
                         sessions.valueAt(i).setParameter(
                             entry.paramId,
                             entry.values[0],
                             entry.values[1],
-                            entry.values[2]
+                            entry.values[2],
                         )
                     }
                 }
@@ -397,12 +430,12 @@ class ViperService : LifecycleService() {
         param: Int,
         bandsString: String,
         bandCountParam: Int = 0,
-        bandCount: Int = 0
+        bandCount: Int = 0,
     ) {
         if (useAidlTypeUuid) {
             FileLogger.d(
                 "Service",
-                "AIDL shm EQ param=0x${param.toString(16)} bands=$bandsString bandCount=$bandCount"
+                "AIDL shm EQ param=0x${param.toString(16)} bands=$bandsString bandCount=$bandCount",
             )
             val bands = bandsString.split(";").filter { it.isNotBlank() }
             val entries = mutableListOf<ParamEntry>()
@@ -432,12 +465,12 @@ class ViperService : LifecycleService() {
     fun dispatchFullState(
         state: MainUiState,
         masterEnabled: Boolean,
-        byteArrayParams: List<ByteArrayParam>? = null
+        byteArrayParams: List<ByteArrayParam>? = null,
     ) {
         if (useAidlTypeUuid) {
             FileLogger.d(
                 "Service",
-                "AIDL shm full state dispatch (master=$masterEnabled fxType=${state.fxType})"
+                "AIDL shm full state dispatch (master=$masterEnabled fxType=${state.fxType})",
             )
             dispatchFullStateViaFile(state, byteArrayParams)
             return
@@ -455,7 +488,7 @@ class ViperService : LifecycleService() {
 
     private fun dispatchFullStateViaFile(
         state: MainUiState,
-        byteArrayParams: List<ByteArrayParam>? = null
+        byteArrayParams: List<ByteArrayParam>? = null,
     ) {
         val params = mutableListOf<ParamEntry>()
         if (state.fxType == ViperParams.FX_TYPE_HEADPHONE) {
@@ -487,7 +520,10 @@ class ViperService : LifecycleService() {
         return result.ifEmpty { null }
     }
 
-    private fun prepareDdcByteArray(name: String, fxType: Int): ByteArrayParam? {
+    private fun prepareDdcByteArray(
+        name: String,
+        fxType: Int,
+    ): ByteArrayParam? {
         return try {
             val ddcDir = java.io.File(getExternalFilesDir(null), "DDC")
             val file = java.io.File(ddcDir, "$name.vdc")
@@ -499,13 +535,21 @@ class ViperService : LifecycleService() {
                 val trimmed = line.trim()
                 when {
                     trimmed.startsWith("SR_44100:") -> {
-                        coeffs44100 = trimmed.removePrefix("SR_44100:")
-                            .split(",").map { it.trim().toFloat() }.toFloatArray()
+                        coeffs44100 =
+                            trimmed
+                                .removePrefix("SR_44100:")
+                                .split(",")
+                                .map { it.trim().toFloat() }
+                                .toFloatArray()
                     }
 
                     trimmed.startsWith("SR_48000:") -> {
-                        coeffs48000 = trimmed.removePrefix("SR_48000:")
-                            .split(",").map { it.trim().toFloat() }.toFloatArray()
+                        coeffs48000 =
+                            trimmed
+                                .removePrefix("SR_48000:")
+                                .split(",")
+                                .map { it.trim().toFloat() }
+                                .toFloatArray()
                     }
                 }
             }
@@ -514,15 +558,22 @@ class ViperService : LifecycleService() {
             if (coeffs44100.size % 5 != 0) return null
             val arrSize = coeffs44100.size
             val naturalSize = 4 + arrSize * 4 * 2
-            val wireSize = when {
-                naturalSize <= 256 -> 256
-                naturalSize <= 1024 -> 1024
-                else -> return null
-            }
-            val param = if (fxType == ViperParams.FX_TYPE_SPEAKER)
-                ViperParams.PARAM_SPK_DDC_COEFFICIENTS else ViperParams.PARAM_HP_DDC_COEFFICIENTS
+            val wireSize =
+                when {
+                    naturalSize <= 256 -> 256
+                    naturalSize <= 1024 -> 1024
+                    else -> return null
+                }
+            val param =
+                if (fxType == ViperParams.FX_TYPE_SPEAKER) {
+                    ViperParams.PARAM_SPK_DDC_COEFFICIENTS
+                } else {
+                    ViperParams.PARAM_HP_DDC_COEFFICIENTS
+                }
             val buffer =
-                java.nio.ByteBuffer.allocate(wireSize).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+                java.nio.ByteBuffer
+                    .allocate(wireSize)
+                    .order(java.nio.ByteOrder.LITTLE_ENDIAN)
             buffer.putInt(arrSize)
             for (f in coeffs44100) buffer.putFloat(f)
             for (f in coeffs48000) buffer.putFloat(f)
@@ -533,7 +584,10 @@ class ViperService : LifecycleService() {
         }
     }
 
-    private fun prepareConvolverByteArray(fileName: String, fxType: Int): ByteArrayParam? {
+    private fun prepareConvolverByteArray(
+        fileName: String,
+        fxType: Int,
+    ): ByteArrayParam? {
         if (!useAidlTypeUuid) return null
         return try {
             val kernelDir = java.io.File(getExternalFilesDir(null), "Kernel")
@@ -543,10 +597,17 @@ class ViperService : LifecycleService() {
             val subDir = if (fxType == ViperParams.FX_TYPE_SPEAKER) "spk" else "hp"
             val kernelPath = "/data/local/tmp/v4a/$subDir/$safeName"
             RootShell.copyFile(file, kernelPath)
-            val param = if (fxType == ViperParams.FX_TYPE_SPEAKER)
-                ViperParams.PARAM_SPK_CONVOLVER_SET_KERNEL else ViperParams.PARAM_HP_CONVOLVER_SET_KERNEL
+            val param =
+                if (fxType == ViperParams.FX_TYPE_SPEAKER) {
+                    ViperParams.PARAM_SPK_CONVOLVER_SET_KERNEL
+                } else {
+                    ViperParams.PARAM_HP_CONVOLVER_SET_KERNEL
+                }
             val pathBytes = kernelPath.toByteArray(Charsets.UTF_8)
-            val buffer = java.nio.ByteBuffer.allocate(256).order(java.nio.ByteOrder.LITTLE_ENDIAN)
+            val buffer =
+                java.nio.ByteBuffer
+                    .allocate(256)
+                    .order(java.nio.ByteOrder.LITTLE_ENDIAN)
             buffer.putInt(pathBytes.size)
             buffer.put(pathBytes)
             ByteArrayParam(param, buffer.array())
@@ -556,14 +617,17 @@ class ViperService : LifecycleService() {
         }
     }
 
-    private fun collectHeadphoneParams(params: MutableList<ParamEntry>, state: MainUiState) {
+    private fun collectHeadphoneParams(
+        params: MutableList<ParamEntry>,
+        state: MainUiState,
+    ) {
         // Output
         params.add(ParamEntry(ViperParams.PARAM_HP_OUTPUT_VOLUME, intArrayOf(state.out.hp.volume)))
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_CHANNEL_PAN,
-                intArrayOf(state.out.hp.channelPan)
-            )
+                intArrayOf(state.out.hp.channelPan),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_HP_LIMITER, intArrayOf(state.out.hp.limiter)))
 
@@ -571,36 +635,36 @@ class ViperService : LifecycleService() {
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_AGC_ENABLE,
-                intArrayOf(if (state.agc.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.agc.hp.enabled) 1 else 0),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_HP_AGC_RATIO, intArrayOf(state.agc.hp.strength)))
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_AGC_MAX_SCALER,
-                intArrayOf(state.agc.hp.maxGain)
-            )
+                intArrayOf(state.agc.hp.maxGain),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_AGC_VOLUME,
-                intArrayOf(state.agc.hp.outputThreshold)
-            )
+                intArrayOf(state.agc.hp.outputThreshold),
+            ),
         )
 
         // LUFS
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_LUFS_ENABLE,
-                intArrayOf(if (state.lufs.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.lufs.hp.enabled) 1 else 0),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_HP_LUFS_TARGET, intArrayOf(state.lufs.hp.target)))
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_LUFS_MAX_GAIN,
-                intArrayOf(state.lufs.hp.maxGain)
-            )
+                intArrayOf(state.lufs.hp.maxGain),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_HP_LUFS_SPEED, intArrayOf(state.lufs.hp.speed)))
 
@@ -608,134 +672,138 @@ class ViperService : LifecycleService() {
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_ENABLE,
-                intArrayOf(if (state.fet.hp.enabled) 100 else 0)
-            )
+                intArrayOf(if (state.fet.hp.enabled) 100 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_THRESHOLD,
-                intArrayOf(EffectDispatcher.fetThresholdToRaw(state.fet.hp.threshold))
-            )
+                intArrayOf(EffectDispatcher.fetThresholdToRaw(state.fet.hp.threshold)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_RATIO,
-                intArrayOf(state.fet.hp.ratio)
-            )
+                intArrayOf(state.fet.hp.ratio),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_KNEE,
-                intArrayOf(if (state.fet.hp.autoKnee) 100 else 0)
-            )
+                intArrayOf(if (state.fet.hp.autoKnee) 100 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE,
-                intArrayOf(EffectDispatcher.fetKneeToRaw(state.fet.hp.knee))
-            )
+                intArrayOf(EffectDispatcher.fetKneeToRaw(state.fet.hp.knee)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE_MULTI,
-                intArrayOf(state.fet.hp.kneeMulti)
-            )
+                intArrayOf(state.fet.hp.kneeMulti),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_GAIN,
-                intArrayOf(if (state.fet.hp.autoGain) 100 else 0)
-            )
+                intArrayOf(if (state.fet.hp.autoGain) 100 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_GAIN,
-                intArrayOf(EffectDispatcher.fetGainToRaw(state.fet.hp.gain))
-            )
+                intArrayOf(EffectDispatcher.fetGainToRaw(state.fet.hp.gain)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_ATTACK,
-                intArrayOf(if (state.fet.hp.autoAttack) 100 else 0)
-            )
+                intArrayOf(if (state.fet.hp.autoAttack) 100 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_ATTACK,
-                intArrayOf(EffectDispatcher.fetAttackMsToRaw(state.fet.hp.attack))
-            )
+                intArrayOf(EffectDispatcher.fetAttackMsToRaw(state.fet.hp.attack)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_MAX_ATTACK,
-                intArrayOf(EffectDispatcher.fetAttackMsToRaw(state.fet.hp.maxAttack))
-            )
+                intArrayOf(EffectDispatcher.fetAttackMsToRaw(state.fet.hp.maxAttack)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_RELEASE,
-                intArrayOf(if (state.fet.hp.autoRelease) 100 else 0)
-            )
+                intArrayOf(if (state.fet.hp.autoRelease) 100 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_RELEASE,
-                intArrayOf(EffectDispatcher.fetReleaseMsToRaw(state.fet.hp.release))
-            )
+                intArrayOf(EffectDispatcher.fetReleaseMsToRaw(state.fet.hp.release)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_MAX_RELEASE,
-                intArrayOf(EffectDispatcher.fetReleaseMsToRaw(state.fet.hp.maxRelease))
-            )
+                intArrayOf(EffectDispatcher.fetReleaseMsToRaw(state.fet.hp.maxRelease)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_CREST,
-                intArrayOf(EffectDispatcher.fetReleaseMsToRaw(state.fet.hp.crest))
-            )
+                intArrayOf(EffectDispatcher.fetReleaseMsToRaw(state.fet.hp.crest)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_ADAPT,
-                intArrayOf(state.fet.hp.adapt)
-            )
+                intArrayOf(state.fet.hp.adapt),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FET_COMPRESSOR_NO_CLIP,
-                intArrayOf(if (state.fet.hp.noClip) 100 else 0)
-            )
+                intArrayOf(if (state.fet.hp.noClip) 100 else 0),
+            ),
         )
 
         // Multiband Compressor
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_MULTIBAND_COMP_ENABLE,
-                intArrayOf(if (state.mbc.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.mbc.hp.enabled) 1 else 0),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_HP_MULTIBAND_COMP_BAND_COUNT, intArrayOf(5)))
         val hpMbcCrossoverDefaults = intArrayOf(120, 500, 4000, 8000)
-        val hpMbcCrossovers = state.mbc.hp.crossovers.split(";")
-            .mapIndexed { i, v -> v.toIntOrNull() ?: hpMbcCrossoverDefaults.getOrElse(i) { 0 } }
+        val hpMbcCrossovers =
+            state.mbc.hp.crossovers
+                .split(";")
+                .mapIndexed { i, v -> v.toIntOrNull() ?: hpMbcCrossoverDefaults.getOrElse(i) { 0 } }
         for (i in hpMbcCrossoverDefaults.indices) {
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_MULTIBAND_COMP_CROSSOVER_FREQ,
-                    intArrayOf(i, hpMbcCrossovers.getOrElse(i) { hpMbcCrossoverDefaults[i] })
-                )
+                    intArrayOf(i, hpMbcCrossovers.getOrElse(i) { hpMbcCrossoverDefaults[i] }),
+                ),
             )
         }
         val hpMbcBandEnables =
-            state.mbc.hp.bandEnables.split(";").map { (it.toIntOrNull() ?: 1) != 0 }
+            state.mbc.hp.bandEnables
+                .split(";")
+                .map { (it.toIntOrNull() ?: 1) != 0 }
         for (b in 0 until 5) {
             val bandEnabled = hpMbcBandEnables.getOrElse(b) { true }
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_MULTIBAND_COMP_BAND_ENABLE,
-                    intArrayOf(b, if (bandEnabled) 100 else 0)
-                )
+                    intArrayOf(b, if (bandEnabled) 100 else 0),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -743,16 +811,25 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetThresholdToRaw(
-                            state.mbc.hp.thresholds.split(";").getOrNull(b)?.toIntOrNull() ?: -18
-                        )
-                    )
-                )
+                            state.mbc.hp.thresholds
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: -18,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_MULTIBAND_COMP_BAND_RATIO,
-                    intArrayOf(b, state.mbc.hp.ratios.split(";").getOrNull(b)?.toIntOrNull() ?: 50)
-                )
+                    intArrayOf(
+                        b,
+                        state.mbc.hp.ratios
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 50,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -760,10 +837,13 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetGainToRaw(
-                            state.mbc.hp.gains.split(";").getOrNull(b)?.toIntOrNull() ?: 24
-                        )
-                    )
-                )
+                            state.mbc.hp.gains
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 24,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -771,10 +851,13 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetAttackMsToRaw(
-                            state.mbc.hp.attacks.split(";").getOrNull(b)?.toIntOrNull() ?: 1
-                        )
-                    )
-                )
+                            state.mbc.hp.attacks
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 1,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -782,10 +865,13 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetReleaseMsToRaw(
-                            state.mbc.hp.releases.split(";").getOrNull(b)?.toIntOrNull() ?: 100
-                        )
-                    )
-                )
+                            state.mbc.hp.releases
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 100,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -793,63 +879,105 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetKneeToRaw(
-                            state.mbc.hp.knees.split(";").getOrNull(b)?.toIntOrNull() ?: 0
-                        )
-                    )
-                )
+                            state.mbc.hp.knees
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 0,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_MULTIBAND_COMP_BAND_AUTO_GAIN,
                     intArrayOf(
                         b,
-                        if ((state.mbc.hp.autoGains.split(";").getOrNull(b)?.toIntOrNull()
-                                ?: 1) != 0
-                        ) 100 else 0
-                    )
-                )
+                        if ((
+                                state.mbc.hp.autoGains
+                                    .split(";")
+                                    .getOrNull(b)
+                                    ?.toIntOrNull()
+                                    ?: 1
+                            ) != 0
+                        ) {
+                            100
+                        } else {
+                            0
+                        },
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_MULTIBAND_COMP_BAND_AUTO_ATTACK,
                     intArrayOf(
                         b,
-                        if ((state.mbc.hp.autoAttacks.split(";").getOrNull(b)?.toIntOrNull()
-                                ?: 1) != 0
-                        ) 100 else 0
-                    )
-                )
+                        if ((
+                                state.mbc.hp.autoAttacks
+                                    .split(";")
+                                    .getOrNull(b)
+                                    ?.toIntOrNull()
+                                    ?: 1
+                            ) != 0
+                        ) {
+                            100
+                        } else {
+                            0
+                        },
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_MULTIBAND_COMP_BAND_AUTO_RELEASE,
                     intArrayOf(
                         b,
-                        if ((state.mbc.hp.autoReleases.split(";").getOrNull(b)?.toIntOrNull()
-                                ?: 1) != 0
-                        ) 100 else 0
-                    )
-                )
+                        if ((
+                                state.mbc.hp.autoReleases
+                                    .split(";")
+                                    .getOrNull(b)
+                                    ?.toIntOrNull()
+                                    ?: 1
+                            ) != 0
+                        ) {
+                            100
+                        } else {
+                            0
+                        },
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_MULTIBAND_COMP_BAND_AUTO_KNEE,
                     intArrayOf(
                         b,
-                        if ((state.mbc.hp.autoKnees.split(";").getOrNull(b)?.toIntOrNull()
-                                ?: 1) != 0
-                        ) 100 else 0
-                    )
-                )
+                        if ((
+                                state.mbc.hp.autoKnees
+                                    .split(";")
+                                    .getOrNull(b)
+                                    ?.toIntOrNull()
+                                    ?: 1
+                            ) != 0
+                        ) {
+                            100
+                        } else {
+                            0
+                        },
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_MULTIBAND_COMP_BAND_KNEE_MULTI,
                     intArrayOf(
                         b,
-                        state.mbc.hp.kneeMultis.split(";").getOrNull(b)?.toIntOrNull() ?: 0
-                    )
-                )
+                        state.mbc.hp.kneeMultis
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 0,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -857,10 +985,13 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetAttackMsToRaw(
-                            state.mbc.hp.maxAttacks.split(";").getOrNull(b)?.toIntOrNull() ?: 44
-                        )
-                    )
-                )
+                            state.mbc.hp.maxAttacks
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 44,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -868,10 +999,13 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetReleaseMsToRaw(
-                            state.mbc.hp.maxReleases.split(";").getOrNull(b)?.toIntOrNull() ?: 200
-                        )
-                    )
-                )
+                            state.mbc.hp.maxReleases
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 200,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -879,27 +1013,45 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetReleaseMsToRaw(
-                            state.mbc.hp.crests.split(";").getOrNull(b)?.toIntOrNull() ?: 100
-                        )
-                    )
-                )
+                            state.mbc.hp.crests
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 100,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_MULTIBAND_COMP_BAND_ADAPT,
-                    intArrayOf(b, state.mbc.hp.adapts.split(";").getOrNull(b)?.toIntOrNull() ?: 50)
-                )
+                    intArrayOf(
+                        b,
+                        state.mbc.hp.adapts
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 50,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_MULTIBAND_COMP_BAND_NO_CLIP,
                     intArrayOf(
                         b,
-                        if ((state.mbc.hp.noClips.split(";").getOrNull(b)?.toIntOrNull()
-                                ?: 1) != 0
-                        ) 100 else 0
-                    )
-                )
+                        if ((
+                                state.mbc.hp.noClips
+                                    .split(";")
+                                    .getOrNull(b)
+                                    ?.toIntOrNull()
+                                    ?: 1
+                            ) != 0
+                        ) {
+                            100
+                        } else {
+                            0
+                        },
+                    ),
+                ),
             )
         }
 
@@ -907,42 +1059,51 @@ class ViperService : LifecycleService() {
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_DDC_ENABLE,
-                intArrayOf(if (state.ddc.hp.enabled && state.ddc.hp.device.isNotEmpty()) 1 else 0)
-            )
+                intArrayOf(
+                    if (state.ddc.hp.enabled &&
+                        state.ddc.hp.device
+                            .isNotEmpty()
+                    ) {
+                        1
+                    } else {
+                        0
+                    },
+                ),
+            ),
         )
 
         // Spectrum Extension
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_SPECTRUM_EXTENSION_ENABLE,
-                intArrayOf(if (state.vse.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.vse.hp.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_SPECTRUM_EXTENSION_BARK,
-                intArrayOf(state.vse.hp.strength)
-            )
+                intArrayOf(state.vse.hp.strength),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_SPECTRUM_EXTENSION_BARK_RECONSTRUCT,
-                intArrayOf(EffectDispatcher.vseExciterToRaw(state.vse.hp.exciter))
-            )
+                intArrayOf(EffectDispatcher.vseExciterToRaw(state.vse.hp.exciter)),
+            ),
         )
 
         // EQ
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_EQ_BAND_COUNT,
-                intArrayOf(state.eq.hp.bandCount)
-            )
+                intArrayOf(state.eq.hp.bandCount),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_EQ_ENABLE,
-                intArrayOf(if (state.eq.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.eq.hp.enabled) 1 else 0),
+            ),
         )
         collectEqBandParams(params, ViperParams.PARAM_HP_EQ_BAND_LEVEL, state.eq.hp.bands)
 
@@ -950,8 +1111,8 @@ class ViperService : LifecycleService() {
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_DYNAMIC_EQ_ENABLE,
-                intArrayOf(if (state.dynamicEq.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.dynamicEq.hp.enabled) 1 else 0),
+            ),
         )
         for (b in 0 until state.dynamicEq.hp.bandCount) {
             params.add(
@@ -959,232 +1120,262 @@ class ViperService : LifecycleService() {
                     ViperParams.PARAM_HP_DYNAMIC_EQ_BAND_FREQ,
                     intArrayOf(
                         b,
-                        state.dynamicEq.hp.freqs.split(";").getOrNull(b)?.toIntOrNull() ?: 1000
-                    )
-                )
+                        state.dynamicEq.hp.freqs
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 1000,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_DYNAMIC_EQ_BAND_Q,
                     intArrayOf(
                         b,
-                        state.dynamicEq.hp.qs.split(";").getOrNull(b)?.toIntOrNull() ?: 150
-                    )
-                )
+                        state.dynamicEq.hp.qs
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 150,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_DYNAMIC_EQ_BAND_GAIN,
                     intArrayOf(
                         b,
-                        state.dynamicEq.hp.gains.split(";").getOrNull(b)?.toIntOrNull() ?: 0
-                    )
-                )
+                        state.dynamicEq.hp.gains
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 0,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_DYNAMIC_EQ_BAND_THRESHOLD,
                     intArrayOf(
                         b,
-                        state.dynamicEq.hp.thresholds.split(";").getOrNull(b)?.toIntOrNull() ?: -300
-                    )
-                )
+                        state.dynamicEq.hp.thresholds
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: -300,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_DYNAMIC_EQ_BAND_ATTACK,
                     intArrayOf(
                         b,
-                        state.dynamicEq.hp.attacks.split(";").getOrNull(b)?.toIntOrNull() ?: 10
-                    )
-                )
+                        state.dynamicEq.hp.attacks
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 10,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_DYNAMIC_EQ_BAND_RELEASE,
                     intArrayOf(
                         b,
-                        state.dynamicEq.hp.releases.split(";").getOrNull(b)?.toIntOrNull() ?: 100
-                    )
-                )
+                        state.dynamicEq.hp.releases
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 100,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_HP_DYNAMIC_EQ_BAND_FILTER_TYPE,
                     intArrayOf(
                         b,
-                        state.dynamicEq.hp.filterTypes.split(";").getOrNull(b)?.toIntOrNull() ?: 0
-                    )
-                )
+                        state.dynamicEq.hp.filterTypes
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 0,
+                    ),
+                ),
             )
         }
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_DYNAMIC_EQ_BAND_COUNT,
-                intArrayOf(state.dynamicEq.hp.bandCount)
-            )
+                intArrayOf(state.dynamicEq.hp.bandCount),
+            ),
         )
 
         // Convolver
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_CONVOLVER_ENABLE,
-                intArrayOf(if (state.convolver.hp.enabled && state.convolver.hp.kernel.isNotEmpty()) 1 else 0)
-            )
+                intArrayOf(
+                    if (state.convolver.hp.enabled &&
+                        state.convolver.hp.kernel
+                            .isNotEmpty()
+                    ) {
+                        1
+                    } else {
+                        0
+                    },
+                ),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_CONVOLVER_CROSS_CHANNEL,
-                intArrayOf(state.convolver.hp.crossChannel)
-            )
+                intArrayOf(state.convolver.hp.crossChannel),
+            ),
         )
 
         // Field Surround
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FIELD_SURROUND_ENABLE,
-                intArrayOf(if (state.fieldSurround.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.fieldSurround.hp.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FIELD_SURROUND_WIDENING,
-                intArrayOf(EffectDispatcher.fieldSurroundWideningToRaw(state.fieldSurround.hp.widening))
-            )
+                intArrayOf(EffectDispatcher.fieldSurroundWideningToRaw(state.fieldSurround.hp.widening)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FIELD_SURROUND_MID_IMAGE,
-                intArrayOf(EffectDispatcher.fieldSurroundMidImageToRaw(state.fieldSurround.hp.midImage))
-            )
+                intArrayOf(EffectDispatcher.fieldSurroundMidImageToRaw(state.fieldSurround.hp.midImage)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_FIELD_SURROUND_DEPTH,
-                intArrayOf(EffectDispatcher.fieldSurroundDepthToRaw(state.fieldSurround.hp.depth))
-            )
+                intArrayOf(EffectDispatcher.fieldSurroundDepthToRaw(state.fieldSurround.hp.depth)),
+            ),
         )
 
         // Diff Surround
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_DIFF_SURROUND_ENABLE,
-                intArrayOf(if (state.diffSurround.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.diffSurround.hp.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_DIFF_SURROUND_DELAY,
-                intArrayOf(EffectDispatcher.diffSurroundDelayToRaw(state.diffSurround.hp.delay))
-            )
+                intArrayOf(EffectDispatcher.diffSurroundDelayToRaw(state.diffSurround.hp.delay)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_DIFF_SURROUND_REVERSE,
-                intArrayOf(if (state.diffSurround.hp.reverse) 1 else 0)
-            )
+                intArrayOf(if (state.diffSurround.hp.reverse) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_DIFF_SURROUND_WET_DRY_MIX,
-                intArrayOf(state.diffSurround.hp.wetDryMix)
-            )
+                intArrayOf(state.diffSurround.hp.wetDryMix),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_DIFF_SURROUND_LP_CUTOFF,
-                intArrayOf(state.diffSurround.hp.lpCutoff)
-            )
+                intArrayOf(state.diffSurround.hp.lpCutoff),
+            ),
         )
 
         // Stereo Imager
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_STEREO_IMAGER_ENABLE,
-                intArrayOf(if (state.stereoImg.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.stereoImg.hp.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_STEREO_IMAGER_LOW_WIDTH,
-                intArrayOf(state.stereoImg.hp.lowWidth)
-            )
+                intArrayOf(state.stereoImg.hp.lowWidth),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_STEREO_IMAGER_MID_WIDTH,
-                intArrayOf(state.stereoImg.hp.midWidth)
-            )
+                intArrayOf(state.stereoImg.hp.midWidth),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_STEREO_IMAGER_HIGH_WIDTH,
-                intArrayOf(state.stereoImg.hp.highWidth)
-            )
+                intArrayOf(state.stereoImg.hp.highWidth),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_STEREO_IMAGER_LOW_CROSSOVER,
-                intArrayOf(state.stereoImg.hp.lowCrossover)
-            )
+                intArrayOf(state.stereoImg.hp.lowCrossover),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_STEREO_IMAGER_HIGH_CROSSOVER,
-                intArrayOf(state.stereoImg.hp.highCrossover)
-            )
+                intArrayOf(state.stereoImg.hp.highCrossover),
+            ),
         )
 
         // Headphone Surround
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_HEADPHONE_SURROUND_ENABLE,
-                intArrayOf(if (state.vhe.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.vhe.hp.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_HEADPHONE_SURROUND_STRENGTH,
-                intArrayOf(state.vhe.hp.quality)
-            )
+                intArrayOf(state.vhe.hp.quality),
+            ),
         )
 
         // Reverb
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_REVERB_ENABLE,
-                intArrayOf(if (state.reverb.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.reverb.hp.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_REVERB_ROOM_SIZE,
-                intArrayOf(state.reverb.hp.roomSize * 10)
-            )
+                intArrayOf(state.reverb.hp.roomSize * 10),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_REVERB_ROOM_WIDTH,
-                intArrayOf(state.reverb.hp.width * 10)
-            )
+                intArrayOf(state.reverb.hp.width * 10),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_REVERB_ROOM_DAMPENING,
-                intArrayOf(state.reverb.hp.dampening)
-            )
+                intArrayOf(state.reverb.hp.dampening),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_REVERB_ROOM_WET_SIGNAL,
-                intArrayOf(state.reverb.hp.wet)
-            )
+                intArrayOf(state.reverb.hp.wet),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_REVERB_ROOM_DRY_SIGNAL,
-                intArrayOf(state.reverb.hp.dry)
-            )
+                intArrayOf(state.reverb.hp.dry),
+            ),
         )
 
         // Dynamic System
@@ -1192,162 +1383,168 @@ class ViperService : LifecycleService() {
             params,
             state.dynamicSystem.hp.enabled,
             state.dynamicSystem.hp.strength,
-            state.dynamicSystem.hp.xLow, state.dynamicSystem.hp.xHigh,
-            state.dynamicSystem.hp.yLow, state.dynamicSystem.hp.yHigh,
-            state.dynamicSystem.hp.sideGainLow, state.dynamicSystem.hp.sideGainHigh,
+            state.dynamicSystem.hp.xLow,
+            state.dynamicSystem.hp.xHigh,
+            state.dynamicSystem.hp.yLow,
+            state.dynamicSystem.hp.yHigh,
+            state.dynamicSystem.hp.sideGainLow,
+            state.dynamicSystem.hp.sideGainHigh,
             ViperParams.PARAM_HP_DYNAMIC_SYSTEM_ENABLE,
             ViperParams.PARAM_HP_DYNAMIC_SYSTEM_STRENGTH,
             ViperParams.PARAM_HP_DYNAMIC_SYSTEM_X_COEFFICIENTS,
             ViperParams.PARAM_HP_DYNAMIC_SYSTEM_Y_COEFFICIENTS,
-            ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN
+            ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN,
         )
 
         // Tube Simulator
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_TUBE_SIMULATOR_ENABLE,
-                intArrayOf(if (state.tube.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.tube.hp.enabled) 1 else 0),
+            ),
         )
 
         // Psycho Bass
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_PSYCHO_BASS_ENABLE,
-                intArrayOf(if (state.psychoBass.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.psychoBass.hp.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_PSYCHO_BASS_CUTOFF,
-                intArrayOf(state.psychoBass.hp.cutoff)
-            )
+                intArrayOf(state.psychoBass.hp.cutoff),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_PSYCHO_BASS_INTENSITY,
-                intArrayOf(state.psychoBass.hp.intensity)
-            )
+                intArrayOf(state.psychoBass.hp.intensity),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_PSYCHO_BASS_HARMONIC_ORDER,
-                intArrayOf(state.psychoBass.hp.harmonicOrder)
-            )
+                intArrayOf(state.psychoBass.hp.harmonicOrder),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_PSYCHO_BASS_ORIGINAL_LEVEL,
-                intArrayOf(state.psychoBass.hp.originalLevel)
-            )
+                intArrayOf(state.psychoBass.hp.originalLevel),
+            ),
         )
 
         // Bass
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_BASS_ENABLE,
-                intArrayOf(if (state.bass.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.bass.hp.enabled) 1 else 0),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_HP_BASS_MODE, intArrayOf(state.bass.hp.mode)))
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_BASS_FREQUENCY,
-                intArrayOf(EffectDispatcher.bassFrequencyToRaw(state.bass.hp.frequency))
-            )
+                intArrayOf(EffectDispatcher.bassFrequencyToRaw(state.bass.hp.frequency)),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_HP_BASS_GAIN, intArrayOf(state.bass.hp.gain)))
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_BASS_ANTI_POP,
-                intArrayOf(if (state.bass.hp.antiPop) 1 else 0)
-            )
+                intArrayOf(if (state.bass.hp.antiPop) 1 else 0),
+            ),
         )
 
         // Bass Mono
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_BASS_MONO_ENABLE,
-                intArrayOf(if (state.bassMono.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.bassMono.hp.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_BASS_MONO_MODE,
-                intArrayOf(state.bassMono.hp.mode)
-            )
+                intArrayOf(state.bassMono.hp.mode),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_BASS_MONO_FREQUENCY,
-                intArrayOf(EffectDispatcher.bassFrequencyToRaw(state.bassMono.hp.frequency))
-            )
+                intArrayOf(EffectDispatcher.bassFrequencyToRaw(state.bassMono.hp.frequency)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_BASS_MONO_GAIN,
-                intArrayOf(state.bassMono.hp.gain)
-            )
+                intArrayOf(state.bassMono.hp.gain),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_BASS_MONO_ANTI_POP,
-                intArrayOf(if (state.bassMono.hp.antiPop) 1 else 0)
-            )
+                intArrayOf(if (state.bassMono.hp.antiPop) 1 else 0),
+            ),
         )
 
         // Clarity
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_CLARITY_ENABLE,
-                intArrayOf(if (state.clarity.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.clarity.hp.enabled) 1 else 0),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_HP_CLARITY_MODE, intArrayOf(state.clarity.hp.mode)))
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_CLARITY_GAIN,
-                intArrayOf(state.clarity.hp.gain)
-            )
+                intArrayOf(state.clarity.hp.gain),
+            ),
         )
 
         // Cure
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_CURE_ENABLE,
-                intArrayOf(if (state.cure.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.cure.hp.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_CURE_STRENGTH,
-                intArrayOf(state.cure.hp.strength)
-            )
+                intArrayOf(state.cure.hp.strength),
+            ),
         )
 
         // AnalogX
         params.add(
             ParamEntry(
                 ViperParams.PARAM_HP_ANALOGX_ENABLE,
-                intArrayOf(if (state.analog.hp.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.analog.hp.enabled) 1 else 0),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_HP_ANALOGX_MODE, intArrayOf(state.analog.hp.mode)))
     }
 
-    private fun collectSpeakerParams(params: MutableList<ParamEntry>, state: MainUiState) {
+    private fun collectSpeakerParams(
+        params: MutableList<ParamEntry>,
+        state: MainUiState,
+    ) {
         // Output
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_OUTPUT_VOLUME,
-                intArrayOf(state.out.spk.volume)
-            )
+                intArrayOf(state.out.spk.volume),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_CHANNEL_PAN,
-                intArrayOf(state.out.spk.channelPan)
-            )
+                intArrayOf(state.out.spk.channelPan),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_SPK_LIMITER, intArrayOf(state.out.spk.limiter)))
 
@@ -1355,36 +1552,36 @@ class ViperService : LifecycleService() {
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_AGC_ENABLE,
-                intArrayOf(if (state.agc.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.agc.spk.enabled) 1 else 0),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_SPK_AGC_RATIO, intArrayOf(state.agc.spk.strength)))
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_AGC_MAX_SCALER,
-                intArrayOf(state.agc.spk.maxGain)
-            )
+                intArrayOf(state.agc.spk.maxGain),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_AGC_VOLUME,
-                intArrayOf(state.agc.spk.outputThreshold)
-            )
+                intArrayOf(state.agc.spk.outputThreshold),
+            ),
         )
 
         // LUFS
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_LUFS_ENABLE,
-                intArrayOf(if (state.lufs.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.lufs.spk.enabled) 1 else 0),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_SPK_LUFS_TARGET, intArrayOf(state.lufs.spk.target)))
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_LUFS_MAX_GAIN,
-                intArrayOf(state.lufs.spk.maxGain)
-            )
+                intArrayOf(state.lufs.spk.maxGain),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_SPK_LUFS_SPEED, intArrayOf(state.lufs.spk.speed)))
 
@@ -1392,134 +1589,138 @@ class ViperService : LifecycleService() {
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_ENABLE,
-                intArrayOf(if (state.fet.spk.enabled) 100 else 0)
-            )
+                intArrayOf(if (state.fet.spk.enabled) 100 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_THRESHOLD,
-                intArrayOf(EffectDispatcher.fetThresholdToRaw(state.fet.spk.threshold))
-            )
+                intArrayOf(EffectDispatcher.fetThresholdToRaw(state.fet.spk.threshold)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_RATIO,
-                intArrayOf(state.fet.spk.ratio)
-            )
+                intArrayOf(state.fet.spk.ratio),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_KNEE,
-                intArrayOf(if (state.fet.spk.autoKnee) 100 else 0)
-            )
+                intArrayOf(if (state.fet.spk.autoKnee) 100 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE,
-                intArrayOf(EffectDispatcher.fetKneeToRaw(state.fet.spk.knee))
-            )
+                intArrayOf(EffectDispatcher.fetKneeToRaw(state.fet.spk.knee)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE_MULTI,
-                intArrayOf(state.fet.spk.kneeMulti)
-            )
+                intArrayOf(state.fet.spk.kneeMulti),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_GAIN,
-                intArrayOf(if (state.fet.spk.autoGain) 100 else 0)
-            )
+                intArrayOf(if (state.fet.spk.autoGain) 100 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_GAIN,
-                intArrayOf(EffectDispatcher.fetGainToRaw(state.fet.spk.gain))
-            )
+                intArrayOf(EffectDispatcher.fetGainToRaw(state.fet.spk.gain)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_ATTACK,
-                intArrayOf(if (state.fet.spk.autoAttack) 100 else 0)
-            )
+                intArrayOf(if (state.fet.spk.autoAttack) 100 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_ATTACK,
-                intArrayOf(EffectDispatcher.fetAttackMsToRaw(state.fet.spk.attack))
-            )
+                intArrayOf(EffectDispatcher.fetAttackMsToRaw(state.fet.spk.attack)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_MAX_ATTACK,
-                intArrayOf(EffectDispatcher.fetAttackMsToRaw(state.fet.spk.maxAttack))
-            )
+                intArrayOf(EffectDispatcher.fetAttackMsToRaw(state.fet.spk.maxAttack)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_RELEASE,
-                intArrayOf(if (state.fet.spk.autoRelease) 100 else 0)
-            )
+                intArrayOf(if (state.fet.spk.autoRelease) 100 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_RELEASE,
-                intArrayOf(EffectDispatcher.fetReleaseMsToRaw(state.fet.spk.release))
-            )
+                intArrayOf(EffectDispatcher.fetReleaseMsToRaw(state.fet.spk.release)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_MAX_RELEASE,
-                intArrayOf(EffectDispatcher.fetReleaseMsToRaw(state.fet.spk.maxRelease))
-            )
+                intArrayOf(EffectDispatcher.fetReleaseMsToRaw(state.fet.spk.maxRelease)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_CREST,
-                intArrayOf(EffectDispatcher.fetReleaseMsToRaw(state.fet.spk.crest))
-            )
+                intArrayOf(EffectDispatcher.fetReleaseMsToRaw(state.fet.spk.crest)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_ADAPT,
-                intArrayOf(state.fet.spk.adapt)
-            )
+                intArrayOf(state.fet.spk.adapt),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FET_COMPRESSOR_NO_CLIP,
-                intArrayOf(if (state.fet.spk.noClip) 100 else 0)
-            )
+                intArrayOf(if (state.fet.spk.noClip) 100 else 0),
+            ),
         )
 
         // Multiband Compressor
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_MULTIBAND_COMP_ENABLE,
-                intArrayOf(if (state.mbc.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.mbc.spk.enabled) 1 else 0),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_SPK_MULTIBAND_COMP_BAND_COUNT, intArrayOf(5)))
         val spkMbcCrossoverDefaults = intArrayOf(120, 500, 4000, 8000)
-        val spkMbcCrossovers = state.mbc.spk.crossovers.split(";")
-            .mapIndexed { i, v -> v.toIntOrNull() ?: spkMbcCrossoverDefaults.getOrElse(i) { 0 } }
+        val spkMbcCrossovers =
+            state.mbc.spk.crossovers
+                .split(";")
+                .mapIndexed { i, v -> v.toIntOrNull() ?: spkMbcCrossoverDefaults.getOrElse(i) { 0 } }
         for (i in spkMbcCrossoverDefaults.indices) {
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_MULTIBAND_COMP_CROSSOVER_FREQ,
-                    intArrayOf(i, spkMbcCrossovers.getOrElse(i) { spkMbcCrossoverDefaults[i] })
-                )
+                    intArrayOf(i, spkMbcCrossovers.getOrElse(i) { spkMbcCrossoverDefaults[i] }),
+                ),
             )
         }
         val spkMbcBandEnables =
-            state.mbc.spk.bandEnables.split(";").map { (it.toIntOrNull() ?: 1) != 0 }
+            state.mbc.spk.bandEnables
+                .split(";")
+                .map { (it.toIntOrNull() ?: 1) != 0 }
         for (b in 0 until 5) {
             val bandEnabled = spkMbcBandEnables.getOrElse(b) { true }
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_MULTIBAND_COMP_BAND_ENABLE,
-                    intArrayOf(b, if (bandEnabled) 100 else 0)
-                )
+                    intArrayOf(b, if (bandEnabled) 100 else 0),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -1527,16 +1728,25 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetThresholdToRaw(
-                            state.mbc.spk.thresholds.split(";").getOrNull(b)?.toIntOrNull() ?: -18
-                        )
-                    )
-                )
+                            state.mbc.spk.thresholds
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: -18,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_MULTIBAND_COMP_BAND_RATIO,
-                    intArrayOf(b, state.mbc.spk.ratios.split(";").getOrNull(b)?.toIntOrNull() ?: 50)
-                )
+                    intArrayOf(
+                        b,
+                        state.mbc.spk.ratios
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 50,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -1544,10 +1754,13 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetGainToRaw(
-                            state.mbc.spk.gains.split(";").getOrNull(b)?.toIntOrNull() ?: 24
-                        )
-                    )
-                )
+                            state.mbc.spk.gains
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 24,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -1555,10 +1768,13 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetAttackMsToRaw(
-                            state.mbc.spk.attacks.split(";").getOrNull(b)?.toIntOrNull() ?: 1
-                        )
-                    )
-                )
+                            state.mbc.spk.attacks
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 1,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -1566,10 +1782,13 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetReleaseMsToRaw(
-                            state.mbc.spk.releases.split(";").getOrNull(b)?.toIntOrNull() ?: 100
-                        )
-                    )
-                )
+                            state.mbc.spk.releases
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 100,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -1577,63 +1796,105 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetKneeToRaw(
-                            state.mbc.spk.knees.split(";").getOrNull(b)?.toIntOrNull() ?: 0
-                        )
-                    )
-                )
+                            state.mbc.spk.knees
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 0,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_MULTIBAND_COMP_BAND_AUTO_GAIN,
                     intArrayOf(
                         b,
-                        if ((state.mbc.spk.autoGains.split(";").getOrNull(b)?.toIntOrNull()
-                                ?: 1) != 0
-                        ) 100 else 0
-                    )
-                )
+                        if ((
+                                state.mbc.spk.autoGains
+                                    .split(";")
+                                    .getOrNull(b)
+                                    ?.toIntOrNull()
+                                    ?: 1
+                            ) != 0
+                        ) {
+                            100
+                        } else {
+                            0
+                        },
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_MULTIBAND_COMP_BAND_AUTO_ATTACK,
                     intArrayOf(
                         b,
-                        if ((state.mbc.spk.autoAttacks.split(";").getOrNull(b)?.toIntOrNull()
-                                ?: 1) != 0
-                        ) 100 else 0
-                    )
-                )
+                        if ((
+                                state.mbc.spk.autoAttacks
+                                    .split(";")
+                                    .getOrNull(b)
+                                    ?.toIntOrNull()
+                                    ?: 1
+                            ) != 0
+                        ) {
+                            100
+                        } else {
+                            0
+                        },
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_MULTIBAND_COMP_BAND_AUTO_RELEASE,
                     intArrayOf(
                         b,
-                        if ((state.mbc.spk.autoReleases.split(";").getOrNull(b)?.toIntOrNull()
-                                ?: 1) != 0
-                        ) 100 else 0
-                    )
-                )
+                        if ((
+                                state.mbc.spk.autoReleases
+                                    .split(";")
+                                    .getOrNull(b)
+                                    ?.toIntOrNull()
+                                    ?: 1
+                            ) != 0
+                        ) {
+                            100
+                        } else {
+                            0
+                        },
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_MULTIBAND_COMP_BAND_AUTO_KNEE,
                     intArrayOf(
                         b,
-                        if ((state.mbc.spk.autoKnees.split(";").getOrNull(b)?.toIntOrNull()
-                                ?: 1) != 0
-                        ) 100 else 0
-                    )
-                )
+                        if ((
+                                state.mbc.spk.autoKnees
+                                    .split(";")
+                                    .getOrNull(b)
+                                    ?.toIntOrNull()
+                                    ?: 1
+                            ) != 0
+                        ) {
+                            100
+                        } else {
+                            0
+                        },
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_MULTIBAND_COMP_BAND_KNEE_MULTI,
                     intArrayOf(
                         b,
-                        state.mbc.spk.kneeMultis.split(";").getOrNull(b)?.toIntOrNull() ?: 0
-                    )
-                )
+                        state.mbc.spk.kneeMultis
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 0,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -1641,10 +1902,13 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetAttackMsToRaw(
-                            state.mbc.spk.maxAttacks.split(";").getOrNull(b)?.toIntOrNull() ?: 44
-                        )
-                    )
-                )
+                            state.mbc.spk.maxAttacks
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 44,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -1652,10 +1916,13 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetReleaseMsToRaw(
-                            state.mbc.spk.maxReleases.split(";").getOrNull(b)?.toIntOrNull() ?: 200
-                        )
-                    )
-                )
+                            state.mbc.spk.maxReleases
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 200,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
@@ -1663,27 +1930,45 @@ class ViperService : LifecycleService() {
                     intArrayOf(
                         b,
                         EffectDispatcher.fetReleaseMsToRaw(
-                            state.mbc.spk.crests.split(";").getOrNull(b)?.toIntOrNull() ?: 100
-                        )
-                    )
-                )
+                            state.mbc.spk.crests
+                                .split(";")
+                                .getOrNull(b)
+                                ?.toIntOrNull() ?: 100,
+                        ),
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_MULTIBAND_COMP_BAND_ADAPT,
-                    intArrayOf(b, state.mbc.spk.adapts.split(";").getOrNull(b)?.toIntOrNull() ?: 50)
-                )
+                    intArrayOf(
+                        b,
+                        state.mbc.spk.adapts
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 50,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_MULTIBAND_COMP_BAND_NO_CLIP,
                     intArrayOf(
                         b,
-                        if ((state.mbc.spk.noClips.split(";").getOrNull(b)?.toIntOrNull()
-                                ?: 1) != 0
-                        ) 100 else 0
-                    )
-                )
+                        if ((
+                                state.mbc.spk.noClips
+                                    .split(";")
+                                    .getOrNull(b)
+                                    ?.toIntOrNull()
+                                    ?: 1
+                            ) != 0
+                        ) {
+                            100
+                        } else {
+                            0
+                        },
+                    ),
+                ),
             )
         }
 
@@ -1691,42 +1976,51 @@ class ViperService : LifecycleService() {
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_DDC_ENABLE,
-                intArrayOf(if (state.ddc.spk.enabled && state.ddc.spk.device.isNotEmpty()) 1 else 0)
-            )
+                intArrayOf(
+                    if (state.ddc.spk.enabled &&
+                        state.ddc.spk.device
+                            .isNotEmpty()
+                    ) {
+                        1
+                    } else {
+                        0
+                    },
+                ),
+            ),
         )
 
         // Spectrum Extension
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_ENABLE,
-                intArrayOf(if (state.vse.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.vse.spk.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_BARK,
-                intArrayOf(state.vse.spk.strength)
-            )
+                intArrayOf(state.vse.spk.strength),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_BARK_RECONSTRUCT,
-                intArrayOf(EffectDispatcher.vseExciterToRaw(state.vse.spk.exciter))
-            )
+                intArrayOf(EffectDispatcher.vseExciterToRaw(state.vse.spk.exciter)),
+            ),
         )
 
         // EQ
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_EQ_BAND_COUNT,
-                intArrayOf(state.eq.spk.bandCount)
-            )
+                intArrayOf(state.eq.spk.bandCount),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_EQ_ENABLE,
-                intArrayOf(if (state.eq.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.eq.spk.enabled) 1 else 0),
+            ),
         )
         collectEqBandParams(params, ViperParams.PARAM_SPK_EQ_BAND_LEVEL, state.eq.spk.bands)
 
@@ -1734,8 +2028,8 @@ class ViperService : LifecycleService() {
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_DYNAMIC_EQ_ENABLE,
-                intArrayOf(if (state.dynamicEq.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.dynamicEq.spk.enabled) 1 else 0),
+            ),
         )
         for (b in 0 until state.dynamicEq.spk.bandCount) {
             params.add(
@@ -1743,233 +2037,263 @@ class ViperService : LifecycleService() {
                     ViperParams.PARAM_SPK_DYNAMIC_EQ_BAND_FREQ,
                     intArrayOf(
                         b,
-                        state.dynamicEq.spk.freqs.split(";").getOrNull(b)?.toIntOrNull() ?: 1000
-                    )
-                )
+                        state.dynamicEq.spk.freqs
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 1000,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_DYNAMIC_EQ_BAND_Q,
                     intArrayOf(
                         b,
-                        state.dynamicEq.spk.qs.split(";").getOrNull(b)?.toIntOrNull() ?: 150
-                    )
-                )
+                        state.dynamicEq.spk.qs
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 150,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_DYNAMIC_EQ_BAND_GAIN,
                     intArrayOf(
                         b,
-                        state.dynamicEq.spk.gains.split(";").getOrNull(b)?.toIntOrNull() ?: 0
-                    )
-                )
+                        state.dynamicEq.spk.gains
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 0,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_DYNAMIC_EQ_BAND_THRESHOLD,
                     intArrayOf(
                         b,
-                        state.dynamicEq.spk.thresholds.split(";").getOrNull(b)?.toIntOrNull()
-                            ?: -300
-                    )
-                )
+                        state.dynamicEq.spk.thresholds
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull()
+                            ?: -300,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_DYNAMIC_EQ_BAND_ATTACK,
                     intArrayOf(
                         b,
-                        state.dynamicEq.spk.attacks.split(";").getOrNull(b)?.toIntOrNull() ?: 10
-                    )
-                )
+                        state.dynamicEq.spk.attacks
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 10,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_DYNAMIC_EQ_BAND_RELEASE,
                     intArrayOf(
                         b,
-                        state.dynamicEq.spk.releases.split(";").getOrNull(b)?.toIntOrNull() ?: 100
-                    )
-                )
+                        state.dynamicEq.spk.releases
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 100,
+                    ),
+                ),
             )
             params.add(
                 ParamEntry(
                     ViperParams.PARAM_SPK_DYNAMIC_EQ_BAND_FILTER_TYPE,
                     intArrayOf(
                         b,
-                        state.dynamicEq.spk.filterTypes.split(";").getOrNull(b)?.toIntOrNull() ?: 0
-                    )
-                )
+                        state.dynamicEq.spk.filterTypes
+                            .split(";")
+                            .getOrNull(b)
+                            ?.toIntOrNull() ?: 0,
+                    ),
+                ),
             )
         }
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_DYNAMIC_EQ_BAND_COUNT,
-                intArrayOf(state.dynamicEq.spk.bandCount)
-            )
+                intArrayOf(state.dynamicEq.spk.bandCount),
+            ),
         )
 
         // Convolver
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_CONVOLVER_ENABLE,
-                intArrayOf(if (state.convolver.spk.enabled && state.convolver.spk.kernel.isNotEmpty()) 1 else 0)
-            )
+                intArrayOf(
+                    if (state.convolver.spk.enabled &&
+                        state.convolver.spk.kernel
+                            .isNotEmpty()
+                    ) {
+                        1
+                    } else {
+                        0
+                    },
+                ),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_CONVOLVER_CROSS_CHANNEL,
-                intArrayOf(state.convolver.spk.crossChannel)
-            )
+                intArrayOf(state.convolver.spk.crossChannel),
+            ),
         )
 
         // Field Surround
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FIELD_SURROUND_ENABLE,
-                intArrayOf(if (state.fieldSurround.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.fieldSurround.spk.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FIELD_SURROUND_WIDENING,
-                intArrayOf(EffectDispatcher.fieldSurroundWideningToRaw(state.fieldSurround.spk.widening))
-            )
+                intArrayOf(EffectDispatcher.fieldSurroundWideningToRaw(state.fieldSurround.spk.widening)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FIELD_SURROUND_MID_IMAGE,
-                intArrayOf(EffectDispatcher.fieldSurroundMidImageToRaw(state.fieldSurround.spk.midImage))
-            )
+                intArrayOf(EffectDispatcher.fieldSurroundMidImageToRaw(state.fieldSurround.spk.midImage)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_FIELD_SURROUND_DEPTH,
-                intArrayOf(EffectDispatcher.fieldSurroundDepthToRaw(state.fieldSurround.spk.depth))
-            )
+                intArrayOf(EffectDispatcher.fieldSurroundDepthToRaw(state.fieldSurround.spk.depth)),
+            ),
         )
 
         // Diff Surround
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_DIFF_SURROUND_ENABLE,
-                intArrayOf(if (state.diffSurround.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.diffSurround.spk.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_DIFF_SURROUND_DELAY,
-                intArrayOf(EffectDispatcher.diffSurroundDelayToRaw(state.diffSurround.spk.delay))
-            )
+                intArrayOf(EffectDispatcher.diffSurroundDelayToRaw(state.diffSurround.spk.delay)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_DIFF_SURROUND_REVERSE,
-                intArrayOf(if (state.diffSurround.spk.reverse) 1 else 0)
-            )
+                intArrayOf(if (state.diffSurround.spk.reverse) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_DIFF_SURROUND_WET_DRY_MIX,
-                intArrayOf(state.diffSurround.spk.wetDryMix)
-            )
+                intArrayOf(state.diffSurround.spk.wetDryMix),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_DIFF_SURROUND_LP_CUTOFF,
-                intArrayOf(state.diffSurround.spk.lpCutoff)
-            )
+                intArrayOf(state.diffSurround.spk.lpCutoff),
+            ),
         )
 
         // Stereo Imager
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_STEREO_IMAGER_ENABLE,
-                intArrayOf(if (state.stereoImg.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.stereoImg.spk.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_STEREO_IMAGER_LOW_WIDTH,
-                intArrayOf(state.stereoImg.spk.lowWidth)
-            )
+                intArrayOf(state.stereoImg.spk.lowWidth),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_STEREO_IMAGER_MID_WIDTH,
-                intArrayOf(state.stereoImg.spk.midWidth)
-            )
+                intArrayOf(state.stereoImg.spk.midWidth),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_STEREO_IMAGER_HIGH_WIDTH,
-                intArrayOf(state.stereoImg.spk.highWidth)
-            )
+                intArrayOf(state.stereoImg.spk.highWidth),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_STEREO_IMAGER_LOW_CROSSOVER,
-                intArrayOf(state.stereoImg.spk.lowCrossover)
-            )
+                intArrayOf(state.stereoImg.spk.lowCrossover),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_STEREO_IMAGER_HIGH_CROSSOVER,
-                intArrayOf(state.stereoImg.spk.highCrossover)
-            )
+                intArrayOf(state.stereoImg.spk.highCrossover),
+            ),
         )
 
         // Headphone Surround
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_HEADPHONE_SURROUND_ENABLE,
-                intArrayOf(if (state.vhe.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.vhe.spk.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_HEADPHONE_SURROUND_STRENGTH,
-                intArrayOf(state.vhe.spk.quality)
-            )
+                intArrayOf(state.vhe.spk.quality),
+            ),
         )
 
         // Reverb
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_REVERB_ENABLE,
-                intArrayOf(if (state.reverb.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.reverb.spk.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_REVERB_ROOM_SIZE,
-                intArrayOf(state.reverb.spk.roomSize * 10)
-            )
+                intArrayOf(state.reverb.spk.roomSize * 10),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_REVERB_ROOM_WIDTH,
-                intArrayOf(state.reverb.spk.width * 10)
-            )
+                intArrayOf(state.reverb.spk.width * 10),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_REVERB_ROOM_DAMPENING,
-                intArrayOf(state.reverb.spk.dampening)
-            )
+                intArrayOf(state.reverb.spk.dampening),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_REVERB_ROOM_WET_SIGNAL,
-                intArrayOf(state.reverb.spk.wet)
-            )
+                intArrayOf(state.reverb.spk.wet),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_REVERB_ROOM_DRY_SIGNAL,
-                intArrayOf(state.reverb.spk.dry)
-            )
+                intArrayOf(state.reverb.spk.dry),
+            ),
         )
 
         // Dynamic System
@@ -1977,176 +2301,179 @@ class ViperService : LifecycleService() {
             params,
             state.dynamicSystem.spk.enabled,
             state.dynamicSystem.spk.strength,
-            state.dynamicSystem.spk.xLow, state.dynamicSystem.spk.xHigh,
-            state.dynamicSystem.spk.yLow, state.dynamicSystem.spk.yHigh,
-            state.dynamicSystem.spk.sideGainLow, state.dynamicSystem.spk.sideGainHigh,
+            state.dynamicSystem.spk.xLow,
+            state.dynamicSystem.spk.xHigh,
+            state.dynamicSystem.spk.yLow,
+            state.dynamicSystem.spk.yHigh,
+            state.dynamicSystem.spk.sideGainLow,
+            state.dynamicSystem.spk.sideGainHigh,
             ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_ENABLE,
             ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_STRENGTH,
             ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_X_COEFFICIENTS,
             ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_Y_COEFFICIENTS,
-            ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_SIDE_GAIN
+            ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_SIDE_GAIN,
         )
 
         // Tube Simulator
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_TUBE_SIMULATOR_ENABLE,
-                intArrayOf(if (state.tube.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.tube.spk.enabled) 1 else 0),
+            ),
         )
 
         // Psycho Bass
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_PSYCHO_BASS_ENABLE,
-                intArrayOf(if (state.psychoBass.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.psychoBass.spk.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_PSYCHO_BASS_CUTOFF,
-                intArrayOf(state.psychoBass.spk.cutoff)
-            )
+                intArrayOf(state.psychoBass.spk.cutoff),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_PSYCHO_BASS_INTENSITY,
-                intArrayOf(state.psychoBass.spk.intensity)
-            )
+                intArrayOf(state.psychoBass.spk.intensity),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_PSYCHO_BASS_HARMONIC_ORDER,
-                intArrayOf(state.psychoBass.spk.harmonicOrder)
-            )
+                intArrayOf(state.psychoBass.spk.harmonicOrder),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_PSYCHO_BASS_ORIGINAL_LEVEL,
-                intArrayOf(state.psychoBass.spk.originalLevel)
-            )
+                intArrayOf(state.psychoBass.spk.originalLevel),
+            ),
         )
 
         // Bass
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_BASS_ENABLE,
-                intArrayOf(if (state.bass.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.bass.spk.enabled) 1 else 0),
+            ),
         )
         params.add(ParamEntry(ViperParams.PARAM_SPK_BASS_MODE, intArrayOf(state.bass.spk.mode)))
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_BASS_FREQUENCY,
-                intArrayOf(EffectDispatcher.bassFrequencyToRaw(state.bass.spk.frequency))
-            )
+                intArrayOf(EffectDispatcher.bassFrequencyToRaw(state.bass.spk.frequency)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_BASS_GAIN,
-                intArrayOf(state.bass.spk.gain)
-            )
+                intArrayOf(state.bass.spk.gain),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_BASS_ANTI_POP,
-                intArrayOf(if (state.bass.spk.antiPop) 1 else 0)
-            )
+                intArrayOf(if (state.bass.spk.antiPop) 1 else 0),
+            ),
         )
 
         // Bass Mono
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_BASS_MONO_ENABLE,
-                intArrayOf(if (state.bassMono.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.bassMono.spk.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_BASS_MONO_MODE,
-                intArrayOf(state.bassMono.spk.mode)
-            )
+                intArrayOf(state.bassMono.spk.mode),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_BASS_MONO_FREQUENCY,
-                intArrayOf(EffectDispatcher.bassFrequencyToRaw(state.bassMono.spk.frequency))
-            )
+                intArrayOf(EffectDispatcher.bassFrequencyToRaw(state.bassMono.spk.frequency)),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_BASS_MONO_GAIN,
-                intArrayOf(state.bassMono.spk.gain)
-            )
+                intArrayOf(state.bassMono.spk.gain),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_BASS_MONO_ANTI_POP,
-                intArrayOf(if (state.bassMono.spk.antiPop) 1 else 0)
-            )
+                intArrayOf(if (state.bassMono.spk.antiPop) 1 else 0),
+            ),
         )
 
         // Clarity
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_CLARITY_ENABLE,
-                intArrayOf(if (state.clarity.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.clarity.spk.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_CLARITY_MODE,
-                intArrayOf(state.clarity.spk.mode)
-            )
+                intArrayOf(state.clarity.spk.mode),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_CLARITY_GAIN,
-                intArrayOf(state.clarity.spk.gain)
-            )
+                intArrayOf(state.clarity.spk.gain),
+            ),
         )
 
         // Cure
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_CURE_ENABLE,
-                intArrayOf(if (state.cure.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.cure.spk.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_CURE_STRENGTH,
-                intArrayOf(state.cure.spk.strength)
-            )
+                intArrayOf(state.cure.spk.strength),
+            ),
         )
 
         // AnalogX
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_ANALOGX_ENABLE,
-                intArrayOf(if (state.analog.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.analog.spk.enabled) 1 else 0),
+            ),
         )
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_ANALOGX_MODE,
-                intArrayOf(state.analog.spk.mode)
-            )
+                intArrayOf(state.analog.spk.mode),
+            ),
         )
 
         // Speaker Correction
         params.add(
             ParamEntry(
                 ViperParams.PARAM_SPK_SPEAKER_CORRECTION_ENABLE,
-                intArrayOf(if (state.speakerCorrection.spk.enabled) 1 else 0)
-            )
+                intArrayOf(if (state.speakerCorrection.spk.enabled) 1 else 0),
+            ),
         )
     }
 
     private fun collectEqBandParams(
         params: MutableList<ParamEntry>,
         param: Int,
-        bandsString: String
+        bandsString: String,
     ) {
         val bands = bandsString.split(";").filter { it.isNotBlank() }
         for ((index, bandStr) in bands.withIndex()) {
@@ -2159,21 +2486,24 @@ class ViperService : LifecycleService() {
         params: MutableList<ParamEntry>,
         enabled: Boolean,
         strength: Int,
-        xLow: Int, xHigh: Int,
-        yLow: Int, yHigh: Int,
-        sideGainLow: Int, sideGainHigh: Int,
+        xLow: Int,
+        xHigh: Int,
+        yLow: Int,
+        yHigh: Int,
+        sideGainLow: Int,
+        sideGainHigh: Int,
         paramEnable: Int,
         paramStrength: Int,
         paramXCoeffs: Int,
         paramYCoeffs: Int,
-        paramSideGain: Int
+        paramSideGain: Int,
     ) {
         params.add(ParamEntry(paramEnable, intArrayOf(if (enabled) 1 else 0)))
         params.add(
             ParamEntry(
                 paramStrength,
-                intArrayOf(EffectDispatcher.dynamicSystemStrengthToRaw(strength))
-            )
+                intArrayOf(EffectDispatcher.dynamicSystemStrengthToRaw(strength)),
+            ),
         )
         params.add(ParamEntry(paramXCoeffs, intArrayOf(xLow, xHigh)))
         params.add(ParamEntry(paramYCoeffs, intArrayOf(yLow, yHigh)))
@@ -2190,7 +2520,10 @@ class ViperService : LifecycleService() {
     fun getGlobalEffect(): ViperEffect? = globalEffect
 
     fun recreateGlobalEffect(aidlType: Boolean) {
-        globalEffect?.let { it.enabled = false; it.release() }
+        globalEffect?.let {
+            it.enabled = false
+            it.release()
+        }
         globalEffect = null
         useAidlTypeUuid = aidlType
         if (globalMode) {
@@ -2207,7 +2540,10 @@ class ViperService : LifecycleService() {
                 initGlobalEffect()
             }
         } else {
-            globalEffect?.let { it.enabled = false; it.release() }
+            globalEffect?.let {
+                it.enabled = false
+                it.release()
+            }
             globalEffect = null
             startSessionMonitor()
         }
@@ -2216,28 +2552,33 @@ class ViperService : LifecycleService() {
     private fun createNotificationChannel() {
         val channelName = getString(R.string.notification_channel_name)
         val channelDescription = getString(R.string.notification_channel_description)
-        val channel = NotificationChannel(
-            NOTIFICATION_CHANNEL_ID,
-            channelName,
-            NotificationManager.IMPORTANCE_LOW
-        ).apply {
-            description = channelDescription
-            setShowBadge(false)
-        }
+        val channel =
+            NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                channelName,
+                NotificationManager.IMPORTANCE_LOW,
+            ).apply {
+                description = channelDescription
+                setShowBadge(false)
+            }
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)
     }
 
     private fun buildNotification(): Notification {
         val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
-        val pendingIntent = launchIntent?.let {
-            PendingIntent.getActivity(
-                this, 0, it,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-        }
+        val pendingIntent =
+            launchIntent?.let {
+                PendingIntent.getActivity(
+                    this,
+                    0,
+                    it,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                )
+            }
 
-        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        return NotificationCompat
+            .Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(getString(R.string.notification_text))
             .setSmallIcon(android.R.drawable.ic_media_play)

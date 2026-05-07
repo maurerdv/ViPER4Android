@@ -39,7 +39,7 @@ fun SettingsDialog(
     onImportKernel: () -> Unit,
     onDebugUnlocked: () -> Unit,
     onImportVdc: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
     val tapCount = remember { mutableIntStateOf(0) }
@@ -53,89 +53,93 @@ fun SettingsDialog(
                 SettingsToggleRow(
                     label = stringResource(R.string.settings_auto_start),
                     checked = autoStartEnabled,
-                    onCheckedChange = onAutoStartChanged
+                    onCheckedChange = onAutoStartChanged,
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                 SettingsToggleRow(
                     label = stringResource(R.string.settings_aidl_mode),
                     checked = aidlModeEnabled,
-                    onCheckedChange = onAidlModeChanged
+                    onCheckedChange = onAidlModeChanged,
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                 SettingsToggleRow(
                     label = stringResource(R.string.settings_global_mode),
                     checked = globalModeEnabled,
-                    onCheckedChange = onGlobalModeChanged
+                    onCheckedChange = onGlobalModeChanged,
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                 Text(
                     text = stringResource(R.string.settings_files_section),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 8.dp),
                 )
                 OutlinedButton(
                     onClick = onImportPreset,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 2.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 2.dp),
                 ) {
                     Text(stringResource(R.string.settings_import_preset))
                 }
                 OutlinedButton(
                     onClick = onImportKernel,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 2.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 2.dp),
                 ) {
                     Text(stringResource(R.string.settings_import_kernel))
                 }
                 OutlinedButton(
                     onClick = onImportVdc,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 2.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 2.dp),
                 ) {
                     Text(stringResource(R.string.settings_import_vdc))
                 }
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            tapCount.intValue++
-                            if (tapCount.intValue >= 7) {
-                                tapCount.intValue = 0
-                                onDebugUnlocked()
-                                Toast.makeText(
-                                    context,
-                                    debugModeEnabledStr,
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                        .padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                tapCount.intValue++
+                                if (tapCount.intValue >= 7) {
+                                    tapCount.intValue = 0
+                                    onDebugUnlocked()
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            debugModeEnabledStr,
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+                                }
+                            }.padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
                         text = stringResource(R.string.settings_driver_version),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
                         text = if (driverStatus.installed) driverStatus.versionName else "-",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                 SettingsInfoRow(
                     label = stringResource(R.string.settings_driver_arch),
-                    value = if (driverStatus.installed) driverStatus.architecture else "-"
+                    value = if (driverStatus.installed) driverStatus.architecture else "-",
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                 SettingsInfoRow(
                     label = stringResource(R.string.settings_app_version),
-                    value = appVersionName
+                    value = appVersionName,
                 )
             }
         },
@@ -143,7 +147,7 @@ fun SettingsDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.action_close))
             }
-        }
+        },
     )
 }
 
@@ -151,43 +155,48 @@ fun SettingsDialog(
 private fun SettingsToggleRow(
     label: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         Switch(
             checked = checked,
-            onCheckedChange = onCheckedChange
+            onCheckedChange = onCheckedChange,
         )
     }
 }
 
 @Composable
-private fun SettingsInfoRow(label: String, value: String) {
+private fun SettingsInfoRow(
+    label: String,
+    value: String,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }

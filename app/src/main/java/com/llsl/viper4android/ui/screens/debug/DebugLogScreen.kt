@@ -55,49 +55,74 @@ private const val MAX_LOG_LINES = 500
 private const val APP_PREFIX = "[App] "
 private const val DRIVER_PREFIX = "[Driver] "
 
-private enum class LogLevel(@param:StringRes val labelRes: Int) {
+private enum class LogLevel(
+    @param:StringRes val labelRes: Int,
+) {
     ALL(R.string.debug_filter_all),
     INFO(R.string.debug_filter_info),
     DEBUG(R.string.debug_filter_debug),
-    ERROR(R.string.debug_filter_error);
+    ERROR(R.string.debug_filter_error),
+    ;
 
-    fun matches(line: String): Boolean = when (this) {
-        ALL -> true
-        INFO -> line.contains("[INFO]") || line.contains(" I/")
-        DEBUG -> line.contains("[DEBUG]") || line.contains(" D/")
-        ERROR -> line.contains("[ERROR]") || line.contains(" E/")
-    }
+    fun matches(line: String): Boolean =
+        when (this) {
+            ALL -> true
+            INFO -> line.contains("[INFO]") || line.contains(" I/")
+            DEBUG -> line.contains("[DEBUG]") || line.contains(" D/")
+            ERROR -> line.contains("[ERROR]") || line.contains(" E/")
+        }
 }
 
-private enum class LogSource(@param:StringRes val labelRes: Int) {
+private enum class LogSource(
+    @param:StringRes val labelRes: Int,
+) {
     ALL(R.string.debug_filter_all),
     APP(R.string.debug_filter_app),
-    DRIVER(R.string.debug_filter_driver);
+    DRIVER(R.string.debug_filter_driver),
+    ;
 
-    fun matches(line: String): Boolean = when (this) {
-        ALL -> true
-        APP -> line.startsWith(APP_PREFIX)
-        DRIVER -> line.startsWith(DRIVER_PREFIX)
-    }
+    fun matches(line: String): Boolean =
+        when (this) {
+            ALL -> true
+            APP -> line.startsWith(APP_PREFIX)
+            DRIVER -> line.startsWith(DRIVER_PREFIX)
+        }
 }
 
-private enum class LogCategory(@param:StringRes val labelRes: Int) {
+private enum class LogCategory(
+    @param:StringRes val labelRes: Int,
+) {
     ALL(R.string.debug_filter_all),
     EFFECT(R.string.debug_filter_effect),
     DISPATCH(R.string.debug_filter_dispatch),
     CONFIG(R.string.debug_filter_config),
-    COMMAND(R.string.debug_filter_command);
+    COMMAND(R.string.debug_filter_command),
+    ;
 
-    fun matches(line: String): Boolean = when (this) {
-        ALL -> true
-        EFFECT -> line.contains(Regex("\\w+: (ON|OFF)"))
-        DISPATCH -> line.contains("[Dispatch]") || line.contains("Dispatch:")
-        CONFIG -> line.contains("Input ") || line.contains("Output ") ||
-                line.contains("sampling") || line.contains("format") ||
-                line.contains("channels") || line.contains("Config")
+    fun matches(line: String): Boolean =
+        when (this) {
+            ALL -> {
+                true
+            }
 
-        COMMAND -> line.contains("handleCommand") || line.contains("EFFECT_CMD")
-    }
+            EFFECT -> {
+                line.contains(Regex("\\w+: (ON|OFF)"))
+            }
+
+            DISPATCH -> {
+                line.contains("[Dispatch]") || line.contains("Dispatch:")
+            }
+
+            CONFIG -> {
+                line.contains("Input ") || line.contains("Output ") ||
+                    line.contains("sampling") || line.contains("format") ||
+                    line.contains("channels") || line.contains("Config")
+            }
+
+            COMMAND -> {
+                line.contains("handleCommand") || line.contains("EFFECT_CMD")
+            }
+        }
 }
 
 @Composable
@@ -105,7 +130,7 @@ fun DebugLogDialog(
     clearTimestamp: Long,
     onClear: () -> Unit,
     onDisableDebug: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val allLines = remember { mutableStateListOf<String>() }
     val listState = rememberLazyListState()
@@ -121,7 +146,8 @@ fun DebugLogDialog(
                 val levelMatch = selectedLevel.matches(line)
                 val sourceMatch = selectedSource.matches(line)
                 val categoryMatch = selectedCategory.matches(line)
-                val searchMatch = searchQuery.isBlank() ||
+                val searchMatch =
+                    searchQuery.isBlank() ||
                         line.contains(searchQuery, ignoreCase = true)
                 levelMatch && sourceMatch && categoryMatch && searchMatch
             }
@@ -155,13 +181,17 @@ fun DebugLogDialog(
         withContext(Dispatchers.IO) {
             var proc: Process? = null
             try {
-                val tsArg = if (clearTimestamp > 0L) {
-                    val fmt = SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.US)
-                    " -T '${fmt.format(Date(clearTimestamp))}'"
-                } else ""
-                proc = ProcessBuilder(RootShell.getSuPath())
-                    .redirectErrorStream(true)
-                    .start()
+                val tsArg =
+                    if (clearTimestamp > 0L) {
+                        val fmt = SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.US)
+                        " -T '${fmt.format(Date(clearTimestamp))}'"
+                    } else {
+                        ""
+                    }
+                proc =
+                    ProcessBuilder(RootShell.getSuPath())
+                        .redirectErrorStream(true)
+                        .start()
                 proc.outputStream.bufferedWriter().let { writer ->
                     writer.write("logcat -s ViPER4Android:* -v time$tsArg\n")
                     writer.flush()
@@ -207,31 +237,34 @@ fun DebugLogDialog(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
                     placeholder = { Text(stringResource(R.string.debug_search_hint)) },
                     leadingIcon = {
                         Icon(
                             Icons.Default.Search,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(18.dp),
                         )
                     },
                     singleLine = true,
                     textStyle = MaterialTheme.typography.bodySmall,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-                    )
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                        ),
                 )
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState())
-                        .padding(bottom = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(bottom = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     LogSource.entries.forEach { source ->
                         FilterChip(
@@ -240,24 +273,26 @@ fun DebugLogDialog(
                             label = {
                                 Text(
                                     stringResource(source.labelRes),
-                                    style = MaterialTheme.typography.labelSmall
+                                    style = MaterialTheme.typography.labelSmall,
                                 )
                             },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = colorForSource(source).copy(alpha = 0.2f),
-                                selectedLabelColor = colorForSource(source)
-                            ),
-                            modifier = Modifier.height(28.dp)
+                            colors =
+                                FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = colorForSource(source).copy(alpha = 0.2f),
+                                    selectedLabelColor = colorForSource(source),
+                                ),
+                            modifier = Modifier.height(28.dp),
                         )
                     }
                 }
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState())
-                        .padding(bottom = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(bottom = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     LogLevel.entries.forEach { level ->
                         FilterChip(
@@ -266,24 +301,26 @@ fun DebugLogDialog(
                             label = {
                                 Text(
                                     stringResource(level.labelRes),
-                                    style = MaterialTheme.typography.labelSmall
+                                    style = MaterialTheme.typography.labelSmall,
                                 )
                             },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = colorForLevel(level).copy(alpha = 0.2f),
-                                selectedLabelColor = colorForLevel(level)
-                            ),
-                            modifier = Modifier.height(28.dp)
+                            colors =
+                                FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = colorForLevel(level).copy(alpha = 0.2f),
+                                    selectedLabelColor = colorForLevel(level),
+                                ),
+                            modifier = Modifier.height(28.dp),
                         )
                     }
                 }
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState())
-                        .padding(bottom = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     LogCategory.entries.forEach { category ->
                         FilterChip(
@@ -292,10 +329,10 @@ fun DebugLogDialog(
                             label = {
                                 Text(
                                     stringResource(category.labelRes),
-                                    style = MaterialTheme.typography.labelSmall
+                                    style = MaterialTheme.typography.labelSmall,
                                 )
                             },
-                            modifier = Modifier.height(28.dp)
+                            modifier = Modifier.height(28.dp),
                         )
                     }
                 }
@@ -304,14 +341,15 @@ fun DebugLogDialog(
                     text = "${filteredLines.size} / ${allLines.size}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 4.dp)
+                    modifier = Modifier.padding(bottom = 4.dp),
                 )
 
                 LazyColumn(
                     state = listState,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(320.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(320.dp),
                 ) {
                     items(filteredLines) { line ->
                         Text(
@@ -319,7 +357,7 @@ fun DebugLogDialog(
                             fontFamily = FontFamily.Monospace,
                             fontSize = 10.sp,
                             color = colorForLogLine(line),
-                            modifier = Modifier.padding(vertical = 1.dp)
+                            modifier = Modifier.padding(vertical = 1.dp),
                         )
                     }
                 }
@@ -344,27 +382,30 @@ fun DebugLogDialog(
                     Text(stringResource(R.string.action_clear))
                 }
             }
-        }
+        },
     )
 }
 
-private fun colorForSource(source: LogSource): Color = when (source) {
-    LogSource.ALL -> Color.Unspecified
-    LogSource.APP -> Color(0xFF66BB6A)
-    LogSource.DRIVER -> Color(0xFFAB47BC)
-}
+private fun colorForSource(source: LogSource): Color =
+    when (source) {
+        LogSource.ALL -> Color.Unspecified
+        LogSource.APP -> Color(0xFF66BB6A)
+        LogSource.DRIVER -> Color(0xFFAB47BC)
+    }
 
-private fun colorForLevel(level: LogLevel): Color = when (level) {
-    LogLevel.ALL -> Color.Unspecified
-    LogLevel.INFO -> Color(0xFF42A5F5)
-    LogLevel.DEBUG -> Color.Gray
-    LogLevel.ERROR -> Color(0xFFEF5350)
-}
+private fun colorForLevel(level: LogLevel): Color =
+    when (level) {
+        LogLevel.ALL -> Color.Unspecified
+        LogLevel.INFO -> Color(0xFF42A5F5)
+        LogLevel.DEBUG -> Color.Gray
+        LogLevel.ERROR -> Color(0xFFEF5350)
+    }
 
-private fun colorForLogLine(line: String): Color = when {
-    line.contains("[ERROR]") || line.contains(" E/") -> Color(0xFFEF5350)
-    line.contains("[WARN]") || line.contains(" W/") -> Color(0xFFFFA726)
-    line.contains("[INFO]") || line.contains(" I/") -> Color(0xFF42A5F5)
-    line.contains("[DEBUG]") || line.contains(" D/") -> Color.Gray
-    else -> Color.Unspecified
-}
+private fun colorForLogLine(line: String): Color =
+    when {
+        line.contains("[ERROR]") || line.contains(" E/") -> Color(0xFFEF5350)
+        line.contains("[WARN]") || line.contains(" W/") -> Color(0xFFFFA726)
+        line.contains("[INFO]") || line.contains(" I/") -> Color(0xFF42A5F5)
+        line.contains("[DEBUG]") || line.contains(" D/") -> Color.Gray
+        else -> Color.Unspecified
+    }

@@ -19,11 +19,17 @@ interface DeviceSettingsDao {
     suspend fun upsert(settings: DeviceSettings)
 
     @Query("UPDATE device_settings SET device_name = :name WHERE device_id = :deviceId")
-    suspend fun rename(deviceId: String, name: String)
+    suspend fun rename(
+        deviceId: String,
+        name: String,
+    )
 
     @Query("DELETE FROM device_settings WHERE device_id = :deviceId")
     suspend fun deleteByDeviceId(deviceId: String)
 
     @Query("UPDATE device_settings SET last_connected = :time WHERE device_id = :deviceId")
-    suspend fun updateLastConnected(deviceId: String, time: Long)
+    suspend fun updateLastConnected(
+        deviceId: String,
+        time: Long,
+    )
 }

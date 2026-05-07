@@ -69,7 +69,7 @@ fun EqCurveGraph(
     bands: List<Float>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    bandCount: Int = 10
+    bandCount: Int = 10,
 ) {
     val freqLabels = EffectDispatcher.eqGraphLabelsForCount(bandCount)
     val primary = MaterialTheme.colorScheme.primary
@@ -77,20 +77,22 @@ fun EqCurveGraph(
     val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
     val density = LocalDensity.current
 
-    val graphModifier = if (modifier == Modifier) {
-        Modifier
-            .fillMaxWidth()
-            .height(180.dp)
-    } else {
-        modifier.fillMaxWidth()
-    }
+    val graphModifier =
+        if (modifier == Modifier) {
+            Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+        } else {
+            modifier.fillMaxWidth()
+        }
 
     Surface(
-        modifier = graphModifier
-            .clip(RoundedCornerShape(12.dp))
-            .clickable { onClick() },
+        modifier =
+            graphModifier
+                .clip(RoundedCornerShape(12.dp))
+                .clickable { onClick() },
         color = surfaceDark,
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
     ) {
         Canvas(modifier = Modifier.fillMaxWidth()) {
             val paddingLeft = 28.dp.toPx()
@@ -101,102 +103,120 @@ fun EqCurveGraph(
             val graphWidth = size.width - paddingLeft - paddingRight
             val graphHeight = size.height - paddingTop - paddingBottom
 
-            val gridPaint = Paint().apply {
-                color = argb(25, 255, 255, 255)
-                strokeWidth = 1f
-                style = Paint.Style.STROKE
-            }
+            val gridPaint =
+                Paint().apply {
+                    color = argb(25, 255, 255, 255)
+                    strokeWidth = 1f
+                    style = Paint.Style.STROKE
+                }
 
-            val freqTextPaint = Paint().apply {
-                color = onSurfaceVariant.hashCode()
-                textSize = with(density) { (if (bandCount > 15) 7 else 9).dp.toPx() }
-                textAlign = Paint.Align.CENTER
-                isAntiAlias = true
-                typeface = Typeface.DEFAULT
-            }
+            val freqTextPaint =
+                Paint().apply {
+                    color = onSurfaceVariant.hashCode()
+                    textSize = with(density) { (if (bandCount > 15) 7 else 9).dp.toPx() }
+                    textAlign = Paint.Align.CENTER
+                    isAntiAlias = true
+                    typeface = Typeface.DEFAULT
+                }
 
-            val dbLabelPaint = Paint().apply {
-                color = argb(120, 255, 255, 255)
-                textSize = with(density) { 8.dp.toPx() }
-                textAlign = Paint.Align.RIGHT
-                isAntiAlias = true
-                typeface = Typeface.DEFAULT
-            }
+            val dbLabelPaint =
+                Paint().apply {
+                    color = argb(120, 255, 255, 255)
+                    textSize = with(density) { 8.dp.toPx() }
+                    textAlign = Paint.Align.RIGHT
+                    isAntiAlias = true
+                    typeface = Typeface.DEFAULT
+                }
 
-            val valuePaint = Paint().apply {
-                color = primary.hashCode()
-                textSize = with(density) { 8.dp.toPx() }
-                textAlign = Paint.Align.CENTER
-                isAntiAlias = true
-                typeface = Typeface.DEFAULT_BOLD
-            }
+            val valuePaint =
+                Paint().apply {
+                    color = primary.hashCode()
+                    textSize = with(density) { 8.dp.toPx() }
+                    textAlign = Paint.Align.CENTER
+                    isAntiAlias = true
+                    typeface = Typeface.DEFAULT_BOLD
+                }
 
             for (db in DB_GRID_LINES) {
                 val y = paddingTop + graphHeight * (1f - (db - DB_MIN) / (DB_MAX - DB_MIN))
                 drawContext.canvas.nativeCanvas.drawLine(
-                    paddingLeft, y, size.width - paddingRight, y, gridPaint
+                    paddingLeft,
+                    y,
+                    size.width - paddingRight,
+                    y,
+                    gridPaint,
                 )
-                val label = when {
-                    db > 0 -> "+${db.toInt()}"
-                    db == 0f -> "0"
-                    else -> "${db.toInt()}"
-                }
+                val label =
+                    when {
+                        db > 0 -> "+${db.toInt()}"
+                        db == 0f -> "0"
+                        else -> "${db.toInt()}"
+                    }
                 drawContext.canvas.nativeCanvas.drawText(
                     label,
                     paddingLeft - 4.dp.toPx(),
                     y + with(density) { 3.dp.toPx() },
-                    dbLabelPaint
+                    dbLabelPaint,
                 )
             }
 
             if (bands.size < bandCount) return@Canvas
 
-            val points = bands.take(bandCount).mapIndexed { i, db ->
-                val x = paddingLeft + graphWidth * i / (bandCount - 1).toFloat()
-                val y = paddingTop + graphHeight * (1f - (db.coerceIn(
-                    DB_MIN,
-                    DB_MAX
-                ) - DB_MIN) / (DB_MAX - DB_MIN))
-                Offset(x, y)
-            }
+            val points =
+                bands.take(bandCount).mapIndexed { i, db ->
+                    val x = paddingLeft + graphWidth * i / (bandCount - 1).toFloat()
+                    val y =
+                        paddingTop + graphHeight * (
+                            1f - (
+                                db.coerceIn(
+                                    DB_MIN,
+                                    DB_MAX,
+                                ) - DB_MIN
+                            ) / (DB_MAX - DB_MIN)
+                        )
+                    Offset(x, y)
+                }
 
             val curvePath = buildSplinePath(points)
 
-            val fillPath = Path().apply {
-                addPath(curvePath)
-                lineTo(points.last().x, paddingTop + graphHeight)
-                lineTo(points.first().x, paddingTop + graphHeight)
-                close()
-            }
+            val fillPath =
+                Path().apply {
+                    addPath(curvePath)
+                    lineTo(points.last().x, paddingTop + graphHeight)
+                    lineTo(points.first().x, paddingTop + graphHeight)
+                    close()
+                }
 
             drawPath(
                 path = fillPath,
-                brush = Brush.verticalGradient(
-                    colors = listOf(primary.copy(alpha = 0.35f), Color.Transparent),
-                    startY = paddingTop,
-                    endY = paddingTop + graphHeight
-                )
+                brush =
+                    Brush.verticalGradient(
+                        colors = listOf(primary.copy(alpha = 0.35f), Color.Transparent),
+                        startY = paddingTop,
+                        endY = paddingTop + graphHeight,
+                    ),
             )
 
             drawPath(
                 path = curvePath,
                 color = primary,
-                style = Stroke(width = 2.dp.toPx())
+                style = Stroke(width = 2.dp.toPx()),
             )
 
-            val labelStep = when (bandCount) {
-                31 -> 5
-                25 -> 4
-                15 -> 2
-                else -> 1
-            }
+            val labelStep =
+                when (bandCount) {
+                    31 -> 5
+                    25 -> 4
+                    15 -> 2
+                    else -> 1
+                }
             val showValues = bandCount <= 15
 
             points.forEachIndexed { i, pt ->
                 drawCircle(
                     color = primary,
                     radius = (if (bandCount > 15) 2 else 3).dp.toPx(),
-                    center = pt
+                    center = pt,
                 )
 
                 if (i % labelStep == 0) {
@@ -204,7 +224,7 @@ fun EqCurveGraph(
                         freqLabels.getOrElse(i) { "" },
                         pt.x,
                         paddingTop + graphHeight + with(density) { 14.dp.toPx() },
-                        freqTextPaint
+                        freqTextPaint,
                     )
                 }
 
@@ -214,7 +234,7 @@ fun EqCurveGraph(
                         valText,
                         pt.x,
                         pt.y - with(density) { 6.dp.toPx() },
-                        valuePaint
+                        valuePaint,
                     )
                 }
             }
@@ -273,11 +293,12 @@ fun EqEditDialog(
     onPresetDelete: (Long) -> Unit,
     onReset: () -> Unit,
     onDismiss: () -> Unit,
-    bandCount: Int = 10
+    bandCount: Int = 10,
 ) {
-    val localBands = remember(bandCount) {
-        mutableStateListOf<Float>().apply { addAll(bands.take(bandCount)) }
-    }
+    val localBands =
+        remember(bandCount) {
+            mutableStateListOf<Float>().apply { addAll(bands.take(bandCount)) }
+        }
 
     LaunchedEffect(bands) {
         val incoming = bands.take(bandCount)
@@ -295,56 +316,57 @@ fun EqEditDialog(
         title = {
             Text(
                 text = stringResource(R.string.section_equalizer),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
         },
         text = {
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState())
+                modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
                 EqCurveGraph(
                     bands = localBands.toList(),
                     onClick = {},
                     modifier = Modifier.height(160.dp),
-                    bandCount = bandCount
+                    bandCount = bandCount,
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 val presetNames = presets.map { it.name }
-                val selectedPresetName = presets.find { it.id == presetId }?.name
-                    ?: stringResource(R.string.label_custom)
+                val selectedPresetName =
+                    presets.find { it.id == presetId }?.name
+                        ?: stringResource(R.string.label_custom)
 
                 LabeledDropdown(
                     label = stringResource(R.string.label_preset),
                     selectedValue = selectedPresetName,
                     options = presetNames,
-                    onOptionSelected = { index, _ -> onPresetSelect(presets[index].id) }
+                    onOptionSelected = { index, _ -> onPresetSelect(presets[index].id) },
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     TextButton(onClick = { showSaveDialog = true }) {
                         Icon(
                             Icons.Default.Add,
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(stringResource(R.string.action_save))
                     }
                     TextButton(
                         onClick = { presetId?.let { onPresetDelete(it) } },
-                        enabled = presetId != null
+                        enabled = presetId != null,
                     ) {
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(stringResource(R.string.action_delete))
@@ -358,7 +380,7 @@ fun EqEditDialog(
                         Icon(
                             Icons.Default.RestartAlt,
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(stringResource(R.string.action_reset))
@@ -376,26 +398,28 @@ fun EqEditDialog(
 
                         val applyBandChange = { newVal: Float ->
                             localBands[index] = newVal.coerceIn(DB_MIN, DB_MAX)
-                            val str = localBands.joinToString(";") {
-                                String.format(
-                                    Locale.US,
-                                    "%.1f",
-                                    it
-                                )
-                            } + ";"
+                            val str =
+                                localBands.joinToString(";") {
+                                    String.format(
+                                        Locale.US,
+                                        "%.1f",
+                                        it,
+                                    )
+                                } + ";"
                             onBandsChange(str)
                         }
 
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 2.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
                                 text = label,
                                 style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(48.dp)
+                                modifier = Modifier.width(48.dp),
                             )
                             IconButton(
                                 onClick = {
@@ -404,17 +428,19 @@ fun EqEditDialog(
                                 },
                                 enabled = !atMin,
                                 modifier = Modifier.size(32.dp),
-                                colors = IconButtonDefaults.iconButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.primary,
-                                    disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(
-                                        alpha = 0.38f
-                                    )
-                                )
+                                colors =
+                                    IconButtonDefaults.iconButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.primary,
+                                        disabledContentColor =
+                                            MaterialTheme.colorScheme.onSurface.copy(
+                                                alpha = 0.38f,
+                                            ),
+                                    ),
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Remove,
                                     contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(16.dp),
                                 )
                             }
                             Slider(
@@ -422,10 +448,11 @@ fun EqEditDialog(
                                 onValueChange = { applyBandChange(it) },
                                 valueRange = DB_MIN..DB_MAX,
                                 modifier = Modifier.weight(1f),
-                                colors = SliderDefaults.colors(
-                                    activeTickColor = Color.Transparent,
-                                    inactiveTickColor = Color.Transparent
-                                )
+                                colors =
+                                    SliderDefaults.colors(
+                                        activeTickColor = Color.Transparent,
+                                        inactiveTickColor = Color.Transparent,
+                                    ),
                             )
                             IconButton(
                                 onClick = {
@@ -434,24 +461,26 @@ fun EqEditDialog(
                                 },
                                 enabled = !atMax,
                                 modifier = Modifier.size(32.dp),
-                                colors = IconButtonDefaults.iconButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.primary,
-                                    disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(
-                                        alpha = 0.38f
-                                    )
-                                )
+                                colors =
+                                    IconButtonDefaults.iconButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.primary,
+                                        disabledContentColor =
+                                            MaterialTheme.colorScheme.onSurface.copy(
+                                                alpha = 0.38f,
+                                            ),
+                                    ),
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
                                     contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(16.dp),
                                 )
                             }
                             Text(
                                 text = "${"%.1f".format(localBands[index])}dB",
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.width(52.dp),
-                                maxLines = 1
+                                maxLines = 1,
                             )
                         }
                     }
@@ -462,7 +491,7 @@ fun EqEditDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(android.R.string.ok))
             }
-        }
+        },
     )
 
     if (showSaveDialog) {
@@ -475,7 +504,7 @@ fun EqEditDialog(
                     onValueChange = { presetNameInput = it },
                     label = { Text(stringResource(R.string.preset_name_hint)) },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             },
             confirmButton = {
@@ -486,7 +515,7 @@ fun EqEditDialog(
                             presetNameInput = ""
                             showSaveDialog = false
                         }
-                    }
+                    },
                 ) {
                     Text(stringResource(android.R.string.ok))
                 }
@@ -495,7 +524,7 @@ fun EqEditDialog(
                 TextButton(onClick = { showSaveDialog = false }) {
                     Text(stringResource(android.R.string.cancel))
                 }
-            }
+            },
         )
     }
 }

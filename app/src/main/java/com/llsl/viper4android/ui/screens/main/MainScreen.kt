@@ -63,9 +63,7 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(
-    viewModel: MainViewModel = hiltViewModel()
-) {
+fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val presets by viewModel.presetList.collectAsStateWithLifecycle()
     val deviceSettings by viewModel.deviceSettingsList.collectAsStateWithLifecycle()
@@ -83,13 +81,14 @@ fun MainScreen(
     var debugLogClearTime by remember { mutableLongStateOf(0L) }
 
     val context = LocalContext.current
-    val appVersionName = remember {
-        try {
-            context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""
-        } catch (_: Exception) {
-            ""
+    val appVersionName =
+        remember {
+            try {
+                context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""
+            } catch (_: Exception) {
+                ""
+            }
         }
-    }
 
     if (showPresetDialog) {
         PresetDialog(
@@ -101,7 +100,7 @@ fun MainScreen(
             },
             onDelete = viewModel::deletePreset,
             onRename = viewModel::renamePreset,
-            onDismiss = { showPresetDialog = false }
+            onDismiss = { showPresetDialog = false },
         )
     }
 
@@ -114,7 +113,7 @@ fun MainScreen(
         }
         DriverStatusDialog(
             driverStatus = driverStatus,
-            onDismiss = { showDriverStatusDialog = false }
+            onDismiss = { showDriverStatusDialog = false },
         )
     }
 
@@ -126,7 +125,7 @@ fun MainScreen(
                 viewModel.disableDebugMode()
                 showDebugLog = false
             },
-            onDismiss = { showDebugLog = false }
+            onDismiss = { showDebugLog = false },
         )
     }
 
@@ -138,41 +137,44 @@ fun MainScreen(
             onLoad = viewModel::loadDevicePreset,
             onSave = viewModel::saveDevicePreset,
             onDelete = viewModel::deleteDeviceSettings,
-            onDismiss = { showDeviceDialog = false }
+            onDismiss = { showDeviceDialog = false },
         )
     }
 
     val importSuccessStr = stringResource(R.string.import_success)
     val importFailedStr = stringResource(R.string.import_failed)
-    val importPresetLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri != null) {
-            val success = viewModel.importPresetFile(uri)
-            val msg = if (success) importSuccessStr else importFailedStr
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    val importPresetLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument(),
+        ) { uri ->
+            if (uri != null) {
+                val success = viewModel.importPresetFile(uri)
+                val msg = if (success) importSuccessStr else importFailedStr
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
-    val importKernelLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri != null) {
-            val success = viewModel.importKernel(uri)
-            val msg = if (success) importSuccessStr else importFailedStr
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    val importKernelLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument(),
+        ) { uri ->
+            if (uri != null) {
+                val success = viewModel.importKernel(uri)
+                val msg = if (success) importSuccessStr else importFailedStr
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
-    val importVdcLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri != null) {
-            val success = viewModel.importVdc(uri)
-            val msg = if (success) importSuccessStr else importFailedStr
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    val importVdcLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument(),
+        ) { uri ->
+            if (uri != null) {
+                val success = viewModel.importVdc(uri)
+                val msg = if (success) importSuccessStr else importFailedStr
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
     if (showSettingsDialog) {
         LaunchedEffect(Unit) { viewModel.queryDriverStatus() }
@@ -191,13 +193,13 @@ fun MainScreen(
                     arrayOf(
                         "audio/*",
                         "application/octet-stream",
-                        "*/*"
-                    )
+                        "*/*",
+                    ),
                 )
             },
             onDebugUnlocked = viewModel::enableDebugMode,
             onImportVdc = { importVdcLauncher.launch(arrayOf("*/*")) },
-            onDismiss = { showSettingsDialog = false }
+            onDismiss = { showSettingsDialog = false },
         )
     }
 
@@ -208,44 +210,45 @@ fun MainScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.app_name)) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ),
                 actions = {
                     if (debugMode) {
                         IconButton(onClick = { showDebugLog = true }) {
                             Icon(
                                 Icons.Default.BugReport,
-                                contentDescription = stringResource(R.string.debug_log_title)
+                                contentDescription = stringResource(R.string.debug_log_title),
                             )
                         }
                     }
                     IconButton(onClick = { showDeviceDialog = true }) {
                         Icon(
                             Icons.Filled.SpeakerGroup,
-                            contentDescription = stringResource(R.string.menu_devices)
+                            contentDescription = stringResource(R.string.menu_devices),
                         )
                     }
                     IconButton(onClick = { showDriverStatusDialog = true }) {
                         Icon(
                             Icons.Default.Info,
-                            contentDescription = stringResource(R.string.menu_driver_status)
+                            contentDescription = stringResource(R.string.menu_driver_status),
                         )
                     }
                     IconButton(onClick = { showPresetDialog = true }) {
                         Icon(
                             Icons.Default.LibraryMusic,
-                            contentDescription = stringResource(R.string.menu_presets)
+                            contentDescription = stringResource(R.string.menu_presets),
                         )
                     }
                     IconButton(onClick = { showSettingsDialog = true }) {
                         Icon(
                             Icons.Default.Settings,
-                            contentDescription = stringResource(R.string.menu_settings)
+                            contentDescription = stringResource(R.string.menu_settings),
                         )
                     }
-                }
+                },
             )
         },
         bottomBar = {
@@ -253,12 +256,13 @@ fun MainScreen(
                 val deviceName = state.activeDeviceName
                 if (deviceName.isNotEmpty()) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(NavigationBarDefaults.containerColor)
-                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(NavigationBarDefaults.containerColor)
+                                .padding(horizontal = 16.dp, vertical = 4.dp),
                         horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Canvas(modifier = Modifier.size(6.dp)) {
                             drawCircle(Color(0xFF4CAF50))
@@ -267,7 +271,7 @@ fun MainScreen(
                         Text(
                             text = deviceName,
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -278,10 +282,10 @@ fun MainScreen(
                         icon = {
                             Icon(
                                 imageVector = if (selectedTab == 0) Icons.Filled.Headphones else Icons.Outlined.Headphones,
-                                contentDescription = null
+                                contentDescription = null,
                             )
                         },
-                        label = { Text(stringResource(R.string.tab_headphone)) }
+                        label = { Text(stringResource(R.string.tab_headphone)) },
                     )
                     NavigationBarItem(
                         selected = selectedTab == 1,
@@ -289,20 +293,20 @@ fun MainScreen(
                         icon = {
                             Icon(
                                 imageVector = if (selectedTab == 1) Icons.Filled.Speaker else Icons.Outlined.Speaker,
-                                contentDescription = null
+                                contentDescription = null,
                             )
                         },
-                        label = { Text(stringResource(R.string.tab_speaker)) }
+                        label = { Text(stringResource(R.string.tab_speaker)) },
                     )
                 }
             }
-        }
+        },
     ) { paddingValues ->
         EffectList(
             state = state,
             viewModel = viewModel,
             isSpkMode = isSpkMode,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues),
         )
     }
 }
@@ -312,10 +316,10 @@ private fun EffectList(
     state: MainUiState,
     viewModel: MainViewModel,
     isSpkMode: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         item { Spacer(modifier = Modifier.height(8.dp)) }
         item { MasterLimiterSection(state, viewModel, isSpkMode) }

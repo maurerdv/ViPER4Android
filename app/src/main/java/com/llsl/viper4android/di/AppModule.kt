@@ -27,73 +27,86 @@ import javax.inject.Singleton
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "viper_preferences")
 
-private val EQ_PRESET_NAMES = listOf(
-    "Acoustic", "Bass Booster", "Bass Reducer", "Classical",
-    "Deep", "Flat", "R&B", "Rock",
-    "Small Speakers", "Treble Booster", "Treble Reducer", "Vocal Booster"
-)
+private val EQ_PRESET_NAMES =
+    listOf(
+        "Acoustic",
+        "Bass Booster",
+        "Bass Reducer",
+        "Classical",
+        "Deep",
+        "Flat",
+        "R&B",
+        "Rock",
+        "Small Speakers",
+        "Treble Booster",
+        "Treble Reducer",
+        "Vocal Booster",
+    )
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): ViperDatabase {
+    fun provideDatabase(
+        @ApplicationContext context: Context,
+    ): ViperDatabase {
         lateinit var db: ViperDatabase
-        db = Room.databaseBuilder(
-            context,
-            ViperDatabase::class.java,
-            "viper4android.db"
-        )
-            .addMigrations(
-                ViperDatabase.MIGRATION_1_2,
-                ViperDatabase.MIGRATION_2_3,
-                ViperDatabase.MIGRATION_3_4
-            )
-            .addCallback(object : RoomDatabase.Callback() {
-                override fun onCreate(sqDb: SupportSQLiteDatabase) {
-                    super.onCreate(sqDb)
-                    CoroutineScope(Dispatchers.IO).launch {
-                        seedEqPresets(db.eqPresetDao())
-                        seedDsPresets(db.dsPresetDao())
-                    }
-                }
+        db =
+            Room
+                .databaseBuilder(
+                    context,
+                    ViperDatabase::class.java,
+                    "viper4android.db",
+                ).addMigrations(
+                    ViperDatabase.MIGRATION_1_2,
+                    ViperDatabase.MIGRATION_2_3,
+                    ViperDatabase.MIGRATION_3_4,
+                ).addCallback(
+                    object : RoomDatabase.Callback() {
+                        override fun onCreate(sqDb: SupportSQLiteDatabase) {
+                            super.onCreate(sqDb)
+                            CoroutineScope(Dispatchers.IO).launch {
+                                seedEqPresets(db.eqPresetDao())
+                                seedDsPresets(db.dsPresetDao())
+                            }
+                        }
 
-                override fun onOpen(sqDb: SupportSQLiteDatabase) {
-                    super.onOpen(sqDb)
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val eqDao = db.eqPresetDao()
-                        if (eqDao.count() == 0) {
-                            seedEqPresets(eqDao)
+                        override fun onOpen(sqDb: SupportSQLiteDatabase) {
+                            super.onOpen(sqDb)
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val eqDao = db.eqPresetDao()
+                                if (eqDao.count() == 0) {
+                                    seedEqPresets(eqDao)
+                                }
+                                val dsDao = db.dsPresetDao()
+                                if (dsDao.count() == 0) {
+                                    seedDsPresets(dsDao)
+                                }
+                            }
                         }
-                        val dsDao = db.dsPresetDao()
-                        if (dsDao.count() == 0) {
-                            seedDsPresets(dsDao)
-                        }
-                    }
-                }
-            })
-            .build()
+                    },
+                ).build()
         return db
     }
 
     private suspend fun seedEqPresets(dao: EqPresetDao) {
         val presets = mutableListOf<EqPreset>()
-        val sources = mapOf(
-            10 to EffectDispatcher.EQ_PRESETS,
-            15 to EffectDispatcher.EQ_PRESETS_15,
-            25 to EffectDispatcher.EQ_PRESETS_25,
-            31 to EffectDispatcher.EQ_PRESETS_31
-        )
+        val sources =
+            mapOf(
+                10 to EffectDispatcher.EQ_PRESETS,
+                15 to EffectDispatcher.EQ_PRESETS_15,
+                25 to EffectDispatcher.EQ_PRESETS_25,
+                31 to EffectDispatcher.EQ_PRESETS_31,
+            )
         for ((bandCount, bandsList) in sources) {
             for ((i, bands) in bandsList.withIndex()) {
                 presets.add(
                     EqPreset(
                         name = EQ_PRESET_NAMES[i],
                         bandCount = bandCount,
-                        bands = bands
-                    )
+                        bands = bands,
+                    ),
                 )
             }
         }
@@ -103,18 +116,19 @@ object AppModule {
     private suspend fun seedDsPresets(dao: DsPresetDao) {
         val devices = EffectDispatcher.DYNAMIC_SYSTEM_DEVICES
         val names = EffectDispatcher.DYNAMIC_SYSTEM_DEVICE_NAMES
-        val presets = devices.mapIndexed { i, coeffStr ->
-            val parts = coeffStr.split(";").map { it.toIntOrNull() ?: 0 }
-            DsPreset(
-                name = names.getOrElse(i) { "Device $i" },
-                xLow = parts.getOrElse(0) { 100 },
-                xHigh = parts.getOrElse(1) { 5600 },
-                yLow = parts.getOrElse(2) { 40 },
-                yHigh = parts.getOrElse(3) { 80 },
-                sideGainLow = parts.getOrElse(4) { 50 },
-                sideGainHigh = parts.getOrElse(5) { 50 }
-            )
-        }
+        val presets =
+            devices.mapIndexed { i, coeffStr ->
+                val parts = coeffStr.split(";").map { it.toIntOrNull() ?: 0 }
+                DsPreset(
+                    name = names.getOrElse(i) { "Device $i" },
+                    xLow = parts.getOrElse(0) { 100 },
+                    xHigh = parts.getOrElse(1) { 5600 },
+                    yLow = parts.getOrElse(2) { 40 },
+                    yHigh = parts.getOrElse(3) { 80 },
+                    sideGainLow = parts.getOrElse(4) { 50 },
+                    sideGainHigh = parts.getOrElse(5) { 50 },
+                )
+            }
         dao.insertAll(presets)
     }
 
@@ -132,11 +146,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDeviceSettingsDao(database: ViperDatabase): DeviceSettingsDao =
-        database.deviceSettingsDao()
+    fun provideDeviceSettingsDao(database: ViperDatabase): DeviceSettingsDao = database.deviceSettingsDao()
 
     @Provides
     @Singleton
-    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
-        context.dataStore
+    fun provideDataStore(
+        @ApplicationContext context: Context,
+    ): DataStore<Preferences> = context.dataStore
 }

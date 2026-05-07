@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EqPresetDao {
-
     @Query("SELECT * FROM eq_presets WHERE band_count = :bandCount ORDER BY id ASC")
     fun getByBandCount(bandCount: Int): Flow<List<EqPreset>>
 
@@ -23,7 +22,10 @@ interface EqPresetDao {
     suspend fun insertAll(presets: List<EqPreset>)
 
     @Query("UPDATE eq_presets SET name = :name WHERE id = :id")
-    suspend fun rename(id: Long, name: String)
+    suspend fun rename(
+        id: Long,
+        name: String,
+    )
 
     @Query("DELETE FROM eq_presets WHERE id = :id")
     suspend fun deleteById(id: Long)

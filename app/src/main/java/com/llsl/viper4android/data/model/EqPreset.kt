@@ -11,5 +11,5 @@ data class EqPreset(
     val name: String,
     @ColumnInfo(name = "band_count")
     val bandCount: Int,
-    val bands: String
+    val bands: String,
 )

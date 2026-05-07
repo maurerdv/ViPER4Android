@@ -42,7 +42,7 @@ fun PresetDialog(
     onLoad: (Long) -> Unit,
     onDelete: (Long) -> Unit,
     onRename: (Long, String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     var showSaveInput by remember { mutableStateOf(false) }
     var saveInputName by remember { mutableStateOf("") }
@@ -55,13 +55,14 @@ fun PresetDialog(
         pendingDeletePreset = null
     }
 
-    val visiblePresets = remember(presets, pendingDeletePreset) {
-        if (pendingDeletePreset != null) {
-            presets.filter { it.id != pendingDeletePreset!!.id }
-        } else {
-            presets
+    val visiblePresets =
+        remember(presets, pendingDeletePreset) {
+            if (pendingDeletePreset != null) {
+                presets.filter { it.id != pendingDeletePreset!!.id }
+            } else {
+                presets
+            }
         }
-    }
 
     if (showSaveInput) {
         AlertDialog(
@@ -73,7 +74,7 @@ fun PresetDialog(
                     onValueChange = { saveInputName = it },
                     label = { Text(stringResource(R.string.preset_name_hint)) },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             },
             confirmButton = {
@@ -85,7 +86,7 @@ fun PresetDialog(
                             showSaveInput = false
                         }
                     },
-                    enabled = saveInputName.isNotBlank()
+                    enabled = saveInputName.isNotBlank(),
                 ) {
                     Text(stringResource(R.string.action_save))
                 }
@@ -94,7 +95,7 @@ fun PresetDialog(
                 TextButton(onClick = { showSaveInput = false }) {
                     Text(stringResource(R.string.action_cancel))
                 }
-            }
+            },
         )
         return
     }
@@ -109,7 +110,7 @@ fun PresetDialog(
                     onValueChange = { renameInputName = it },
                     label = { Text(stringResource(R.string.preset_name_hint)) },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             },
             confirmButton = {
@@ -120,7 +121,7 @@ fun PresetDialog(
                             renamingId = -1L
                         }
                     },
-                    enabled = renameInputName.isNotBlank()
+                    enabled = renameInputName.isNotBlank(),
                 ) {
                     Text(stringResource(R.string.action_rename))
                 }
@@ -129,13 +130,16 @@ fun PresetDialog(
                 TextButton(onClick = { renamingId = -1L }) {
                     Text(stringResource(R.string.action_cancel))
                 }
-            }
+            },
         )
         return
     }
 
     AlertDialog(
-        onDismissRequest = { commitPendingDelete(); onDismiss() },
+        onDismissRequest = {
+            commitPendingDelete()
+            onDismiss()
+        },
         title = { Text(stringResource(R.string.menu_presets)) },
         text = {
             Column {
@@ -143,16 +147,19 @@ fun PresetDialog(
                     Text(
                         text = stringResource(R.string.preset_empty),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 } else {
                     LazyColumn(
-                        modifier = Modifier.heightIn(max = 300.dp)
+                        modifier = Modifier.heightIn(max = 300.dp),
                     ) {
                         items(visiblePresets, key = { it.id }) { preset ->
                             PresetItem(
                                 preset = preset,
-                                onLoad = { commitPendingDelete(); onLoad(preset.id) },
+                                onLoad = {
+                                    commitPendingDelete()
+                                    onLoad(preset.id)
+                                },
                                 onDelete = {
                                     commitPendingDelete()
                                     pendingDeletePreset = preset
@@ -160,7 +167,7 @@ fun PresetDialog(
                                 onRename = {
                                     renameInputName = preset.name
                                     renamingId = preset.id
-                                }
+                                },
                             )
                             HorizontalDivider()
                         }
@@ -170,7 +177,7 @@ fun PresetDialog(
                                     preset = deleted,
                                     onRestore = {
                                         pendingDeletePreset = null
-                                    }
+                                    },
                                 )
                                 HorizontalDivider()
                             }
@@ -180,15 +187,21 @@ fun PresetDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { showSaveInput = true; saveInputName = "" }) {
+            TextButton(onClick = {
+                showSaveInput = true
+                saveInputName = ""
+            }) {
                 Text(stringResource(R.string.preset_save_current))
             }
         },
         dismissButton = {
-            TextButton(onClick = { commitPendingDelete(); onDismiss() }) {
+            TextButton(onClick = {
+                commitPendingDelete()
+                onDismiss()
+            }) {
                 Text(stringResource(R.string.action_close))
             }
-        }
+        },
     )
 }
 
@@ -197,27 +210,28 @@ private fun PresetItem(
     preset: Preset,
     onLoad: () -> Unit,
     onDelete: () -> Unit,
-    onRename: () -> Unit
+    onRename: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onLoad)
-            .padding(vertical = 8.dp, horizontal = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onLoad)
+                .padding(vertical = 8.dp, horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = preset.name,
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
             Text(
                 text = stringResource(if (preset.fxType == 1) R.string.tab_headphone else R.string.tab_speaker),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Row {
@@ -225,14 +239,14 @@ private fun PresetItem(
                 Icon(
                     Icons.Default.Edit,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             IconButton(onClick = onDelete) {
                 Icon(
                     Icons.Default.Delete,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error
+                    tint = MaterialTheme.colorScheme.error,
                 )
             }
         }
@@ -242,14 +256,15 @@ private fun PresetItem(
 @Composable
 private fun DeletedPresetItem(
     preset: Preset,
-    onRestore: () -> Unit
+    onRestore: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -257,19 +272,19 @@ private fun DeletedPresetItem(
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
             )
             Text(
                 text = stringResource(R.string.label_deleted),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
             )
         }
         IconButton(onClick = onRestore) {
             Icon(
                 Icons.Default.Restore,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
             )
         }
     }

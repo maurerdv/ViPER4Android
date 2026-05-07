@@ -4,7 +4,6 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 object RootShell {
-
     private const val TAG = "RootShell"
     private const val SU_TIMEOUT_SEC = 10L
 
@@ -14,7 +13,10 @@ object RootShell {
     @Volatile
     private var suDetected = false
 
-    fun exec(command: String, timeoutSec: Long = SU_TIMEOUT_SEC): Process {
+    fun exec(
+        command: String,
+        timeoutSec: Long = SU_TIMEOUT_SEC,
+    ): Process {
         val su = getSuPath()
         val process = Runtime.getRuntime().exec(arrayOf(su, "-c", command))
         if (!process.waitFor(timeoutSec, TimeUnit.SECONDS)) {
@@ -42,14 +44,13 @@ object RootShell {
         }
     }
 
-    fun isRootAvailable(): Boolean {
-        return try {
+    fun isRootAvailable(): Boolean =
+        try {
             getSuPath()
             true
         } catch (_: Exception) {
             false
         }
-    }
 
     private fun detectSu(): String {
         if (testSu("su")) {
@@ -57,19 +58,20 @@ object RootShell {
             return "su"
         }
 
-        val candidates = arrayOf(
-            "/system/bin/su",
-            "/system/xbin/su",
-            "/system/bin/kp",
-            "/sbin/su",
-            "/debug_ramdisk/su",
-            "/su/bin/su",
-            "/data/adb/ksud",
-            "/data/adb/ksu/bin/ksud",
-            "/data/adb/apd",
-            "/sbin/magisk",
-            "/debug_ramdisk/magisk"
-        )
+        val candidates =
+            arrayOf(
+                "/system/bin/su",
+                "/system/xbin/su",
+                "/system/bin/kp",
+                "/sbin/su",
+                "/debug_ramdisk/su",
+                "/su/bin/su",
+                "/data/adb/ksud",
+                "/data/adb/ksu/bin/ksud",
+                "/data/adb/apd",
+                "/sbin/magisk",
+                "/debug_ramdisk/magisk",
+            )
         for (path in candidates) {
             if (File(path).exists() && testSu(path)) {
                 FileLogger.i(TAG, "su found at $path")
@@ -97,7 +99,10 @@ object RootShell {
         }
     }
 
-    fun copyFile(src: File, destPath: String) {
+    fun copyFile(
+        src: File,
+        destPath: String,
+    ) {
         val destFile = File(destPath)
         val destDir = destFile.parentFile
         val tmpPath = "$destPath.tmp"

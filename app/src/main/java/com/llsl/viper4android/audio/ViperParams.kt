@@ -1,7 +1,6 @@
 package com.llsl.viper4android.audio
 
 object ViperParams {
-
     const val PARAM_GET_ENABLED = 1
     const val PARAM_GET_CONFIGURE = 2
     const val PARAM_GET_STREAMING = 3

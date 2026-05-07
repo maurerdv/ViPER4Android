@@ -38,7 +38,7 @@ fun LabeledDropdown(
     onOptionSelected: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    onDeleteOption: ((Int, String) -> Unit)? = null
+    onDeleteOption: ((Int, String) -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var deleteTarget by remember { mutableStateOf<Pair<Int, String>?>(null) }
@@ -46,9 +46,10 @@ fun LabeledDropdown(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { if (enabled) expanded = it },
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
     ) {
         OutlinedTextField(
             value = selectedValue,
@@ -56,37 +57,38 @@ fun LabeledDropdown(
             readOnly = true,
             label = { Text(label, style = MaterialTheme.typography.bodySmall) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                    .fillMaxWidth(),
             enabled = enabled,
-            singleLine = true
+            singleLine = true,
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
         ) {
             options.forEachIndexed { index, option ->
                 val canDelete = onDeleteOption != null && index > 0
                 if (canDelete) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 48.dp)
-                            .combinedClickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = ripple(),
-                                onClick = {
-                                    onOptionSelected(index, option)
-                                    expanded = false
-                                },
-                                onLongClick = {
-                                    deleteTarget = index to option
-                                    expanded = false
-                                }
-                            )
-                            .padding(horizontal = 16.dp),
-                        contentAlignment = Alignment.CenterStart
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 48.dp)
+                                .combinedClickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = ripple(),
+                                    onClick = {
+                                        onOptionSelected(index, option)
+                                        expanded = false
+                                    },
+                                    onLongClick = {
+                                        deleteTarget = index to option
+                                        expanded = false
+                                    },
+                                ).padding(horizontal = 16.dp),
+                        contentAlignment = Alignment.CenterStart,
                     ) {
                         Text(option, style = MaterialTheme.typography.bodyLarge)
                     }
@@ -96,7 +98,7 @@ fun LabeledDropdown(
                         onClick = {
                             onOptionSelected(index, option)
                             expanded = false
-                        }
+                        },
                     )
                 }
             }
@@ -120,7 +122,7 @@ fun LabeledDropdown(
                 TextButton(onClick = { deleteTarget = null }) {
                     Text(stringResource(R.string.action_cancel))
                 }
-            }
+            },
         )
     }
 }
