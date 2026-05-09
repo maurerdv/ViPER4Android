@@ -272,15 +272,15 @@
 
     <!-- EQ presets -->
     <string name="eq_preset_acoustic">Акустика</string>
-    <string name="eq_preset_bass_booster">Усиление басов</string>
-    <string name="eq_preset_bass_reducer">Уменьшение басов</string>
-    <string name="eq_preset_classical">Коассика</string>
+    <string name="eq_preset_bass_booster">Усиление НЧ</string>
+    <string name="eq_preset_bass_reducer">Уменьшение НЧ</string>
+    <string name="eq_preset_classical">Классика</string>
     <string name="eq_preset_deep">Глубокий звук</string>
     <string name="eq_preset_flat">Плоский звук</string>
     <string name="eq_preset_rnb">RnB</string>
     <string name="eq_preset_rock">Рок</string>
-    <string name="eq_preset_small_speakers">Маленике динамики</string>
-    <string name="eq_preset_treble_booster">Усиление высоких частот</string>
-    <string name="eq_preset_treble_reducer">Уменьшение высоких частот</string>
+    <string name="eq_preset_small_speakers">Маленькие динамики</string>
+    <string name="eq_preset_treble_booster">Усиление ВЧ</string>
+    <string name="eq_preset_treble_reducer">Уменьшение ВЧ</string>
     <string name="eq_preset_vocal_booster">Усиление вокала</string>
 </resources>
