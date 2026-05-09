@@ -162,22 +162,22 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
 
     val importKernelLauncher =
         rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.OpenDocument(),
-        ) { uri ->
-            if (uri != null) {
-                val success = viewModel.importKernel(uri)
-                val msg = if (success) importSuccessStr else importFailedStr
+            contract = ActivityResultContracts.OpenMultipleDocuments(),
+        ) { uris ->
+            if (uris.isNotEmpty()) {
+                val count = viewModel.importKernels(uris)
+                val msg = if (count > 0) importSuccessStr else importFailedStr
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
             }
         }
 
     val importVdcLauncher =
         rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.OpenDocument(),
-        ) { uri ->
-            if (uri != null) {
-                val success = viewModel.importVdc(uri)
-                val msg = if (success) importSuccessStr else importFailedStr
+            contract = ActivityResultContracts.OpenMultipleDocuments(),
+        ) { uris ->
+            if (uris.isNotEmpty()) {
+                val count = viewModel.importVdcs(uris)
+                val msg = if (count > 0) importSuccessStr else importFailedStr
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
             }
         }

@@ -4316,28 +4316,32 @@ class MainViewModel
             }
         }
 
-        fun importKernel(uri: Uri): Boolean {
-            return try {
-                val destDir = getFilesDir("Kernel")
-                copyUriToFile(uri, destDir, "kernel.wav") ?: return false
-                refreshFileLists()
-                true
-            } catch (e: Exception) {
-                FileLogger.e("ViewModel", "Failed to import kernel", e)
-                false
+        fun importKernels(uris: List<Uri>): Int {
+            val destDir = getFilesDir("Kernel")
+            var count = 0
+            for (uri in uris) {
+                try {
+                    if (copyUriToFile(uri, destDir, "kernel_$count.wav") != null) count++
+                } catch (e: Exception) {
+                    FileLogger.e("ViewModel", "Failed to import kernel from $uri", e)
+                }
             }
+            if (count > 0) refreshFileLists()
+            return count
         }
 
-        fun importVdc(uri: Uri): Boolean {
-            return try {
-                val destDir = getFilesDir("DDC")
-                copyUriToFile(uri, destDir, "imported.vdc") ?: return false
-                refreshFileLists()
-                true
-            } catch (e: Exception) {
-                FileLogger.e("ViewModel", "Failed to import VDC", e)
-                false
+        fun importVdcs(uris: List<Uri>): Int {
+            val destDir = getFilesDir("DDC")
+            var count = 0
+            for (uri in uris) {
+                try {
+                    if (copyUriToFile(uri, destDir, "imported_$count.vdc") != null) count++
+                } catch (e: Exception) {
+                    FileLogger.e("ViewModel", "Failed to import VDC from $uri", e)
+                }
             }
+            if (count > 0) refreshFileLists()
+            return count
         }
 
         fun refreshFileLists() {
