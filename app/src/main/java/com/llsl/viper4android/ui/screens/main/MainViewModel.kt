@@ -1,12 +1,14 @@
 package com.llsl.viper4android.ui.screens.main
 
 import android.app.Application
+import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.net.Uri
 import android.os.IBinder
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.llsl.viper4android.audio.AudioDevice
@@ -98,6 +100,8 @@ class MainViewModel
             const val PREF_AIDL_MODE = "aidl_mode"
             const val PREF_GLOBAL_MODE = "global_mode"
             const val PREF_DEBUG_MODE = "debug_mode"
+            private const val IMPORT_NOTIFICATION_ID = 2
+            private const val IMPORT_CHANNEL_ID = "viper4android_service"
         }
 
         private val _uiState = MutableStateFlow(MainUiState())
@@ -4256,6 +4260,32 @@ class MainViewModel
             return dir
         }
 
+        private fun updateImportProgress(
+            title: String,
+            current: Int,
+            total: Int,
+        ) {
+            val app = getApplication<Application>()
+            val nm = app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notification =
+                NotificationCompat
+                    .Builder(app, IMPORT_CHANNEL_ID)
+                    .setSmallIcon(android.R.drawable.stat_sys_download)
+                    .setContentTitle(title)
+                    .setContentText("$current / $total")
+                    .setProgress(total, current, false)
+                    .setOngoing(true)
+                    .setSilent(true)
+                    .build()
+            nm.notify(IMPORT_NOTIFICATION_ID, notification)
+        }
+
+        private fun dismissImportProgress() {
+            val app = getApplication<Application>()
+            val nm = app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            nm.cancel(IMPORT_NOTIFICATION_ID)
+        }
+
         private fun copyUriToFile(
             uri: Uri,
             destDir: File,
@@ -4316,32 +4346,56 @@ class MainViewModel
             }
         }
 
-        fun importKernels(uris: List<Uri>): Int {
-            val destDir = getFilesDir("Kernel")
-            var count = 0
-            for (uri in uris) {
-                try {
-                    if (copyUriToFile(uri, destDir, "kernel_$count.wav") != null) count++
-                } catch (e: Exception) {
-                    FileLogger.e("ViewModel", "Failed to import kernel from $uri", e)
+        fun importKernels(
+            uris: List<Uri>,
+            notificationTitle: String,
+            onResult: (Boolean) -> Unit,
+        ) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val total = uris.size
+                val showProgress = total > 50
+                val destDir = getFilesDir("Kernel")
+                var count = 0
+                for ((index, uri) in uris.withIndex()) {
+                    try {
+                        if (copyUriToFile(uri, destDir, "kernel_$count.wav") != null) count++
+                    } catch (e: Exception) {
+                        FileLogger.e("ViewModel", "Failed to import kernel from $uri", e)
+                    }
+                    if (showProgress && ((index + 1) % 10 == 0 || index + 1 == total)) {
+                        updateImportProgress(notificationTitle, index + 1, total)
+                    }
                 }
+                if (showProgress) dismissImportProgress()
+                if (count > 0) refreshFileLists()
+                launch(Dispatchers.Main) { onResult(count > 0) }
             }
-            if (count > 0) refreshFileLists()
-            return count
         }
 
-        fun importVdcs(uris: List<Uri>): Int {
-            val destDir = getFilesDir("DDC")
-            var count = 0
-            for (uri in uris) {
-                try {
-                    if (copyUriToFile(uri, destDir, "imported_$count.vdc") != null) count++
-                } catch (e: Exception) {
-                    FileLogger.e("ViewModel", "Failed to import VDC from $uri", e)
+        fun importVdcs(
+            uris: List<Uri>,
+            notificationTitle: String,
+            onResult: (Boolean) -> Unit,
+        ) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val total = uris.size
+                val showProgress = total > 50
+                val destDir = getFilesDir("DDC")
+                var count = 0
+                for ((index, uri) in uris.withIndex()) {
+                    try {
+                        if (copyUriToFile(uri, destDir, "imported_$count.vdc") != null) count++
+                    } catch (e: Exception) {
+                        FileLogger.e("ViewModel", "Failed to import VDC from $uri", e)
+                    }
+                    if (showProgress && ((index + 1) % 10 == 0 || index + 1 == total)) {
+                        updateImportProgress(notificationTitle, index + 1, total)
+                    }
                 }
+                if (showProgress) dismissImportProgress()
+                if (count > 0) refreshFileLists()
+                launch(Dispatchers.Main) { onResult(count > 0) }
             }
-            if (count > 0) refreshFileLists()
-            return count
         }
 
         fun refreshFileLists() {
