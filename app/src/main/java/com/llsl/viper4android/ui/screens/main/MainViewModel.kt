@@ -4280,10 +4280,24 @@ class MainViewModel
             nm.notify(IMPORT_NOTIFICATION_ID, notification)
         }
 
-        private fun dismissImportProgress() {
+        private fun completeImportProgress(
+            title: String,
+            content: String,
+        ) {
             val app = getApplication<Application>()
             val nm = app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            nm.cancel(IMPORT_NOTIFICATION_ID)
+            val notification =
+                NotificationCompat
+                    .Builder(app, IMPORT_CHANNEL_ID)
+                    .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                    .setContentTitle(title)
+                    .setContentText(content)
+                    .setProgress(0, 0, false)
+                    .setOngoing(false)
+                    .setSilent(true)
+                    .setAutoCancel(true)
+                    .build()
+            nm.notify(IMPORT_NOTIFICATION_ID, notification)
         }
 
         private fun copyUriToFile(
@@ -4349,6 +4363,7 @@ class MainViewModel
         fun importKernels(
             uris: List<Uri>,
             notificationTitle: String,
+            successStr: String,
             onResult: (Boolean) -> Unit,
         ) {
             viewModelScope.launch(Dispatchers.IO) {
@@ -4366,7 +4381,7 @@ class MainViewModel
                         updateImportProgress(notificationTitle, index + 1, total)
                     }
                 }
-                if (showProgress) dismissImportProgress()
+                if (showProgress) completeImportProgress(notificationTitle, "$successStr: $count / $total")
                 if (count > 0) refreshFileLists()
                 launch(Dispatchers.Main) { onResult(count > 0) }
             }
@@ -4375,6 +4390,7 @@ class MainViewModel
         fun importVdcs(
             uris: List<Uri>,
             notificationTitle: String,
+            successStr: String,
             onResult: (Boolean) -> Unit,
         ) {
             viewModelScope.launch(Dispatchers.IO) {
@@ -4392,7 +4408,7 @@ class MainViewModel
                         updateImportProgress(notificationTitle, index + 1, total)
                     }
                 }
-                if (showProgress) dismissImportProgress()
+                if (showProgress) completeImportProgress(notificationTitle, "$successStr: $count / $total")
                 if (count > 0) refreshFileLists()
                 launch(Dispatchers.Main) { onResult(count > 0) }
             }

@@ -166,7 +166,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             contract = ActivityResultContracts.OpenMultipleDocuments(),
         ) { uris ->
             if (uris.isNotEmpty()) {
-                viewModel.importKernels(uris, importKernelStr) { success ->
+                viewModel.importKernels(uris, notificationTitle = importKernelStr, successStr = importSuccessStr) { success ->
                     val msg = if (success) importSuccessStr else importFailedStr
                     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                 }
@@ -179,7 +179,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             contract = ActivityResultContracts.OpenMultipleDocuments(),
         ) { uris ->
             if (uris.isNotEmpty()) {
-                viewModel.importVdcs(uris, importVdcStr) { success ->
+                viewModel.importVdcs(uris, notificationTitle = importVdcStr, successStr = importSuccessStr) { success ->
                     val msg = if (success) importSuccessStr else importFailedStr
                     Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                 }
