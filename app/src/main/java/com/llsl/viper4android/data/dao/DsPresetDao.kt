@@ -32,4 +32,7 @@ interface DsPresetDao {
 
     @Query("SELECT COUNT(*) FROM ds_presets")
     suspend fun count(): Int
+
+    @Query("SELECT COUNT(*) FROM ds_presets WHERE name_key IS NOT NULL")
+    suspend fun countBuiltins(): Int
 }

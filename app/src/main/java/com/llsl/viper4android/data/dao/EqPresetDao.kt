@@ -32,4 +32,7 @@ interface EqPresetDao {
 
     @Query("SELECT COUNT(*) FROM eq_presets")
     suspend fun count(): Int
+
+    @Query("SELECT COUNT(*) FROM eq_presets WHERE name_key IS NOT NULL")
+    suspend fun countBuiltins(): Int
 }

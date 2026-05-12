@@ -15,7 +15,7 @@ import com.llsl.viper4android.data.model.Preset
 
 @Database(
     entities = [Preset::class, EqPreset::class, DsPreset::class, DeviceSettings::class],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 abstract class ViperDatabase : RoomDatabase() {
@@ -69,6 +69,53 @@ abstract class ViperDatabase : RoomDatabase() {
                             "`settings_json` TEXT NOT NULL, " +
                             "`last_connected` INTEGER NOT NULL)",
                     )
+                }
+            }
+
+        val MIGRATION_4_5 =
+            object : Migration(4, 5) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL("ALTER TABLE eq_presets ADD COLUMN name_key TEXT DEFAULT NULL")
+                    val builtins =
+                        mapOf(
+                            "Acoustic" to "eq_preset_acoustic",
+                            "Bass Booster" to "eq_preset_bass_booster",
+                            "Bass Reducer" to "eq_preset_bass_reducer",
+                            "Classical" to "eq_preset_classical",
+                            "Deep" to "eq_preset_deep",
+                            "Flat" to "eq_preset_flat",
+                            "R&B" to "eq_preset_rnb",
+                            "Rock" to "eq_preset_rock",
+                            "Small Speakers" to "eq_preset_small_speakers",
+                            "Treble Booster" to "eq_preset_treble_booster",
+                            "Treble Reducer" to "eq_preset_treble_reducer",
+                            "Vocal Booster" to "eq_preset_vocal_booster",
+                        )
+                    for ((oldName, key) in builtins) {
+                        db.execSQL(
+                            "UPDATE eq_presets SET name_key = ? WHERE name = ?",
+                            arrayOf(key, oldName),
+                        )
+                    }
+                    db.execSQL("ALTER TABLE ds_presets ADD COLUMN name_key TEXT DEFAULT NULL")
+                    val keptBuiltins =
+                        mapOf(
+                            "Extreme Headphone (v2)" to "ds_device_extreme_headphone_v2",
+                            "High-End Headphone (v2)" to "ds_device_high_end_headphone_v2",
+                            "Common Headphone (v2)" to "ds_device_common_headphone_v2",
+                            "Low-End Headphone (v2)" to "ds_device_low_end_headphone_v2",
+                            "Common Earphone (v2)" to "ds_device_common_earphone_v2",
+                            "Extreme Headphone (v1)" to "ds_device_extreme_headphone_v1",
+                            "High-End Headphone (v1)" to "ds_device_high_end_headphone_v1",
+                            "Common Headphone (v1)" to "ds_device_common_headphone_v1",
+                            "Common Earphone (v1)" to "ds_device_common_earphone_v1",
+                        )
+                    for ((oldName, key) in keptBuiltins) {
+                        db.execSQL(
+                            "UPDATE ds_presets SET name_key = ? WHERE name = ?",
+                            arrayOf(key, oldName),
+                        )
+                    }
                 }
             }
     }

@@ -332,9 +332,9 @@ fun EqEditDialog(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                val presetNames = presets.map { it.name }
+                val presetNames = presets.map { resolvePresetName(it) }
                 val selectedPresetName =
-                    presets.find { it.id == presetId }?.name
+                    presets.find { it.id == presetId }?.let { resolvePresetName(it) }
                         ?: stringResource(R.string.label_custom)
 
                 LabeledDropdown(
