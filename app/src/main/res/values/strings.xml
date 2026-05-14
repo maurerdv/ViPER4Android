@@ -283,4 +283,15 @@
     <string name="eq_preset_treble_booster">Treble Booster</string>
     <string name="eq_preset_treble_reducer">Treble Reducer</string>
     <string name="eq_preset_vocal_booster">Vocal Booster</string>
+
+    <!-- Dynamic System device presets -->
+    <string name="ds_device_extreme_headphone_v2">Extreme Headphone (v2)</string>
+    <string name="ds_device_high_end_headphone_v2">High-End Headphone (v2)</string>
+    <string name="ds_device_common_headphone_v2">Common Headphone (v2)</string>
+    <string name="ds_device_low_end_headphone_v2">Low-End Headphone (v2)</string>
+    <string name="ds_device_common_earphone_v2">Common Earphone (v2)</string>
+    <string name="ds_device_extreme_headphone_v1">Extreme Headphone (v1)</string>
+    <string name="ds_device_high_end_headphone_v1">High-End Headphone (v1)</string>
+    <string name="ds_device_common_headphone_v1">Common Headphone (v1)</string>
+    <string name="ds_device_common_earphone_v1">Common Earphone (v1)</string>
 </resources>

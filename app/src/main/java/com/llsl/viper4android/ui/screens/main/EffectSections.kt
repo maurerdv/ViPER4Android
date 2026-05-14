@@ -65,6 +65,7 @@ import com.llsl.viper4android.ui.components.EqEditDialog
 import com.llsl.viper4android.ui.components.LabeledDropdown
 import com.llsl.viper4android.ui.components.LabeledSlider
 import com.llsl.viper4android.ui.components.LabeledSwitch
+import com.llsl.viper4android.ui.components.resolvePresetName
 import java.util.Locale
 import kotlin.math.log10
 import kotlin.math.roundToInt
@@ -1334,11 +1335,12 @@ fun DynamicSystemSection(
         icon = Icons.Default.CandlestickChart,
     ) {
         val presetName =
-            dsPresets.find { it.id == dsPresetId }?.name ?: stringResource(R.string.label_custom)
+            dsPresets.find { it.id == dsPresetId }?.let { resolvePresetName(it) }
+                ?: stringResource(R.string.label_custom)
         LabeledDropdown(
             label = stringResource(R.string.label_preset),
             selectedValue = presetName,
-            options = dsPresets.map { it.name },
+            options = dsPresets.map { resolvePresetName(it) },
             onOptionSelected = { index, _ -> onPresetSelect(dsPresets[index].id) },
         )
 

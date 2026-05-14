@@ -27,22 +27,6 @@ import javax.inject.Singleton
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "viper_preferences")
 
-private val EQ_PRESET_NAMES =
-    listOf(
-        "Acoustic",
-        "Bass Booster",
-        "Bass Reducer",
-        "Classical",
-        "Deep",
-        "Flat",
-        "R&B",
-        "Rock",
-        "Small Speakers",
-        "Treble Booster",
-        "Treble Reducer",
-        "Vocal Booster",
-    )
-
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
@@ -62,6 +46,7 @@ object AppModule {
                     ViperDatabase.MIGRATION_1_2,
                     ViperDatabase.MIGRATION_2_3,
                     ViperDatabase.MIGRATION_3_4,
+                    ViperDatabase.MIGRATION_4_5,
                 ).addCallback(
                     object : RoomDatabase.Callback() {
                         override fun onCreate(sqDb: SupportSQLiteDatabase) {
@@ -76,11 +61,11 @@ object AppModule {
                             super.onOpen(sqDb)
                             CoroutineScope(Dispatchers.IO).launch {
                                 val eqDao = db.eqPresetDao()
-                                if (eqDao.count() == 0) {
+                                if (eqDao.countBuiltins() == 0) {
                                     seedEqPresets(eqDao)
                                 }
                                 val dsDao = db.dsPresetDao()
-                                if (dsDao.count() == 0) {
+                                if (dsDao.countBuiltins() == 0) {
                                     seedDsPresets(dsDao)
                                 }
                             }
@@ -92,18 +77,19 @@ object AppModule {
 
     private suspend fun seedEqPresets(dao: EqPresetDao) {
         val presets = mutableListOf<EqPreset>()
-        val sources =
-            mapOf(
-                10 to EffectDispatcher.EQ_PRESETS,
-                15 to EffectDispatcher.EQ_PRESETS_15,
-                25 to EffectDispatcher.EQ_PRESETS_25,
-                31 to EffectDispatcher.EQ_PRESETS_31,
-            )
-        for ((bandCount, bandsList) in sources) {
-            for ((i, bands) in bandsList.withIndex()) {
+        for (builtin in EffectDispatcher.BUILTIN_EQ_PRESETS) {
+            val bandsByCount =
+                mapOf(
+                    10 to builtin.bands10,
+                    15 to builtin.bands15,
+                    25 to builtin.bands25,
+                    31 to builtin.bands31,
+                )
+            for ((bandCount, bands) in bandsByCount) {
                 presets.add(
                     EqPreset(
-                        name = EQ_PRESET_NAMES[i],
+                        name = builtin.key,
+                        nameKey = builtin.key,
                         bandCount = bandCount,
                         bands = bands,
                     ),
@@ -114,19 +100,17 @@ object AppModule {
     }
 
     private suspend fun seedDsPresets(dao: DsPresetDao) {
-        val devices = EffectDispatcher.DYNAMIC_SYSTEM_DEVICES
-        val names = EffectDispatcher.DYNAMIC_SYSTEM_DEVICE_NAMES
         val presets =
-            devices.mapIndexed { i, coeffStr ->
-                val parts = coeffStr.split(";").map { it.toIntOrNull() ?: 0 }
+            EffectDispatcher.BUILTIN_DS_PRESETS.map { builtin ->
                 DsPreset(
-                    name = names.getOrElse(i) { "Device $i" },
-                    xLow = parts.getOrElse(0) { 100 },
-                    xHigh = parts.getOrElse(1) { 5600 },
-                    yLow = parts.getOrElse(2) { 40 },
-                    yHigh = parts.getOrElse(3) { 80 },
-                    sideGainLow = parts.getOrElse(4) { 50 },
-                    sideGainHigh = parts.getOrElse(5) { 50 },
+                    name = builtin.key,
+                    nameKey = builtin.key,
+                    xLow = builtin.xLow,
+                    xHigh = builtin.xHigh,
+                    yLow = builtin.yLow,
+                    yHigh = builtin.yHigh,
+                    sideGainLow = builtin.sideGainLow,
+                    sideGainHigh = builtin.sideGainHigh,
                 )
             }
         dao.insertAll(presets)

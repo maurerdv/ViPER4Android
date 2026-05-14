@@ -77,22 +77,33 @@ class AudioSessionMonitor(
             for (piid in newPiids) {
                 val info = discovered[piid] ?: continue
                 if (info.sessionId <= 0) continue
+                val alreadyTracked = activePiids.values.any { it.sessionId == info.sessionId }
                 activePiids[piid] = info
-                FileLogger.i(
-                    TAG,
-                    "New session piid=$piid session=${info.sessionId} (${info.packageName})",
-                )
-                onSessionOpen(info.sessionId, info.packageName)
+                if (!alreadyTracked) {
+                    FileLogger.i(
+                        TAG,
+                        "New session piid=$piid session=${info.sessionId} (${info.packageName})",
+                    )
+                    onSessionOpen(info.sessionId, info.packageName)
+                } else {
+                    FileLogger.d(
+                        TAG,
+                        "Additional piid=$piid for existing session=${info.sessionId} (${info.packageName})",
+                    )
+                }
             }
 
             for (piid in gonePiids) {
                 val info = activePiids.remove(piid) ?: continue
                 if (info.sessionId > 0) {
+                    val stillActive = activePiids.values.any { it.sessionId == info.sessionId }
                     FileLogger.i(
                         TAG,
-                        "Session ended piid=$piid session=${info.sessionId} (${info.packageName})",
+                        "Piid ended piid=$piid session=${info.sessionId} (${info.packageName}) stillActive=$stillActive",
                     )
-                    onSessionClose(info.sessionId)
+                    if (!stillActive) {
+                        onSessionClose(info.sessionId)
+                    }
                 }
             }
         }

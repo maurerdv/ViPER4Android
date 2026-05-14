@@ -160,25 +160,29 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             }
         }
 
+    val importKernelStr = stringResource(R.string.settings_import_kernel)
     val importKernelLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.OpenMultipleDocuments(),
         ) { uris ->
             if (uris.isNotEmpty()) {
-                val count = viewModel.importKernels(uris)
-                val msg = if (count > 0) importSuccessStr else importFailedStr
-                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                viewModel.importKernels(uris, notificationTitle = importKernelStr, successStr = importSuccessStr) { success ->
+                    val msg = if (success) importSuccessStr else importFailedStr
+                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
+    val importVdcStr = stringResource(R.string.settings_import_vdc)
     val importVdcLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.OpenMultipleDocuments(),
         ) { uris ->
             if (uris.isNotEmpty()) {
-                val count = viewModel.importVdcs(uris)
-                val msg = if (count > 0) importSuccessStr else importFailedStr
-                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                viewModel.importVdcs(uris, notificationTitle = importVdcStr, successStr = importSuccessStr) { success ->
+                    val msg = if (success) importSuccessStr else importFailedStr
+                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                }
             }
         }
 

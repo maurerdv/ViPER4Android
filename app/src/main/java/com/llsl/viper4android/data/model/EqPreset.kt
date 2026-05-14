@@ -9,6 +9,8 @@ data class EqPreset(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
+    @ColumnInfo(name = "name_key")
+    val nameKey: String? = null,
     @ColumnInfo(name = "band_count")
     val bandCount: Int,
     val bands: String,

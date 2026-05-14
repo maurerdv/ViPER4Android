@@ -2517,7 +2517,14 @@ class ViperService : LifecycleService() {
         }
     }
 
-    fun getGlobalEffect(): ViperEffect? = globalEffect
+    fun getActiveEffect(): ViperEffect? {
+        globalEffect?.let { if (it.isCreated) return it }
+        for (i in 0 until sessions.size) {
+            val effect = sessions.valueAt(i)
+            if (effect.isCreated) return effect
+        }
+        return null
+    }
 
     fun recreateGlobalEffect(aidlType: Boolean) {
         globalEffect?.let {
