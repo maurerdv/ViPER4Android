@@ -2180,6 +2180,7 @@ class MainViewModel
             val count = vals.bandCount
             val entries = mutableListOf<ParamEntry>()
             val freqs = parseInts(vals.freqs, 1000, 8)
+            if (count > 0 && freqs[count - 1] >= 20000) return
             val qs = parseInts(vals.qs, 150, 8)
             val gains = parseInts(vals.gains, 0, 8)
             val thresholds = parseInts(vals.thresholds, -300, 8)
