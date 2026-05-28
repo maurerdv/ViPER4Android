@@ -24,7 +24,7 @@ object FileLogger {
     private var outputStream: FileOutputStream? = null
 
     fun init(context: Context) {
-        val dir = File(context.getExternalFilesDir(null), "Log")
+        val dir = File(context.filesDir, "Log")
         if (!dir.exists()) dir.mkdirs()
         logFile = File(dir, LOG_FILE_NAME)
         openLogFile()

@@ -98,7 +98,6 @@ class MainViewModel
     ) : AndroidViewModel(application) {
         companion object {
             const val PREF_AUTO_START = "auto_start"
-            const val PREF_AIDL_MODE = "aidl_mode"
             const val PREF_GLOBAL_MODE = "global_mode"
             const val PREF_DEBUG_MODE = "debug_mode"
             private const val IMPORT_NOTIFICATION_ID = 2
@@ -2180,6 +2179,7 @@ class MainViewModel
             val count = vals.bandCount
             val entries = mutableListOf<ParamEntry>()
             val freqs = parseInts(vals.freqs, 1000, 8)
+            if (count > 0 && freqs[count - 1] >= 20000) return
             val qs = parseInts(vals.qs, 150, 8)
             val gains = parseInts(vals.gains, 0, 8)
             val thresholds = parseInts(vals.thresholds, -300, 8)
@@ -4787,11 +4787,7 @@ class MainViewModel
                     _autoStartEnabled.value = v
                 }
             }
-            viewModelScope.launch {
-                repository.getBooleanPreference(PREF_AIDL_MODE).collect { v ->
-                    _aidlModeEnabled.value = v
-                }
-            }
+            _aidlModeEnabled.value = repository.aidlMode
             viewModelScope.launch {
                 repository.getBooleanPreference(PREF_GLOBAL_MODE).collect { v ->
                     _globalModeEnabled.value = v
@@ -4956,14 +4952,6 @@ class MainViewModel
             viewModelScope.launch {
                 repository.setBooleanPreference(PREF_AUTO_START, enabled)
             }
-        }
-
-        fun toggleAidlMode(enabled: Boolean) {
-            _aidlModeEnabled.value = enabled
-            viewModelScope.launch {
-                repository.setBooleanPreference(PREF_AIDL_MODE, enabled)
-            }
-            viperService?.recreateGlobalEffect(enabled)
         }
 
         fun toggleGlobalMode(enabled: Boolean) {

@@ -77,7 +77,7 @@ class ViperService : LifecycleService() {
         startForeground(NOTIFICATION_ID, buildNotification())
         FileLogger.i("Service", "Service created")
         lifecycleScope.launch {
-            useAidlTypeUuid = repository.getBooleanPreference(MainViewModel.PREF_AIDL_MODE).first()
+            useAidlTypeUuid = repository.aidlMode
             globalMode = repository.getBooleanPreference(MainViewModel.PREF_GLOBAL_MODE).first()
             if (globalMode) {
                 initGlobalEffect()
@@ -2524,18 +2524,6 @@ class ViperService : LifecycleService() {
             if (effect.isCreated) return effect
         }
         return null
-    }
-
-    fun recreateGlobalEffect(aidlType: Boolean) {
-        globalEffect?.let {
-            it.enabled = false
-            it.release()
-        }
-        globalEffect = null
-        useAidlTypeUuid = aidlType
-        if (globalMode) {
-            initGlobalEffect()
-        }
     }
 
     fun setGlobalMode(enabled: Boolean) {
