@@ -196,7 +196,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             driverStatus = driverStatus,
             appVersionName = appVersionName,
             onAutoStartChanged = viewModel::toggleAutoStart,
-            onImportPreset = { importPresetLauncher.launch(arrayOf("application/json", "*/*")) },
+            onImportPreset = { importPresetLauncher.launch(arrayOf("application/json", "text/xml", "application/xml", "*/*")) },
             onImportKernel = {
                 importKernelLauncher.launch(
                     arrayOf(
