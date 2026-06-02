@@ -4330,20 +4330,32 @@ class MainViewModel
         fun importPresetFile(uri: Uri): Boolean {
             return try {
                 val destDir = getFilesDir("Preset")
-                val destFile = copyUriToFile(uri, destDir, "preset.json") ?: return false
-                // Accept both the legacy ViPER4Android xml presets and the app's
-                // own json presets - translate xml into json up front.
-                val raw = destFile.readText()
-                val isSpk: Boolean
-                val json: String
-                if (ViperXmlPreset.isViperXml(raw)) {
-                    isSpk = ViperXmlPreset.isSpeaker(raw, destFile.name)
-                    json = ViperXmlPreset.toJson(raw, isSpk).toString()
-                } else {
-                    json = raw
-                    val obj = JSONObject(json)
-                    isSpk = obj.has("spkMasterEnabled") && !obj.has("masterEnabled")
-                }
+                val destFile =
+                    if (uri.toString().endsWith(".xml", true)) {
+                        val raw =
+                            getApplication<Application>()
+                                .contentResolver
+                                .openInputStream(uri)
+                                ?.bufferedReader()
+                                .use { it?.readText() }
+                                ?: throw Exception("Failed to read XML preset")
+                        val isSpk = ViperXmlPreset.isSpeaker(raw, uri.lastPathSegment ?: "preset.xml")
+                        val json = ViperXmlPreset.toJson(raw, isSpk).toString()
+                        val presetName = uri.path?.substringAfterLast("/") ?: "preset.xml"
+                        val destFile = File(destDir, presetName.replace(".xml", ".json"))
+                        FileOutputStream(destFile).use { fos ->
+                            fos.write(json.toByteArray(Charsets.UTF_8))
+                            fos.fd.sync()
+                        }
+                        destFile
+                    } else {
+                        val destFile = copyUriToFile(uri, destDir, "preset.json")
+                        destFile
+                    }
+                if (destFile == null) return false
+                val json = destFile.readText()
+                val obj = JSONObject(json)
+                val isSpk = obj.has("spkMasterEnabled") && !obj.has("masterEnabled")
                 val fxType = if (isSpk) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
                 deserializeAndApplyStateForMode(json, fxType)
                 viewModelScope.launch { persistStateForMode(fxType) }

@@ -14,7 +14,6 @@ import org.json.JSONObject
  * fields, and spaces before `/>`.
  */
 object ViperXmlPreset {
-
     /**
      * Is this a legacy ViPER xml preset? Identified by the master-enable param
      * (id 36868), which every preset carries in every version/layout. The app's
@@ -29,7 +28,10 @@ object ViperXmlPreset {
      * param 32775; older ones don't, so fall back to the output type in the
      * file name (device keywords win over "speaker").
      */
-    fun isSpeaker(content: String, fileName: String): Boolean {
+    fun isSpeaker(
+        content: String,
+        fileName: String,
+    ): Boolean {
         Regex("""name="32775"\s+value="([12])"""").find(content)?.let {
             return it.groupValues[1] == "2"
         }
@@ -42,25 +44,44 @@ object ViperXmlPreset {
     }
 
     /** Translate a legacy ViPER xml preset into the app's json preset. */
-    fun toJson(content: String, isSpk: Boolean): JSONObject {
+    fun toJson(
+        content: String,
+        isSpk: Boolean,
+    ): JSONObject {
         val xv = parse(content)
         normalize(xv)
 
         var state = MainUiState()
         val prefByKey = EFFECT_PREFS.associateBy { it.jsonKey }
 
-        fun setB(key: String, v: Boolean) {
+        fun setB(
+            key: String,
+            v: Boolean,
+        ) {
             (prefByKey[key] as? BoolPref)?.let { state = if (isSpk) it.setSpk(state, v) else it.setHp(state, v) }
         }
-        fun setI(key: String, v: Int) {
+
+        fun setI(
+            key: String,
+            v: Int,
+        ) {
             (prefByKey[key] as? IntPref)?.let { state = if (isSpk) it.setSpk(state, v) else it.setHp(state, v) }
         }
-        fun setS(key: String, v: String) {
+
+        fun setS(
+            key: String,
+            v: String,
+        ) {
             (prefByKey[key] as? StringPref)?.let { state = if (isSpk) it.setSpk(state, v) else it.setHp(state, v) }
         }
-        fun setL(key: String, v: Long?) {
+
+        fun setL(
+            key: String,
+            v: Long?,
+        ) {
             (prefByKey[key] as? NullableLongPref)?.let { state = if (isSpk) it.setSpk(state, v) else it.setHp(state, v) }
         }
+
         fun int(id: String): Int? = xv[id]?.trim()?.let { it.toIntOrNull() ?: it.toDoubleOrNull()?.toInt() }
 
         // booleans copied straight across
@@ -114,14 +135,22 @@ object ViperXmlPreset {
             val name = m.groupValues[2]
             if (tag == "string") {
                 // repair the mangled "&" some presets wrote ("></string>amp;")
-                val repaired = line
-                    .replace("></string>amp;", "&amp;")
-                    .replace(">Select impulse response file</string>amp;", "&amp;")
-                var v = stringText.find(repaired)?.groupValues?.get(1)?.let { xmlUnescape(it) } ?: ""
+                val repaired =
+                    line
+                        .replace("></string>amp;", "&amp;")
+                        .replace(">Select impulse response file</string>amp;", "&amp;")
+                var v =
+                    stringText
+                        .find(repaired)
+                        ?.groupValues
+                        ?.get(1)
+                        ?.let { xmlUnescape(it) } ?: ""
                 // "no kernel selected" placeholder text means an empty kernel
-                v = v.replace("Select impulse response file", "")
-                    .replace("Choose Impulse Response", "")
-                    .replace("Selecione o arquivo de impulso de resposta", "")
+                v =
+                    v
+                        .replace("Select impulse response file", "")
+                        .replace("Choose Impulse Response", "")
+                        .replace("Selecione o arquivo de impulso de resposta", "")
                 if (v == "Kernel") v = ""
                 xv[name] = v
             } else {
@@ -133,26 +162,42 @@ object ViperXmlPreset {
 
     /** Bring older preset layouts up to the v2.7.2.x one. */
     private fun normalize(xv: MutableMap<String, String>) {
-        fun adopt(old: String, new: String) {
+        fun adopt(
+            old: String,
+            new: String,
+        ) {
             if (xv.containsKey(old) && !xv.containsKey(new)) xv[new] = xv[old]!!
         }
+
         // room size / width moved id and used to be 0-100 instead of 0-10
-        fun adoptRoom(old: String, new: String) {
+        fun adoptRoom(
+            old: String,
+            new: String,
+        ) {
             val n = (xv[new] ?: xv[old])?.toIntOrNull() ?: return
             xv[new] = (if (n > 10) n / 10 else n).toString()
         }
         // the FET compressor block used a different run of ids (offset by 17)
         for (j in 0..16) adopt((65627 + j).toString(), (65610 + j).toString())
-        adopt("65595", "65551"); adopt("65596", "65552")                         // equalizer
-        adopt("65589", "65538"); adopt("65591;65592;65593", "65540;65541;65542") // convolver
+        adopt("65595", "65551")
+        adopt("65596", "65552") // equalizer
+        adopt("65589", "65538")
+        adopt("65591;65592;65593", "65540;65541;65542") // convolver
         adopt("65594", "65543")
-        adopt("65597", "65559"); adopt("65600", "65562")                         // reverb
-        adopt("65601", "65563"); adopt("65602", "65564")
-        adoptRoom("65598", "65560"); adoptRoom("65599", "65561")
+        adopt("65597", "65559")
+        adopt("65600", "65562") // reverb
+        adopt("65601", "65563")
+        adopt("65602", "65564")
+        adoptRoom("65598", "65560")
+        adoptRoom("65599", "65561")
 
         // a few sliders older presets stored on a wider scale (rescale only when
         // the value is out of the current range)
-        fun rescale(id: String, max: Int, f: (Int) -> Int) {
+        fun rescale(
+            id: String,
+            max: Int,
+            f: (Int) -> Int,
+        ) {
             val n = xv[id]?.toIntOrNull() ?: return
             if (n > max) xv[id] = f(n).toString()
         }
@@ -166,38 +211,75 @@ object ViperXmlPreset {
     }
 
     private fun xmlUnescape(s: String): String =
-        s.replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"")
-            .replace("&apos;", "'").replace("&amp;", "&")
+        s
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&quot;", "\"")
+            .replace("&apos;", "'")
+            .replace("&amp;", "&")
 
     // parameter id -> json key, for values that copy straight across
     private val BOOL_MAP =
         mapOf(
-            "36868" to "masterEnabled", "65565" to "agcEnabled",
-            "65610" to "fetEnabled", "65614" to "fetAutoKnee", "65616" to "fetAutoGain",
-            "65618" to "fetAutoAttack", "65620" to "fetAutoRelease", "65626" to "fetNoClip",
-            "65546" to "ddcEnabled", "65548" to "vseEnabled", "65551" to "eqEnabled",
-            "65538" to "convolverEnabled", "65553" to "fieldSurroundEnabled",
-            "65557" to "diffSurroundEnabled", "65544" to "vheEnabled", "65559" to "reverbEnabled",
-            "65569" to "dynamicSystemEnabled", "65583" to "tubeSimulatorEnabled",
-            "65574" to "bassEnabled", "65578" to "clarityEnabled", "65581" to "cureEnabled",
-            "65584" to "analogxEnabled", "65603" to "speakerOptEnabled",
+            "36868" to "masterEnabled",
+            "65565" to "agcEnabled",
+            "65610" to "fetEnabled",
+            "65614" to "fetAutoKnee",
+            "65616" to "fetAutoGain",
+            "65618" to "fetAutoAttack",
+            "65620" to "fetAutoRelease",
+            "65626" to "fetNoClip",
+            "65546" to "ddcEnabled",
+            "65548" to "vseEnabled",
+            "65551" to "eqEnabled",
+            "65538" to "convolverEnabled",
+            "65553" to "fieldSurroundEnabled",
+            "65557" to "diffSurroundEnabled",
+            "65544" to "vheEnabled",
+            "65559" to "reverbEnabled",
+            "65569" to "dynamicSystemEnabled",
+            "65583" to "tubeSimulatorEnabled",
+            "65574" to "bassEnabled",
+            "65578" to "clarityEnabled",
+            "65581" to "cureEnabled",
+            "65584" to "analogxEnabled",
+            "65603" to "speakerOptEnabled",
         )
     private val INT_MAP =
         mapOf(
-            "65611" to "fetThreshold", "65612" to "fetRatio", "65613" to "fetKnee",
-            "65615" to "fetGain", "65617" to "fetAttack", "65619" to "fetRelease",
-            "65621" to "fetKneeMulti", "65622" to "fetMaxAttack", "65623" to "fetMaxRelease",
-            "65624" to "fetCrest", "65625" to "fetAdapt", "65543" to "convolverCrossChannel",
-            "65555" to "fieldSurroundMidImage", "65554;65556" to "fieldSurroundWidening",
-            "65558" to "diffSurroundDelay", "65545" to "vheQuality",
-            "65560" to "reverbRoomSize", "65561" to "reverbWidth", "65562" to "reverbDampening",
-            "65563" to "reverbWet", "65564" to "reverbDry", "65573" to "dynamicSystemStrength",
-            "65576" to "bassFrequency", "65582" to "cureStrength", "65585" to "analogxMode",
+            "65611" to "fetThreshold",
+            "65612" to "fetRatio",
+            "65613" to "fetKnee",
+            "65615" to "fetGain",
+            "65617" to "fetAttack",
+            "65619" to "fetRelease",
+            "65621" to "fetKneeMulti",
+            "65622" to "fetMaxAttack",
+            "65623" to "fetMaxRelease",
+            "65624" to "fetCrest",
+            "65625" to "fetAdapt",
+            "65543" to "convolverCrossChannel",
+            "65555" to "fieldSurroundMidImage",
+            "65554;65556" to "fieldSurroundWidening",
+            "65558" to "diffSurroundDelay",
+            "65545" to "vheQuality",
+            "65560" to "reverbRoomSize",
+            "65561" to "reverbWidth",
+            "65562" to "reverbDampening",
+            "65563" to "reverbWet",
+            "65564" to "reverbDry",
+            "65573" to "dynamicSystemStrength",
+            "65576" to "bassFrequency",
+            "65582" to "cureStrength",
+            "65585" to "analogxMode",
         )
     private val STR_MAP =
         mapOf(
-            "65552" to "eqBands", "65547" to "ddcDevice", "65540;65541;65542" to "convolverKernel",
+            "65552" to "eqBands",
+            "65547" to "ddcDevice",
+            "65540;65541;65542" to "convolverKernel",
         )
+
     // mode stored as a <string> in xml but a number in the app
     private val MODE_MAP = mapOf("65575" to "bassMode", "65579" to "clarityMode")
 }
