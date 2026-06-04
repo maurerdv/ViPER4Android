@@ -4261,7 +4261,7 @@ class MainViewModel
             return dir
         }
 
-        private fun updateImportProgress(
+        private fun updateNotificationProgress(
             title: String,
             current: Int,
             total: Int,
@@ -4281,7 +4281,7 @@ class MainViewModel
             nm.notify(IMPORT_NOTIFICATION_ID, notification)
         }
 
-        private fun completeImportProgress(
+        private fun completeNotificationProgress(
             title: String,
             content: String,
         ) {
@@ -4392,10 +4392,10 @@ class MainViewModel
                         FileLogger.e("ViewModel", "Failed to import preset from $uri", e)
                     }
                     if (showProgress && ((index + 1) % 5 == 0 || index + 1 == total)) {
-                        updateImportProgress(notificationTitle, index + 1, total)
+                        updateNotificationProgress(notificationTitle, index + 1, total)
                     }
                 }
-                if (showProgress) completeImportProgress(notificationTitle, "$successStr: $count / $total")
+                if (showProgress) completeNotificationProgress(notificationTitle, "$successStr: $count / $total")
                 if (total == 1 && count == 1 && lastJson != null) {
                     val applyJson = lastJson
                     val applyFxType = lastFxType
@@ -4429,10 +4429,10 @@ class MainViewModel
                         FileLogger.e("ViewModel", "Failed to import kernel from $uri", e)
                     }
                     if (showProgress && ((index + 1) % 10 == 0 || index + 1 == total)) {
-                        updateImportProgress(notificationTitle, index + 1, total)
+                        updateNotificationProgress(notificationTitle, index + 1, total)
                     }
                 }
-                if (showProgress) completeImportProgress(notificationTitle, "$successStr: $count / $total")
+                if (showProgress) completeNotificationProgress(notificationTitle, "$successStr: $count / $total")
                 if (count > 0) refreshFileLists()
                 launch(Dispatchers.Main) { onResult(count > 0) }
             }
@@ -4456,10 +4456,10 @@ class MainViewModel
                         FileLogger.e("ViewModel", "Failed to import VDC from $uri", e)
                     }
                     if (showProgress && ((index + 1) % 10 == 0 || index + 1 == total)) {
-                        updateImportProgress(notificationTitle, index + 1, total)
+                        updateNotificationProgress(notificationTitle, index + 1, total)
                     }
                 }
-                if (showProgress) completeImportProgress(notificationTitle, "$successStr: $count / $total")
+                if (showProgress) completeNotificationProgress(notificationTitle, "$successStr: $count / $total")
                 if (count > 0) refreshFileLists()
                 launch(Dispatchers.Main) { onResult(count > 0) }
             }
@@ -4907,6 +4907,31 @@ class MainViewModel
                     File(presetDir, "${preset.name}.json").delete()
                 } catch (_: Exception) {
                 }
+            }
+        }
+
+        fun clearAllPresets(
+            notificationTitle: String,
+            successStr: String,
+            onResult: (Int) -> Unit,
+        ) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val files =
+                    getFilesDir("Preset").listFiles { f -> f.isFile && f.extension == "json" }
+                        ?: emptyArray()
+                val total = files.size
+                val showProgress = total > 10
+                var deleted = 0
+                files.forEachIndexed { index, file ->
+                    if (file.delete()) deleted++
+                    if (showProgress && ((index + 1) % 5 == 0 || index + 1 == total)) {
+                        updateNotificationProgress(notificationTitle, index + 1, total)
+                    }
+                }
+                repository.deleteAllPresets()
+                if (showProgress) completeNotificationProgress(notificationTitle, "$successStr: $deleted / $total")
+                FileLogger.i("ViewModel", "clearAllPresets: files deleted=$deleted/$total, db wiped")
+                launch(Dispatchers.Main) { onResult(deleted) }
             }
         }
 

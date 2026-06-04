@@ -96,6 +96,8 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             }
         }
 
+    val clearAllProgressStr = stringResource(R.string.preset_clear_all_progress)
+    val clearedStr = stringResource(R.string.preset_cleared)
     if (showPresetDialog) {
         PresetDialog(
             presets = presets,
@@ -106,6 +108,14 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             },
             onDelete = viewModel::deletePreset,
             onRename = viewModel::renamePreset,
+            onClearAll = {
+                viewModel.clearAllPresets(
+                    notificationTitle = clearAllProgressStr,
+                    successStr = clearedStr,
+                ) { count ->
+                    Toast.makeText(context, "$clearedStr: $count", Toast.LENGTH_SHORT).show()
+                }
+            },
             onDismiss = { showPresetDialog = false },
         )
     }

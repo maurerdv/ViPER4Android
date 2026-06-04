@@ -47,6 +47,8 @@ class ViperRepository
 
         suspend fun deletePresetById(id: Long) = presetDao.deleteById(id)
 
+        suspend fun deleteAllPresets() = presetDao.deleteAll()
+
         fun getEqPresetsByBandCount(bandCount: Int): Flow<List<EqPreset>> = eqPresetDao.getByBandCount(bandCount)
 
         suspend fun getEqPresetById(id: Long): EqPreset? = eqPresetDao.getById(id)

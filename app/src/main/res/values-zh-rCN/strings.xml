@@ -199,6 +199,11 @@
     <string name="preset_name_hint">预设名称</string>
     <string name="preset_empty">没有已保存的预设</string>
     <string name="preset_save_current">保存当前预设</string>
+    <string name="preset_clear_all">Clear All</string>
+    <string name="preset_clear_all_title">Clear All Presets</string>
+    <string name="preset_clear_all_confirm">Delete all %1$d presets? This cannot be undone.</string>
+    <string name="preset_clear_all_progress">Clearing presets</string>
+    <string name="preset_cleared">Cleared</string>
 
     <!-- Driver Status -->
     <string name="driver_not_found">未找到驱动</string>

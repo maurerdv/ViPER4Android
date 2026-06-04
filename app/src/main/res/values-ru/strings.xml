@@ -199,6 +199,11 @@
     <string name="preset_name_hint">Имя профиля</string>
     <string name="preset_empty">Нет сохраненных профилей</string>
     <string name="preset_save_current">Сохранить текущий</string>
+    <string name="preset_clear_all">Clear All</string>
+    <string name="preset_clear_all_title">Clear All Presets</string>
+    <string name="preset_clear_all_confirm">Delete all %1$d presets? This cannot be undone.</string>
+    <string name="preset_clear_all_progress">Clearing presets</string>
+    <string name="preset_cleared">Cleared</string>
 
     <!-- Driver Status -->
     <string name="driver_not_found">Драйвер не найден</string>

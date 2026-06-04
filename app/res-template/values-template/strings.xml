@@ -207,6 +207,11 @@
     <string name="preset_name_hint">placeholder</string>
     <string name="preset_empty">placeholder</string>
     <string name="preset_save_current">placeholder</string>
+    <string name="preset_clear_all">placeholder</string>
+    <string name="preset_clear_all_title">placeholder</string>
+    <string name="preset_clear_all_confirm">placeholder</string>
+    <string name="preset_clear_all_progress">placeholder</string>
+    <string name="preset_cleared">placeholder</string>
 
     <!-- Driver Status -->
     <string name="driver_not_found">placeholder</string>

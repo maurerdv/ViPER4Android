@@ -37,4 +37,7 @@ interface PresetDao {
 
     @Query("DELETE FROM presets WHERE id = :id")
     suspend fun deleteById(id: Long)
+
+    @Query("DELETE FROM presets")
+    suspend fun deleteAll()
 }

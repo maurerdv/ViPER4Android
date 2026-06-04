@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,6 +43,7 @@ fun PresetDialog(
     onLoad: (Long) -> Unit,
     onDelete: (Long) -> Unit,
     onRename: (Long, String) -> Unit,
+    onClearAll: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     var showSaveInput by remember { mutableStateOf(false) }
@@ -49,6 +51,7 @@ fun PresetDialog(
     var renamingId by remember { mutableLongStateOf(-1L) }
     var renameInputName by remember { mutableStateOf("") }
     var pendingDeletePreset by remember { mutableStateOf<Preset?>(null) }
+    var showClearAllConfirm by remember { mutableStateOf(false) }
 
     fun commitPendingDelete() {
         pendingDeletePreset?.let { onDelete(it.id) }
@@ -135,6 +138,36 @@ fun PresetDialog(
         return
     }
 
+    if (showClearAllConfirm) {
+        AlertDialog(
+            onDismissRequest = { showClearAllConfirm = false },
+            title = { Text(stringResource(R.string.preset_clear_all_title)) },
+            text = {
+                Text(stringResource(R.string.preset_clear_all_confirm, presets.size))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onClearAll()
+                        showClearAllConfirm = false
+                    },
+                    colors =
+                        ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error,
+                        ),
+                ) {
+                    Text(stringResource(R.string.preset_clear_all))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearAllConfirm = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
+        return
+    }
+
     AlertDialog(
         onDismissRequest = {
             commitPendingDelete()
@@ -195,11 +228,27 @@ fun PresetDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = {
-                commitPendingDelete()
-                onDismiss()
-            }) {
-                Text(stringResource(R.string.action_close))
+            Row {
+                if (presets.isNotEmpty()) {
+                    TextButton(
+                        onClick = {
+                            commitPendingDelete()
+                            showClearAllConfirm = true
+                        },
+                        colors =
+                            ButtonDefaults.textButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error,
+                            ),
+                    ) {
+                        Text(stringResource(R.string.preset_clear_all))
+                    }
+                }
+                TextButton(onClick = {
+                    commitPendingDelete()
+                    onDismiss()
+                }) {
+                    Text(stringResource(R.string.action_close))
+                }
             }
         },
     )
