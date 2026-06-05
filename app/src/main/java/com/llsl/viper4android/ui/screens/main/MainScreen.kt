@@ -108,6 +108,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             },
             onDelete = viewModel::deletePreset,
             onRename = viewModel::renamePreset,
+            onUpdate = viewModel::updatePreset,
             onClearAll = {
                 viewModel.clearAllPresets(
                     notificationTitle = clearAllProgressStr,

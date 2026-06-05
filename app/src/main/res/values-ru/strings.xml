@@ -206,6 +206,8 @@
     <string name="preset_clear_all_confirm">Delete all %1$d presets? This cannot be undone.</string>
     <string name="preset_clear_all_progress">Clearing presets</string>
     <string name="preset_cleared">Cleared</string>
+    <string name="preset_update_title">Update Preset</string>
+    <string name="preset_update_confirm">Overwrite "%1$s" with current settings? This cannot be undone.</string>
 
     <!-- Driver Status -->
     <string name="driver_not_found">Драйвер не найден</string>

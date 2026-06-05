@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -43,6 +44,7 @@ fun PresetDialog(
     onLoad: (Long) -> Unit,
     onDelete: (Long) -> Unit,
     onRename: (Long, String) -> Unit,
+    onUpdate: (Long) -> Unit,
     onClearAll: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -52,6 +54,8 @@ fun PresetDialog(
     var renameInputName by remember { mutableStateOf("") }
     var pendingDeletePreset by remember { mutableStateOf<Preset?>(null) }
     var showClearAllConfirm by remember { mutableStateOf(false) }
+    var showUpdateConfirm by remember { mutableStateOf(false) }
+    var updateTargetPreset by remember { mutableStateOf<Preset?>(null) }
 
     fun commitPendingDelete() {
         pendingDeletePreset?.let { onDelete(it.id) }
@@ -168,6 +172,37 @@ fun PresetDialog(
         return
     }
 
+    if (showUpdateConfirm && updateTargetPreset != null) {
+        val target = updateTargetPreset!!
+        AlertDialog(
+            onDismissRequest = { showUpdateConfirm = false },
+            title = { Text(stringResource(R.string.preset_update_title)) },
+            text = {
+                Text(stringResource(R.string.preset_update_confirm, target.name))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onUpdate(target.id)
+                        showUpdateConfirm = false
+                    },
+                    colors =
+                        ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error,
+                        ),
+                ) {
+                    Text(stringResource(R.string.action_update))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showUpdateConfirm = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
+        return
+    }
+
     AlertDialog(
         onDismissRequest = {
             commitPendingDelete()
@@ -200,6 +235,10 @@ fun PresetDialog(
                                 onRename = {
                                     renameInputName = preset.name
                                     renamingId = preset.id
+                                },
+                                onUpdate = {
+                                    updateTargetPreset = preset
+                                    showUpdateConfirm = true
                                 },
                             )
                             HorizontalDivider()
@@ -260,6 +299,7 @@ private fun PresetItem(
     onLoad: () -> Unit,
     onDelete: () -> Unit,
     onRename: () -> Unit,
+    onUpdate: () -> Unit,
 ) {
     Row(
         modifier =
@@ -289,6 +329,13 @@ private fun PresetItem(
                     Icons.Default.Edit,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            IconButton(onClick = onUpdate) {
+                Icon(
+                    Icons.Default.Sync,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             }
             IconButton(onClick = onDelete) {

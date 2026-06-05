@@ -4979,6 +4979,26 @@ class MainViewModel
             }
         }
 
+        fun updatePreset(id: Long) {
+            viewModelScope.launch {
+                val preset = repository.getPresetById(id) ?: return@launch
+                val json = serializeStateForMode(_uiState.value, preset.fxType)
+                repository.updatePreset(
+                    preset.copy(settingsJson = json, updatedAt = System.currentTimeMillis()),
+                )
+                try {
+                    val presetDir = getFilesDir("Preset")
+                    val file = File(presetDir, "${preset.name}.json")
+                    FileOutputStream(file).use { fos ->
+                        fos.write(json.toByteArray(Charsets.UTF_8))
+                        fos.fd.sync()
+                    }
+                } catch (e: Exception) {
+                    FileLogger.e("ViewModel", "updatePreset: failed for id=$id", e)
+                }
+            }
+        }
+
         fun queryDriverStatus() {
             if (_aidlModeEnabled.value) {
                 queryDriverStatusFromFile()
