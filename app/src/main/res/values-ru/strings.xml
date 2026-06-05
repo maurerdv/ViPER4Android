@@ -5,8 +5,8 @@
     <string name="notification_channel_description">Показывать когда ViPER4Android обрабатывает аудио</string>
     <string name="notification_title">ViPER4Android</string>
     <string name="notification_text">Обработка аудио активна</string>
-    <string name="notification_bulk_op_channel_name">Bulk Operations</string>
-    <string name="notification_bulk_op_channel_description">Progress for bulk operations</string>
+    <string name="notification_bulk_op_channel_name">Массовые операции</string>
+    <string name="notification_bulk_op_channel_description">Прогресс выполнения массовых операций </string>
 
     <!-- Tabs -->
     <string name="tab_headphone">Наушники</string>
@@ -201,13 +201,13 @@
     <string name="preset_name_hint">Имя профиля</string>
     <string name="preset_empty">Нет сохраненных профилей</string>
     <string name="preset_save_current">Сохранить текущий</string>
-    <string name="preset_clear_all">Clear All</string>
-    <string name="preset_clear_all_title">Clear All Presets</string>
-    <string name="preset_clear_all_confirm">Delete all %1$d presets? This cannot be undone.</string>
-    <string name="preset_clear_all_progress">Clearing presets</string>
-    <string name="preset_cleared">Cleared</string>
-    <string name="preset_update_title">Update Preset</string>
-    <string name="preset_update_confirm">Overwrite "%1$s" with current settings? This cannot be undone.</string>
+    <string name="preset_clear_all">Очистить все</string>
+    <string name="preset_clear_all_title">Очисть все пресеты</string>
+    <string name="preset_clear_all_confirm">Удалить все %1$d пресетов? Это действие нельзя отменить.</string>
+    <string name="preset_clear_all_progress">Очистка пресетов</string>
+    <string name="preset_cleared">Очищено</string>
+    <string name="preset_update_title">Обновление пресета</string>
+    <string name="preset_update_confirm">Перезаписать «%1$s» с текущими настройками? Это действие нельзя отменить.</string>
 
     <!-- Driver Status -->
     <string name="driver_not_found">Драйвер не найден</string>
@@ -247,8 +247,8 @@
     <string name="device_no_devices">Нет сохранённых устройств</string>
     <string name="device_rename_title">Переименовать устройство</string>
     <string name="device_rename_hint">Имя устройства</string>
-    <string name="device_update_title">Update Device Preset</string>
-    <string name="device_update_confirm">Overwrite "%1$s" preset with current settings? This cannot be undone.</string>
+    <string name="device_update_title">Обновление пресета устройства</string>
+    <string name="device_update_confirm">Перезаписать пресет «%1$s» текущими настройками? Это действие нельзя отменить.</string>
 
     <!-- Actions -->
     <string name="action_save">Сохранить</string>
