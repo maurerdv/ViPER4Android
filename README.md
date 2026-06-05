@@ -53,7 +53,7 @@ Material Design 3 UI for ViPER4Android FX. Full feature set of the ViPER4Android
 2. Install the APK
 3. Flash the Magisk module from [ViPERFX_RE](https://github.com/likelikeslike/ViPERFX_RE) (or the AIDL variant)
 4. Reboot
-5. Open the app. Enable `AIDL mode` in Settings if your device uses AIDL HALs
+5. Open the app and tune the settings.
 6. Enjoy
 
 ## Q&A

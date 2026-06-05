@@ -96,6 +96,8 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             }
         }
 
+    val clearAllProgressStr = stringResource(R.string.preset_clear_all_progress)
+    val clearedStr = stringResource(R.string.preset_cleared)
     if (showPresetDialog) {
         PresetDialog(
             presets = presets,
@@ -106,6 +108,15 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             },
             onDelete = viewModel::deletePreset,
             onRename = viewModel::renamePreset,
+            onUpdate = viewModel::updatePreset,
+            onClearAll = {
+                viewModel.clearAllPresets(
+                    notificationTitle = clearAllProgressStr,
+                    successStr = clearedStr,
+                ) { count ->
+                    Toast.makeText(context, "$clearedStr: $count", Toast.LENGTH_SHORT).show()
+                }
+            },
             onDismiss = { showPresetDialog = false },
         )
     }
@@ -141,7 +152,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             activeDeviceId = state.activeDeviceId,
             onRename = viewModel::renameDevice,
             onLoad = viewModel::loadDevicePreset,
-            onSave = viewModel::saveDevicePreset,
+            onUpdate = viewModel::saveDevicePreset,
             onDelete = viewModel::deleteDeviceSettings,
             onDismiss = { showDeviceDialog = false },
         )
@@ -149,14 +160,16 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
 
     val importSuccessStr = stringResource(R.string.import_success)
     val importFailedStr = stringResource(R.string.import_failed)
+    val importPresetStr = stringResource(R.string.settings_import_preset)
     val importPresetLauncher =
         rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.OpenDocument(),
-        ) { uri ->
-            if (uri != null) {
-                val success = viewModel.importPresetFile(uri)
-                val msg = if (success) importSuccessStr else importFailedStr
-                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            contract = ActivityResultContracts.OpenMultipleDocuments(),
+        ) { uris ->
+            if (uris.isNotEmpty()) {
+                viewModel.importPresetFiles(uris, notificationTitle = importPresetStr, successStr = importSuccessStr) { success ->
+                    val msg = if (success) importSuccessStr else importFailedStr
+                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -196,7 +209,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             driverStatus = driverStatus,
             appVersionName = appVersionName,
             onAutoStartChanged = viewModel::toggleAutoStart,
-            onImportPreset = { importPresetLauncher.launch(arrayOf("application/json", "*/*")) },
+            onImportPreset = { importPresetLauncher.launch(arrayOf("application/json", "text/xml", "application/xml", "*/*")) },
             onImportKernel = {
                 importKernelLauncher.launch(
                     arrayOf(

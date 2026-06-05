@@ -5,6 +5,8 @@
     <string name="notification_channel_description">Shows when ViPER4Android is processing audio</string>
     <string name="notification_title">ViPER4Android</string>
     <string name="notification_text">Audio processing active</string>
+    <string name="notification_bulk_op_channel_name">Bulk Operations</string>
+    <string name="notification_bulk_op_channel_description">Progress for bulk operations</string>
 
     <!-- Tabs -->
     <string name="tab_headphone">Headphone</string>
@@ -199,6 +201,13 @@
     <string name="preset_name_hint">Preset name</string>
     <string name="preset_empty">No saved presets</string>
     <string name="preset_save_current">Save Current</string>
+    <string name="preset_clear_all">Clear All</string>
+    <string name="preset_clear_all_title">Clear All Presets</string>
+    <string name="preset_clear_all_confirm">Delete all %1$d presets? This cannot be undone.</string>
+    <string name="preset_clear_all_progress">Clearing presets</string>
+    <string name="preset_cleared">Cleared</string>
+    <string name="preset_update_title">Update Preset</string>
+    <string name="preset_update_confirm">Overwrite "%1$s" with current settings? This cannot be undone.</string>
 
     <!-- Driver Status -->
     <string name="driver_not_found">Driver not found</string>
@@ -238,6 +247,8 @@
     <string name="device_no_devices">No saved devices</string>
     <string name="device_rename_title">Rename Device</string>
     <string name="device_rename_hint">Device name</string>
+    <string name="device_update_title">Update Device Preset</string>
+    <string name="device_update_confirm">Overwrite "%1$s" preset with current settings? This cannot be undone.</string>
 
     <!-- Actions -->
     <string name="action_save">Save</string>

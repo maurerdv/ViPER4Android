@@ -5,6 +5,8 @@
     <string name="notification_channel_description">当 ViPER4Android 正在处理音频时显示</string>
     <string name="notification_title">ViPER4Android</string>
     <string name="notification_text">音频处理已激活</string>
+    <string name="notification_bulk_op_channel_name">Bulk Operations</string>
+    <string name="notification_bulk_op_channel_description">Progress for bulk operations</string>
 
     <!-- Tabs -->
     <string name="tab_headphone">耳机</string>
@@ -199,6 +201,13 @@
     <string name="preset_name_hint">预设名称</string>
     <string name="preset_empty">没有已保存的预设</string>
     <string name="preset_save_current">保存当前预设</string>
+    <string name="preset_clear_all">Clear All</string>
+    <string name="preset_clear_all_title">Clear All Presets</string>
+    <string name="preset_clear_all_confirm">Delete all %1$d presets? This cannot be undone.</string>
+    <string name="preset_clear_all_progress">Clearing presets</string>
+    <string name="preset_cleared">Cleared</string>
+    <string name="preset_update_title">Update Preset</string>
+    <string name="preset_update_confirm">Overwrite "%1$s" with current settings? This cannot be undone.</string>
 
     <!-- Driver Status -->
     <string name="driver_not_found">未找到驱动</string>
@@ -238,6 +247,8 @@
     <string name="device_no_devices">无已保存设备</string>
     <string name="device_rename_title">重命名设备</string>
     <string name="device_rename_hint">设备名称</string>
+    <string name="device_update_title">Update Device Preset</string>
+    <string name="device_update_confirm">Overwrite "%1$s" preset with current settings? This cannot be undone.</string>
 
     <!-- Actions -->
     <string name="action_save">保存</string>

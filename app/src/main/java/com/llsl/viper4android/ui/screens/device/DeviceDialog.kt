@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.material.icons.filled.Speaker
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -56,13 +57,15 @@ fun DeviceDialog(
     activeDeviceId: String,
     onRename: (String, String) -> Unit,
     onLoad: (String) -> Unit,
-    onSave: (String) -> Unit,
+    onUpdate: (String) -> Unit,
     onDelete: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
     var selectedDeviceId by remember { mutableStateOf<String?>(null) }
     var renamingDeviceId by remember { mutableStateOf<String?>(null) }
     var renameInput by remember { mutableStateOf("") }
+    var showUpdateConfirm by remember { mutableStateOf(false) }
+    var updateTargetDevice by remember { mutableStateOf<DeviceSettings?>(null) }
 
     val selectedDevice = selectedDeviceId?.let { id -> devices.find { it.deviceId == id } }
 
@@ -99,6 +102,36 @@ fun DeviceDialog(
             },
         )
         return
+    }
+
+    if (showUpdateConfirm && updateTargetDevice != null) {
+        val target = updateTargetDevice!!
+        AlertDialog(
+            onDismissRequest = { showUpdateConfirm = false },
+            title = { Text(stringResource(R.string.device_update_title)) },
+            text = {
+                Text(stringResource(R.string.device_update_confirm, target.deviceName))
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onUpdate(target.deviceId)
+                        showUpdateConfirm = false
+                    },
+                    colors =
+                        ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error,
+                        ),
+                ) {
+                    Text(stringResource(R.string.action_update))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showUpdateConfirm = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
     }
 
     AlertDialog(
@@ -139,7 +172,10 @@ fun DeviceDialog(
                     device = selectedDevice,
                     isActive = selectedDevice.deviceId == activeDeviceId,
                     onLoad = { onLoad(selectedDevice.deviceId) },
-                    onSave = { onSave(selectedDevice.deviceId) },
+                    onUpdate = {
+                        updateTargetDevice = selectedDevice
+                        showUpdateConfirm = true
+                    },
                     onDelete = {
                         onDelete(selectedDevice.deviceId)
                         selectedDeviceId = null
@@ -257,7 +293,7 @@ private fun DeviceDetailView(
     device: DeviceSettings,
     isActive: Boolean,
     onLoad: () -> Unit,
-    onSave: () -> Unit,
+    onUpdate: () -> Unit,
     onDelete: () -> Unit,
 ) {
     val isBuiltIn = device.deviceId in BUILTIN_DEVICE_IDS
@@ -306,7 +342,7 @@ private fun DeviceDetailView(
             ActionItem(
                 icon = Icons.Default.Sync,
                 label = stringResource(R.string.action_update),
-                onClick = onSave,
+                onClick = onUpdate,
             )
             ActionItem(
                 icon = Icons.Default.Delete,

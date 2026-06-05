@@ -1,8 +1,6 @@
 package com.llsl.viper4android.service
 
 import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -15,6 +13,7 @@ import androidx.core.util.size
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.llsl.viper4android.R
+import com.llsl.viper4android.SERVICE_CHANNEL_ID
 import com.llsl.viper4android.audio.AudioDevice
 import com.llsl.viper4android.audio.AudioOutputDetector
 import com.llsl.viper4android.audio.AudioSessionMonitor
@@ -45,7 +44,6 @@ class ViperService : LifecycleService() {
 
     companion object {
         private const val NOTIFICATION_ID = 1
-        private const val NOTIFICATION_CHANNEL_ID = "viper4android_service"
 
         const val ACTION_START = "com.llsl.viper4android.service.START"
         const val ACTION_STOP = "com.llsl.viper4android.service.STOP"
@@ -73,7 +71,6 @@ class ViperService : LifecycleService() {
 
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel()
         startForeground(NOTIFICATION_ID, buildNotification())
         FileLogger.i("Service", "Service created")
         lifecycleScope.launch {
@@ -2544,22 +2541,6 @@ class ViperService : LifecycleService() {
         }
     }
 
-    private fun createNotificationChannel() {
-        val channelName = getString(R.string.notification_channel_name)
-        val channelDescription = getString(R.string.notification_channel_description)
-        val channel =
-            NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                channelName,
-                NotificationManager.IMPORTANCE_LOW,
-            ).apply {
-                description = channelDescription
-                setShowBadge(false)
-            }
-        val manager = getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(channel)
-    }
-
     private fun buildNotification(): Notification {
         val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
         val pendingIntent =
@@ -2573,7 +2554,7 @@ class ViperService : LifecycleService() {
             }
 
         return NotificationCompat
-            .Builder(this, NOTIFICATION_CHANNEL_ID)
+            .Builder(this, SERVICE_CHANNEL_ID)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(getString(R.string.notification_text))
             .setSmallIcon(android.R.drawable.ic_media_play)

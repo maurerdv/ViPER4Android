@@ -11,6 +11,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.llsl.viper4android.BULK_OP_CHANNEL_ID
 import com.llsl.viper4android.audio.AudioDevice
 import com.llsl.viper4android.audio.AudioOutputDetector
 import com.llsl.viper4android.audio.ByteArrayParam
@@ -30,6 +31,7 @@ import com.llsl.viper4android.utils.RootShell
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -45,6 +47,7 @@ import java.io.FileOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.CRC32
 import javax.inject.Inject
 
@@ -100,8 +103,12 @@ class MainViewModel
             const val PREF_AUTO_START = "auto_start"
             const val PREF_GLOBAL_MODE = "global_mode"
             const val PREF_DEBUG_MODE = "debug_mode"
-            private const val IMPORT_NOTIFICATION_ID = 2
-            private const val IMPORT_CHANNEL_ID = "viper4android_service"
+            private const val NOTIFY_ID_PRESET_IMPORT = 2
+            private const val NOTIFY_ID_PRESET_CLEAR = 3
+            private const val NOTIFY_ID_KERNEL_IMPORT = 4
+            private const val NOTIFY_ID_VDC_IMPORT = 5
+            private const val PROGRESS_NOTIFY_MIN_GAP_MS = 200L
+            private const val PROGRESS_DRAIN_DELAY_MS = 250L
         }
 
         private val _uiState = MutableStateFlow(MainUiState())
@@ -4261,16 +4268,23 @@ class MainViewModel
             return dir
         }
 
-        private fun updateImportProgress(
+        private val lastBulkProgressNotifyMs = ConcurrentHashMap<Int, Long>()
+
+        private fun updateBulkProgress(
+            notificationId: Int,
             title: String,
             current: Int,
             total: Int,
         ) {
+            val now = System.currentTimeMillis()
+            val last = lastBulkProgressNotifyMs[notificationId] ?: 0L
+            if (current < total && now - last < PROGRESS_NOTIFY_MIN_GAP_MS) return
+            lastBulkProgressNotifyMs[notificationId] = now
             val app = getApplication<Application>()
             val nm = app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val notification =
                 NotificationCompat
-                    .Builder(app, IMPORT_CHANNEL_ID)
+                    .Builder(app, BULK_OP_CHANNEL_ID)
                     .setSmallIcon(android.R.drawable.stat_sys_download)
                     .setContentTitle(title)
                     .setContentText("$current / $total")
@@ -4278,18 +4292,21 @@ class MainViewModel
                     .setOngoing(true)
                     .setSilent(true)
                     .build()
-            nm.notify(IMPORT_NOTIFICATION_ID, notification)
+            nm.notify(notificationId, notification)
         }
 
-        private fun completeImportProgress(
+        private suspend fun completeBulkProgress(
+            notificationId: Int,
             title: String,
             content: String,
         ) {
+            delay(PROGRESS_DRAIN_DELAY_MS)
+            lastBulkProgressNotifyMs.remove(notificationId)
             val app = getApplication<Application>()
             val nm = app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val notification =
                 NotificationCompat
-                    .Builder(app, IMPORT_CHANNEL_ID)
+                    .Builder(app, BULK_OP_CHANNEL_ID)
                     .setSmallIcon(android.R.drawable.stat_sys_download_done)
                     .setContentTitle(title)
                     .setContentText(content)
@@ -4298,7 +4315,7 @@ class MainViewModel
                     .setSilent(true)
                     .setAutoCancel(true)
                     .build()
-            nm.notify(IMPORT_NOTIFICATION_ID, notification)
+            nm.notify(notificationId, notification)
         }
 
         private fun copyUriToFile(
@@ -4327,40 +4344,89 @@ class MainViewModel
             }
         }
 
-        fun importPresetFile(uri: Uri): Boolean {
-            return try {
+        fun importPresetFiles(
+            uris: List<Uri>,
+            notificationTitle: String,
+            successStr: String,
+            onResult: (Boolean) -> Unit,
+        ) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val total = uris.size
+                val showProgress = total > 10
                 val destDir = getFilesDir("Preset")
-                val destFile = copyUriToFile(uri, destDir, "preset.json") ?: return false
-                val json = destFile.readText()
-                val obj = JSONObject(json)
-                val isSpk = obj.has("spkMasterEnabled") && !obj.has("masterEnabled")
-                val fxType = if (isSpk) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
-                deserializeAndApplyStateForMode(json, fxType)
-                viewModelScope.launch { persistStateForMode(fxType) }
-                if (fxType == activeDeviceType) {
-                    applyFullState()
-                }
-                val presetName = destFile.nameWithoutExtension
-                viewModelScope.launch {
-                    val existing = repository.getPresetByNameAndFxType(presetName, fxType)
-                    if (existing != null) {
-                        repository.updatePreset(
-                            existing.copy(settingsJson = json, updatedAt = System.currentTimeMillis()),
-                        )
-                    } else {
-                        repository.savePreset(
-                            Preset(
-                                name = presetName,
-                                fxType = fxType,
-                                settingsJson = json,
-                            ),
-                        )
+                var count = 0
+                var lastJson: String? = null
+                var lastFxType: Int = ViperParams.FX_TYPE_HEADPHONE
+                for ((index, uri) in uris.withIndex()) {
+                    try {
+                        val destFile =
+                            if (uri.toString().endsWith(".xml", true)) {
+                                val raw =
+                                    getApplication<Application>()
+                                        .contentResolver
+                                        .openInputStream(uri)
+                                        ?.bufferedReader()
+                                        .use { it?.readText() }
+                                        ?: throw Exception("Failed to read XML preset")
+                                val isSpk = ViperXmlPreset.isSpeaker(raw, uri.lastPathSegment ?: "preset.xml")
+                                val json = ViperXmlPreset.toJson(raw, isSpk).toString()
+                                val presetName = uri.path?.substringAfterLast("/") ?: "import_$index.xml"
+                                val destFile = File(destDir, presetName.replace(".xml", ".json"))
+                                FileOutputStream(destFile).use { fos ->
+                                    fos.write(json.toByteArray(Charsets.UTF_8))
+                                    fos.fd.sync()
+                                }
+                                destFile
+                            } else {
+                                val destFile = copyUriToFile(uri, destDir, "import_$index.json")
+                                destFile
+                            }
+                        if (destFile != null) {
+                            val json = destFile.readText()
+                            val obj = JSONObject(json)
+                            val isSpk = obj.has("spkMasterEnabled") && !obj.has("masterEnabled")
+                            val fxType = if (isSpk) ViperParams.FX_TYPE_SPEAKER else ViperParams.FX_TYPE_HEADPHONE
+                            val presetName = destFile.nameWithoutExtension
+                            val existing = repository.getPresetByNameAndFxType(presetName, fxType)
+                            if (existing != null) {
+                                repository.updatePreset(
+                                    existing.copy(settingsJson = json, updatedAt = System.currentTimeMillis()),
+                                )
+                            } else {
+                                repository.savePreset(
+                                    Preset(
+                                        name = presetName,
+                                        fxType = fxType,
+                                        settingsJson = json,
+                                    ),
+                                )
+                            }
+                            count++
+                            lastJson = json
+                            lastFxType = fxType
+                        }
+                    } catch (e: Exception) {
+                        FileLogger.e("ViewModel", "Failed to import preset from $uri", e)
+                    }
+                    if (showProgress) {
+                        updateBulkProgress(NOTIFY_ID_PRESET_IMPORT, notificationTitle, index + 1, total)
                     }
                 }
-                true
-            } catch (e: Exception) {
-                FileLogger.e("ViewModel", "Failed to import preset", e)
-                false
+                if (showProgress) {
+                    completeBulkProgress(NOTIFY_ID_PRESET_IMPORT, notificationTitle, "$successStr: $count / $total")
+                }
+                if (total == 1 && count == 1 && lastJson != null) {
+                    val applyJson = lastJson
+                    val applyFxType = lastFxType
+                    launch(Dispatchers.Main) {
+                        deserializeAndApplyStateForMode(applyJson, applyFxType)
+                        viewModelScope.launch { persistStateForMode(applyFxType) }
+                        if (applyFxType == activeDeviceType) {
+                            applyFullState()
+                        }
+                    }
+                }
+                launch(Dispatchers.Main) { onResult(count > 0) }
             }
         }
 
@@ -4381,11 +4447,13 @@ class MainViewModel
                     } catch (e: Exception) {
                         FileLogger.e("ViewModel", "Failed to import kernel from $uri", e)
                     }
-                    if (showProgress && ((index + 1) % 10 == 0 || index + 1 == total)) {
-                        updateImportProgress(notificationTitle, index + 1, total)
+                    if (showProgress) {
+                        updateBulkProgress(NOTIFY_ID_KERNEL_IMPORT, notificationTitle, index + 1, total)
                     }
                 }
-                if (showProgress) completeImportProgress(notificationTitle, "$successStr: $count / $total")
+                if (showProgress) {
+                    completeBulkProgress(NOTIFY_ID_KERNEL_IMPORT, notificationTitle, "$successStr: $count / $total")
+                }
                 if (count > 0) refreshFileLists()
                 launch(Dispatchers.Main) { onResult(count > 0) }
             }
@@ -4408,11 +4476,13 @@ class MainViewModel
                     } catch (e: Exception) {
                         FileLogger.e("ViewModel", "Failed to import VDC from $uri", e)
                     }
-                    if (showProgress && ((index + 1) % 10 == 0 || index + 1 == total)) {
-                        updateImportProgress(notificationTitle, index + 1, total)
+                    if (showProgress) {
+                        updateBulkProgress(NOTIFY_ID_VDC_IMPORT, notificationTitle, index + 1, total)
                     }
                 }
-                if (showProgress) completeImportProgress(notificationTitle, "$successStr: $count / $total")
+                if (showProgress) {
+                    completeBulkProgress(NOTIFY_ID_VDC_IMPORT, notificationTitle, "$successStr: $count / $total")
+                }
                 if (count > 0) refreshFileLists()
                 launch(Dispatchers.Main) { onResult(count > 0) }
             }
@@ -4863,6 +4933,33 @@ class MainViewModel
             }
         }
 
+        fun clearAllPresets(
+            notificationTitle: String,
+            successStr: String,
+            onResult: (Int) -> Unit,
+        ) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val files =
+                    getFilesDir("Preset").listFiles { f -> f.isFile && f.extension == "json" }
+                        ?: emptyArray()
+                val total = files.size
+                val showProgress = total > 10
+                var deleted = 0
+                files.forEachIndexed { index, file ->
+                    if (file.delete()) deleted++
+                    if (showProgress) {
+                        updateBulkProgress(NOTIFY_ID_PRESET_CLEAR, notificationTitle, index + 1, total)
+                    }
+                }
+                repository.deleteAllPresets()
+                if (showProgress) {
+                    completeBulkProgress(NOTIFY_ID_PRESET_CLEAR, notificationTitle, "$successStr: $deleted / $total")
+                }
+                FileLogger.i("ViewModel", "clearAllPresets: files deleted=$deleted/$total, db wiped")
+                launch(Dispatchers.Main) { onResult(deleted) }
+            }
+        }
+
         fun renamePreset(
             id: Long,
             newName: String,
@@ -4878,6 +4975,26 @@ class MainViewModel
                     val newFile = File(presetDir, "$newName.json")
                     oldFile.renameTo(newFile)
                 } catch (_: Exception) {
+                }
+            }
+        }
+
+        fun updatePreset(id: Long) {
+            viewModelScope.launch {
+                val preset = repository.getPresetById(id) ?: return@launch
+                val json = serializeStateForMode(_uiState.value, preset.fxType)
+                repository.updatePreset(
+                    preset.copy(settingsJson = json, updatedAt = System.currentTimeMillis()),
+                )
+                try {
+                    val presetDir = getFilesDir("Preset")
+                    val file = File(presetDir, "${preset.name}.json")
+                    FileOutputStream(file).use { fos ->
+                        fos.write(json.toByteArray(Charsets.UTF_8))
+                        fos.fd.sync()
+                    }
+                } catch (e: Exception) {
+                    FileLogger.e("ViewModel", "updatePreset: failed for id=$id", e)
                 }
             }
         }
