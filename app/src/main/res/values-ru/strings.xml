@@ -196,17 +196,17 @@
     <string name="clarity_mode_xhifi">XHiFi</string>
 
     <!-- Presets -->
-    <string name="preset_save_title">Созранить профиль</string>
+    <string name="preset_save_title">Сохранить профиль</string>
     <string name="preset_rename_title">Переименовать профиль</string>
     <string name="preset_name_hint">Имя профиля</string>
     <string name="preset_empty">Нет сохраненных профилей</string>
     <string name="preset_save_current">Сохранить текущий</string>
-    <string name="preset_clear_all">Очистить все</string>
-    <string name="preset_clear_all_title">Очисть все пресеты</string>
-    <string name="preset_clear_all_confirm">Удалить все %1$d пресетов? Это действие нельзя отменить.</string>
-    <string name="preset_clear_all_progress">Очистка пресетов</string>
-    <string name="preset_cleared">Очищено</string>
-    <string name="preset_update_title">Обновление пресета</string>
+    <string name="preset_clear_all">Удалить все</string>
+    <string name="preset_clear_all_title">Удалить все профили</string>
+    <string name="preset_clear_all_confirm">Удалить все профили (всего %1$d)? Это действие нельзя отменить.</string>
+    <string name="preset_clear_all_progress">Удаление профилей</string>
+    <string name="preset_cleared">Удалено</string>
+    <string name="preset_update_title">Обновление профиля</string>
     <string name="preset_update_confirm">Перезаписать «%1$s» с текущими настройками? Это действие нельзя отменить.</string>
 
     <!-- Driver Status -->
@@ -247,8 +247,8 @@
     <string name="device_no_devices">Нет сохранённых устройств</string>
     <string name="device_rename_title">Переименовать устройство</string>
     <string name="device_rename_hint">Имя устройства</string>
-    <string name="device_update_title">Обновление пресета устройства</string>
-    <string name="device_update_confirm">Перезаписать пресет «%1$s» текущими настройками? Это действие нельзя отменить.</string>
+    <string name="device_update_title">Обновление профиля устройства</string>
+    <string name="device_update_confirm">Перезаписать профиль «%1$s» текущими настройками? Это действие нельзя отменить.</string>
 
     <!-- Actions -->
     <string name="action_save">Сохранить</string>
