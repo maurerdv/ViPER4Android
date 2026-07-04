@@ -132,7 +132,7 @@ fun SettingsDialog(
                     label = stringResource(R.string.settings_driver_arch),
                     value = if (driverStatus.installed) driverStatus.architecture else "-",
                 )
-                if (!aidlModeActive) {
+                if (aidlModeActive) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     Row(
                         modifier =
