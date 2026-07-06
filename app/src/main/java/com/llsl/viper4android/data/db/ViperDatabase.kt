@@ -118,5 +118,21 @@ abstract class ViperDatabase : RoomDatabase() {
                     }
                 }
             }
+
+        val MIGRATION_5_6 =
+            object : Migration(5, 6) {
+                override fun migrate(db: SupportSQLiteDatabase) {
+                    db.execSQL("DROP TABLE IF EXISTS `presets`")
+                    db.execSQL(
+                        "CREATE TABLE IF NOT EXISTS `presets` (" +
+                            "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                            "`name` TEXT NOT NULL, " +
+                            "`settings_json` TEXT NOT NULL, " +
+                            "`created_at` INTEGER NOT NULL, " +
+                            "`updated_at` INTEGER NOT NULL)",
+                    )
+                    db.execSQL("DELETE FROM `device_settings`")
+                }
+            }
     }
 }

@@ -317,11 +317,6 @@ private fun PresetItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(
-                text = stringResource(if (preset.fxType == 1) R.string.tab_headphone else R.string.tab_speaker),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
         Row {
             IconButton(onClick = onRename) {

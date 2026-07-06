@@ -47,6 +47,7 @@ object AppModule {
                     ViperDatabase.MIGRATION_2_3,
                     ViperDatabase.MIGRATION_3_4,
                     ViperDatabase.MIGRATION_4_5,
+                    ViperDatabase.MIGRATION_5_6,
                 ).addCallback(
                     object : RoomDatabase.Callback() {
                         override fun onCreate(sqDb: SupportSQLiteDatabase) {
