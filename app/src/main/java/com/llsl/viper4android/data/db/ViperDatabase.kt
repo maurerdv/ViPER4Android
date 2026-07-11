@@ -15,7 +15,7 @@ import com.llsl.viper4android.data.model.Preset
 
 @Database(
     entities = [Preset::class, EqPreset::class, DsPreset::class, DeviceSettings::class],
-    version = 5,
+    version = 6,
     exportSchema = true,
 )
 abstract class ViperDatabase : RoomDatabase() {
@@ -132,6 +132,27 @@ abstract class ViperDatabase : RoomDatabase() {
                             "`updated_at` INTEGER NOT NULL)",
                     )
                     db.execSQL("DELETE FROM `device_settings`")
+
+                    db.execSQL(
+                        "DELETE FROM eq_presets WHERE name_key IS NOT NULL AND id NOT IN (" +
+                            "SELECT MIN(id) FROM eq_presets WHERE name_key IS NOT NULL " +
+                            "GROUP BY name_key, band_count)",
+                    )
+                    db.execSQL(
+                        "CREATE UNIQUE INDEX IF NOT EXISTS " +
+                            "`index_eq_presets_name_key_band_count` " +
+                            "ON `eq_presets` (`name_key`, `band_count`)",
+                    )
+                    db.execSQL(
+                        "DELETE FROM ds_presets WHERE name_key IS NOT NULL AND id NOT IN (" +
+                            "SELECT MIN(id) FROM ds_presets WHERE name_key IS NOT NULL " +
+                            "GROUP BY name_key)",
+                    )
+                    db.execSQL(
+                        "CREATE UNIQUE INDEX IF NOT EXISTS " +
+                            "`index_ds_presets_name_key` " +
+                            "ON `ds_presets` (`name_key`)",
+                    )
                 }
             }
     }
