@@ -6,1522 +6,1343 @@ import kotlinx.coroutines.flow.first
 import org.json.JSONObject
 
 sealed class EffectPref<T>(
-    val hpPrefKey: String,
-    val spkPrefKey: String,
+    val effectKey: String,
+    val paramId: Int,
     val jsonKey: String,
-    val spkJsonKey: String,
     val defaultValue: T,
-    val getHp: (MainUiState) -> T,
-    val setHp: MainUiState.(T) -> MainUiState,
-    val getSpk: (MainUiState) -> T,
-    val setSpk: MainUiState.(T) -> MainUiState,
-)
+    val get: (MainUiState) -> T,
+    val set: MainUiState.(T) -> MainUiState,
+) {
+    val prefKey: String =
+        if (paramId != -1) {
+            paramId.toString()
+        } else if (effectKey.isEmpty()) {
+            jsonKey
+        } else {
+            "${effectKey}_$jsonKey"
+        }
+
+    abstract fun toRaw(value: T): Int
+}
 
 class IntPref(
-    hpPrefKey: String,
-    spkPrefKey: String,
+    effectKey: String,
+    paramId: Int,
     jsonKey: String,
-    spkJsonKey: String,
     defaultValue: Int,
-    getHp: (MainUiState) -> Int,
-    setHp: MainUiState.(Int) -> MainUiState,
-    getSp: (MainUiState) -> Int,
-    setSp: MainUiState.(Int) -> MainUiState,
-) : EffectPref<Int>(
-        hpPrefKey,
-        spkPrefKey,
-        jsonKey,
-        spkJsonKey,
-        defaultValue,
-        getHp,
-        setHp,
-        getSp,
-        setSp,
-    )
+    get: (MainUiState) -> Int,
+    set: MainUiState.(Int) -> MainUiState,
+) : EffectPref<Int>(effectKey, paramId, jsonKey, defaultValue, get, set) {
+    override fun toRaw(value: Int): Int = value
+}
 
 class BoolPref(
-    hpPrefKey: String,
-    spkPrefKey: String,
+    effectKey: String,
+    paramId: Int,
     jsonKey: String,
-    spkJsonKey: String,
     defaultValue: Boolean,
-    getHp: (MainUiState) -> Boolean,
-    setHp: MainUiState.(Boolean) -> MainUiState,
-    getSp: (MainUiState) -> Boolean,
-    setSp: MainUiState.(Boolean) -> MainUiState,
-) : EffectPref<Boolean>(
-        hpPrefKey,
-        spkPrefKey,
-        jsonKey,
-        spkJsonKey,
-        defaultValue,
-        getHp,
-        setHp,
-        getSp,
-        setSp,
-    )
+    get: (MainUiState) -> Boolean,
+    set: MainUiState.(Boolean) -> MainUiState,
+) : EffectPref<Boolean>(effectKey, paramId, jsonKey, defaultValue, get, set) {
+    override fun toRaw(value: Boolean): Int = if (value) 1 else 0
+}
 
 class StringPref(
-    hpPrefKey: String,
-    spkPrefKey: String,
+    effectKey: String,
+    paramId: Int,
     jsonKey: String,
-    spkJsonKey: String,
     defaultValue: String,
-    getHp: (MainUiState) -> String,
-    setHp: MainUiState.(String) -> MainUiState,
-    getSp: (MainUiState) -> String,
-    setSp: MainUiState.(String) -> MainUiState,
-) : EffectPref<String>(
-        hpPrefKey,
-        spkPrefKey,
-        jsonKey,
-        spkJsonKey,
-        defaultValue,
-        getHp,
-        setHp,
-        getSp,
-        setSp,
-    )
+    get: (MainUiState) -> String,
+    set: MainUiState.(String) -> MainUiState,
+) : EffectPref<String>(effectKey, paramId, jsonKey, defaultValue, get, set) {
+    override fun toRaw(value: String): Int = 0
+}
 
 class NullableLongPref(
-    hpPrefKey: String,
-    spkPrefKey: String,
+    effectKey: String,
     jsonKey: String,
-    spkJsonKey: String,
-    getHp: (MainUiState) -> Long?,
-    setHp: MainUiState.(Long?) -> MainUiState,
-    getSp: (MainUiState) -> Long?,
-    setSp: MainUiState.(Long?) -> MainUiState,
-) : EffectPref<Long?>(hpPrefKey, spkPrefKey, jsonKey, spkJsonKey, null, getHp, setHp, getSp, setSp)
+    get: (MainUiState) -> Long?,
+    set: MainUiState.(Long?) -> MainUiState,
+) : EffectPref<Long?>(effectKey, -1, jsonKey, null, get, set) {
+    override fun toRaw(value: Long?): Int = value?.toInt() ?: -1
+}
+
+class IntListPref(
+    effectKey: String,
+    jsonKey: String,
+    defaultValue: List<Int>,
+    get: (MainUiState) -> List<Int>,
+    set: MainUiState.(List<Int>) -> MainUiState,
+) : EffectPref<List<Int>>(effectKey, -1, jsonKey, defaultValue, get, set) {
+    override fun toRaw(value: List<Int>): Int = 0
+}
+
+class BoolListPref(
+    effectKey: String,
+    jsonKey: String,
+    defaultValue: List<Boolean>,
+    get: (MainUiState) -> List<Boolean>,
+    set: MainUiState.(List<Boolean>) -> MainUiState,
+) : EffectPref<List<Boolean>>(effectKey, -1, jsonKey, defaultValue, get, set) {
+    override fun toRaw(value: List<Boolean>): Int = 0
+}
+
+class DoubleListPref(
+    effectKey: String,
+    paramId: Int,
+    jsonKey: String,
+    defaultValue: List<Double>,
+    get: (MainUiState) -> List<Double>,
+    set: MainUiState.(List<Double>) -> MainUiState,
+) : EffectPref<List<Double>>(effectKey, paramId, jsonKey, defaultValue, get, set) {
+    override fun toRaw(value: List<Double>): Int = 0
+}
+
+abstract class EffectGroupBuilder(
+    val effectKey: String,
+) {
+    private val prefList = mutableListOf<EffectPref<*>>()
+
+    protected fun int(
+        paramId: Int,
+        jsonKey: String,
+        default: Int,
+        get: (MainUiState) -> Int,
+        set: MainUiState.(Int) -> MainUiState,
+    ): IntPref {
+        val pref = IntPref(effectKey, paramId, jsonKey, default, get, set)
+        prefList += pref
+        return pref
+    }
+
+    protected fun bool(
+        paramId: Int,
+        jsonKey: String,
+        default: Boolean,
+        get: (MainUiState) -> Boolean,
+        set: MainUiState.(Boolean) -> MainUiState,
+    ): BoolPref {
+        val pref = BoolPref(effectKey, paramId, jsonKey, default, get, set)
+        prefList += pref
+        return pref
+    }
+
+    protected fun string(
+        paramId: Int,
+        jsonKey: String,
+        default: String,
+        get: (MainUiState) -> String,
+        set: MainUiState.(String) -> MainUiState,
+    ): StringPref {
+        val pref = StringPref(effectKey, paramId, jsonKey, default, get, set)
+        prefList += pref
+        return pref
+    }
+
+    protected fun nullableLong(
+        jsonKey: String,
+        get: (MainUiState) -> Long?,
+        set: MainUiState.(Long?) -> MainUiState,
+    ): NullableLongPref {
+        val pref = NullableLongPref(effectKey, jsonKey, get, set)
+        prefList += pref
+        return pref
+    }
+
+    protected fun intList(
+        jsonKey: String,
+        default: List<Int>,
+        get: (MainUiState) -> List<Int>,
+        set: MainUiState.(List<Int>) -> MainUiState,
+    ): IntListPref {
+        val pref = IntListPref(effectKey, jsonKey, default, get, set)
+        prefList += pref
+        return pref
+    }
+
+    protected fun boolList(
+        jsonKey: String,
+        default: List<Boolean>,
+        get: (MainUiState) -> List<Boolean>,
+        set: MainUiState.(List<Boolean>) -> MainUiState,
+    ): BoolListPref {
+        val pref = BoolListPref(effectKey, jsonKey, default, get, set)
+        prefList += pref
+        return pref
+    }
+
+    protected fun doubleList(
+        paramId: Int,
+        jsonKey: String,
+        default: List<Double>,
+        get: (MainUiState) -> List<Double>,
+        set: MainUiState.(List<Double>) -> MainUiState,
+    ): DoubleListPref {
+        val pref = DoubleListPref(effectKey, paramId, jsonKey, default, get, set)
+        prefList += pref
+        return pref
+    }
+
+    fun toGroup(): EffectGroup = EffectGroup(effectKey, prefList.toList())
+}
+
+data class EffectGroup(
+    val effectKey: String,
+    val prefs: List<EffectPref<*>>,
+)
+
+class MasterLimiterEffect : EffectGroupBuilder("masterLimiter") {
+    val threshold =
+        int(
+            ViperParams.kParamMasterLimiterThreshold,
+            "threshold",
+            100,
+            { it.out.limiter },
+            { copy(out = out.copy(limiter = it)) },
+        )
+    val outputVolume =
+        int(
+            ViperParams.kParamMasterLimiterOutputVolume,
+            "outputVolume",
+            100,
+            { it.out.volume },
+            { copy(out = out.copy(volume = it)) },
+        )
+    val channelPan =
+        int(
+            ViperParams.kParamMasterLimiterChannelPan,
+            "channelPan",
+            0,
+            { it.out.channelPan },
+            { copy(out = out.copy(channelPan = it)) },
+        )
+}
+
+class PlaybackGainControlEffect : EffectGroupBuilder("playbackGainControl") {
+    val enable =
+        bool(
+            ViperParams.kParamPlaybackGainControlEnable,
+            "enable",
+            false,
+            { it.playbackGainControl.enable },
+            { copy(playbackGainControl = playbackGainControl.copy(enable = it)) },
+        )
+    val strength =
+        int(
+            ViperParams.kParamPlaybackGainControlStrength,
+            "strength",
+            100,
+            { it.playbackGainControl.strength },
+            { copy(playbackGainControl = playbackGainControl.copy(strength = it)) },
+        )
+    val maxGain =
+        int(
+            ViperParams.kParamPlaybackGainControlMaxGain,
+            "maxGain",
+            100,
+            { it.playbackGainControl.maxGain },
+            { copy(playbackGainControl = playbackGainControl.copy(maxGain = it)) },
+        )
+    val outputThreshold =
+        int(
+            ViperParams.kParamPlaybackGainControlOutputThreshold,
+            "outputThreshold",
+            100,
+            { it.playbackGainControl.outputThreshold },
+            { copy(playbackGainControl = playbackGainControl.copy(outputThreshold = it)) },
+        )
+}
+
+class LufsEffect : EffectGroupBuilder("lufs") {
+    val enable =
+        bool(
+            ViperParams.kParamLufsEnable,
+            "enable",
+            false,
+            { it.lufs.enable },
+            { copy(lufs = lufs.copy(enable = it)) },
+        )
+    val target =
+        int(
+            ViperParams.kParamLufsTarget,
+            "target",
+            140,
+            { it.lufs.target },
+            { copy(lufs = lufs.copy(target = it)) },
+        )
+    val maxGain =
+        int(
+            ViperParams.kParamLufsMaxGain,
+            "maxGain",
+            60,
+            { it.lufs.maxGain },
+            { copy(lufs = lufs.copy(maxGain = it)) },
+        )
+    val speed =
+        int(
+            ViperParams.kParamLufsSpeed,
+            "speed",
+            1,
+            { it.lufs.speed },
+            { copy(lufs = lufs.copy(speed = it)) },
+        )
+}
+
+class FetCompressorEffect : EffectGroupBuilder("fetCompressor") {
+    val enable =
+        bool(
+            ViperParams.kParamFetCompressorEnable,
+            "enable",
+            false,
+            { it.fetCompressor.enable },
+            { copy(fetCompressor = fetCompressor.copy(enable = it)) },
+        )
+    val threshold =
+        int(
+            ViperParams.kParamFetCompressorThreshold,
+            "threshold",
+            -18,
+            { it.fetCompressor.threshold },
+            { copy(fetCompressor = fetCompressor.copy(threshold = it)) },
+        )
+    val ratio =
+        int(
+            ViperParams.kParamFetCompressorRatio,
+            "ratio",
+            100,
+            { it.fetCompressor.ratio },
+            { copy(fetCompressor = fetCompressor.copy(ratio = it)) },
+        )
+    val kneeAuto =
+        bool(
+            ViperParams.kParamFetCompressorKneeAuto,
+            "kneeAuto",
+            true,
+            { it.fetCompressor.kneeAuto },
+            { copy(fetCompressor = fetCompressor.copy(kneeAuto = it)) },
+        )
+    val knee =
+        int(
+            ViperParams.kParamFetCompressorKnee,
+            "knee",
+            0,
+            { it.fetCompressor.knee },
+            { copy(fetCompressor = fetCompressor.copy(knee = it)) },
+        )
+    val kneeMulti =
+        int(
+            ViperParams.kParamFetCompressorKneeMulti,
+            "kneeMulti",
+            0,
+            { it.fetCompressor.kneeMulti },
+            { copy(fetCompressor = fetCompressor.copy(kneeMulti = it)) },
+        )
+    val gainAuto =
+        bool(
+            ViperParams.kParamFetCompressorGainAuto,
+            "gainAuto",
+            true,
+            { it.fetCompressor.gainAuto },
+            { copy(fetCompressor = fetCompressor.copy(gainAuto = it)) },
+        )
+    val gain =
+        int(
+            ViperParams.kParamFetCompressorGain,
+            "gain",
+            0,
+            { it.fetCompressor.gain },
+            { copy(fetCompressor = fetCompressor.copy(gain = it)) },
+        )
+    val attackAuto =
+        bool(
+            ViperParams.kParamFetCompressorAttackAuto,
+            "attackAuto",
+            true,
+            { it.fetCompressor.attackAuto },
+            { copy(fetCompressor = fetCompressor.copy(attackAuto = it)) },
+        )
+    val attack =
+        int(
+            ViperParams.kParamFetCompressorAttack,
+            "attack",
+            20,
+            { it.fetCompressor.attack },
+            { copy(fetCompressor = fetCompressor.copy(attack = it)) },
+        )
+    val maxAttack =
+        int(
+            ViperParams.kParamFetCompressorMaxAttack,
+            "maxAttack",
+            80,
+            { it.fetCompressor.maxAttack },
+            { copy(fetCompressor = fetCompressor.copy(maxAttack = it)) },
+        )
+    val releaseAuto =
+        bool(
+            ViperParams.kParamFetCompressorReleaseAuto,
+            "releaseAuto",
+            true,
+            { it.fetCompressor.releaseAuto },
+            { copy(fetCompressor = fetCompressor.copy(releaseAuto = it)) },
+        )
+    val release =
+        int(
+            ViperParams.kParamFetCompressorRelease,
+            "release",
+            50,
+            { it.fetCompressor.release },
+            { copy(fetCompressor = fetCompressor.copy(release = it)) },
+        )
+    val maxRelease =
+        int(
+            ViperParams.kParamFetCompressorMaxRelease,
+            "maxRelease",
+            100,
+            { it.fetCompressor.maxRelease },
+            { copy(fetCompressor = fetCompressor.copy(maxRelease = it)) },
+        )
+    val crest =
+        int(
+            ViperParams.kParamFetCompressorCrest,
+            "crest",
+            100,
+            { it.fetCompressor.crest },
+            { copy(fetCompressor = fetCompressor.copy(crest = it)) },
+        )
+    val adapt =
+        int(
+            ViperParams.kParamFetCompressorAdapt,
+            "adapt",
+            50,
+            { it.fetCompressor.adapt },
+            { copy(fetCompressor = fetCompressor.copy(adapt = it)) },
+        )
+    val noClip =
+        bool(
+            ViperParams.kParamFetCompressorNoClip,
+            "noClip",
+            true,
+            { it.fetCompressor.noClip },
+            { copy(fetCompressor = fetCompressor.copy(noClip = it)) },
+        )
+}
+
+class MultibandCompressorEffect : EffectGroupBuilder("multibandCompressor") {
+    val enable =
+        bool(
+            ViperParams.kParamMultibandCompressorEnable,
+            "enable",
+            false,
+            { it.multibandCompressor.enable },
+            { copy(multibandCompressor = multibandCompressor.copy(enable = it)) },
+        )
+    val bandEnables =
+        boolList(
+            "bandEnables",
+            listOf(true, true, true, true, true),
+            { it.multibandCompressor.bandEnables },
+            { copy(multibandCompressor = multibandCompressor.copy(bandEnables = it)) },
+        )
+    val crossovers =
+        intList(
+            "crossovers",
+            listOf(120, 500, 4000, 8000),
+            { it.multibandCompressor.crossovers },
+            { copy(multibandCompressor = multibandCompressor.copy(crossovers = it)) },
+        )
+    val thresholds =
+        intList(
+            "thresholds",
+            listOf(-18, -18, -18, -18, -18),
+            { it.multibandCompressor.thresholds },
+            { copy(multibandCompressor = multibandCompressor.copy(thresholds = it)) },
+        )
+    val ratios =
+        intList(
+            "ratios",
+            listOf(50, 50, 50, 50, 50),
+            { it.multibandCompressor.ratios },
+            { copy(multibandCompressor = multibandCompressor.copy(ratios = it)) },
+        )
+    val gains =
+        intList(
+            "gains",
+            listOf(0, 0, 0, 0, 0),
+            { it.multibandCompressor.gains },
+            { copy(multibandCompressor = multibandCompressor.copy(gains = it)) },
+        )
+    val knees =
+        intList(
+            "knees",
+            listOf(0, 0, 0, 0, 0),
+            { it.multibandCompressor.knees },
+            { copy(multibandCompressor = multibandCompressor.copy(knees = it)) },
+        )
+    val kneeMultis =
+        intList(
+            "kneeMultis",
+            listOf(0, 0, 0, 0, 0),
+            { it.multibandCompressor.kneeMultis },
+            { copy(multibandCompressor = multibandCompressor.copy(kneeMultis = it)) },
+        )
+    val attacks =
+        intList(
+            "attacks",
+            listOf(1, 1, 1, 1, 1),
+            { it.multibandCompressor.attacks },
+            { copy(multibandCompressor = multibandCompressor.copy(attacks = it)) },
+        )
+    val maxAttacks =
+        intList(
+            "maxAttacks",
+            listOf(44, 44, 44, 44, 44),
+            { it.multibandCompressor.maxAttacks },
+            { copy(multibandCompressor = multibandCompressor.copy(maxAttacks = it)) },
+        )
+    val releases =
+        intList(
+            "releases",
+            listOf(100, 100, 100, 100, 100),
+            { it.multibandCompressor.releases },
+            { copy(multibandCompressor = multibandCompressor.copy(releases = it)) },
+        )
+    val maxReleases =
+        intList(
+            "maxReleases",
+            listOf(200, 200, 200, 200, 200),
+            { it.multibandCompressor.maxReleases },
+            { copy(multibandCompressor = multibandCompressor.copy(maxReleases = it)) },
+        )
+    val crests =
+        intList(
+            "crests",
+            listOf(100, 100, 100, 100, 100),
+            { it.multibandCompressor.crests },
+            { copy(multibandCompressor = multibandCompressor.copy(crests = it)) },
+        )
+    val adapts =
+        intList(
+            "adapts",
+            listOf(50, 50, 50, 50, 50),
+            { it.multibandCompressor.adapts },
+            { copy(multibandCompressor = multibandCompressor.copy(adapts = it)) },
+        )
+    val kneeAutos =
+        boolList(
+            "kneeAutos",
+            listOf(true, true, true, true, true),
+            { it.multibandCompressor.kneeAutos },
+            { copy(multibandCompressor = multibandCompressor.copy(kneeAutos = it)) },
+        )
+    val gainAutos =
+        boolList(
+            "gainAutos",
+            listOf(true, true, true, true, true),
+            { it.multibandCompressor.gainAutos },
+            { copy(multibandCompressor = multibandCompressor.copy(gainAutos = it)) },
+        )
+    val attackAutos =
+        boolList(
+            "attackAutos",
+            listOf(true, true, true, true, true),
+            { it.multibandCompressor.attackAutos },
+            { copy(multibandCompressor = multibandCompressor.copy(attackAutos = it)) },
+        )
+    val releaseAutos =
+        boolList(
+            "releaseAutos",
+            listOf(true, true, true, true, true),
+            { it.multibandCompressor.releaseAutos },
+            { copy(multibandCompressor = multibandCompressor.copy(releaseAutos = it)) },
+        )
+    val noClips =
+        boolList(
+            "noClips",
+            listOf(true, true, true, true, true),
+            { it.multibandCompressor.noClips },
+            { copy(multibandCompressor = multibandCompressor.copy(noClips = it)) },
+        )
+}
+
+class DdcEffect : EffectGroupBuilder("ddc") {
+    val enable =
+        bool(
+            ViperParams.kParamDdcEnable,
+            "enable",
+            false,
+            { it.ddc.enable },
+            { copy(ddc = ddc.copy(enable = it)) },
+        )
+    val device =
+        string(
+            -1,
+            "device",
+            "",
+            { it.ddc.device },
+            { copy(ddc = ddc.copy(device = it)) },
+        )
+}
+
+class SpectrumExtensionEffect : EffectGroupBuilder("spectrumExtension") {
+    val enable =
+        bool(
+            ViperParams.kParamSpectrumExtensionEnable,
+            "enable",
+            false,
+            { it.spectrumExtension.enable },
+            { copy(spectrumExtension = spectrumExtension.copy(enable = it)) },
+        )
+    val strength =
+        int(
+            ViperParams.kParamSpectrumExtensionStrength,
+            "strength",
+            7600,
+            { it.spectrumExtension.strength },
+            { copy(spectrumExtension = spectrumExtension.copy(strength = it)) },
+        )
+    val exciter =
+        int(
+            ViperParams.kParamSpectrumExtensionExciter,
+            "exciter",
+            0,
+            { it.spectrumExtension.exciter },
+            { copy(spectrumExtension = spectrumExtension.copy(exciter = it)) },
+        )
+}
+
+class EqualizerEffect : EffectGroupBuilder("equalizer") {
+    val enable =
+        bool(
+            ViperParams.kParamEqualizerEnable,
+            "enable",
+            false,
+            { it.eq.enable },
+            { copy(eq = eq.copy(enable = it)) },
+        )
+    val bandCount =
+        int(
+            ViperParams.kParamEqualizerBandCount,
+            "bandCount",
+            10,
+            { it.eq.bandCount },
+            { copy(eq = eq.copy(bandCount = it)) },
+        )
+    val bands =
+        doubleList(
+            ViperParams.kParamEqualizerBandLevel,
+            "bands",
+            List(10) { 0.0 },
+            { it.eq.bands },
+            { copy(eq = eq.copy(bands = it)) },
+        )
+    val presetId =
+        nullableLong(
+            "presetId",
+            { it.eq.presetId },
+            { copy(eq = eq.copy(presetId = it)) },
+        )
+}
+
+class DynamicEqEffect : EffectGroupBuilder("dynamicEq") {
+    val enable =
+        bool(
+            ViperParams.kParamDynamicEqEnable,
+            "enable",
+            false,
+            { it.dynamicEq.enable },
+            { copy(dynamicEq = dynamicEq.copy(enable = it)) },
+        )
+    val bandCount =
+        int(
+            -1,
+            "bandCount",
+            3,
+            { it.dynamicEq.bandCount },
+            { copy(dynamicEq = dynamicEq.copy(bandCount = it)) },
+        )
+    val freqs =
+        intList(
+            "freqs",
+            listOf(60, 150, 400, 1000, 2500, 5000, 8000, 12000),
+            { it.dynamicEq.freqs },
+            { copy(dynamicEq = dynamicEq.copy(freqs = it)) },
+        )
+    val qs =
+        intList(
+            "qs",
+            listOf(100, 100, 150, 150, 150, 200, 200, 200),
+            { it.dynamicEq.qs },
+            { copy(dynamicEq = dynamicEq.copy(qs = it)) },
+        )
+    val gains =
+        intList(
+            "gains",
+            listOf(0, 0, 0, 0, 0, 0, 0, 0),
+            { it.dynamicEq.gains },
+            { copy(dynamicEq = dynamicEq.copy(gains = it)) },
+        )
+    val thresholds =
+        intList(
+            "thresholds",
+            listOf(-300, -300, -250, -250, -200, -200, -200, -200),
+            { it.dynamicEq.thresholds },
+            { copy(dynamicEq = dynamicEq.copy(thresholds = it)) },
+        )
+    val attacks =
+        intList(
+            "attacks",
+            listOf(10, 10, 10, 10, 10, 10, 10, 10),
+            { it.dynamicEq.attacks },
+            { copy(dynamicEq = dynamicEq.copy(attacks = it)) },
+        )
+    val releases =
+        intList(
+            "releases",
+            listOf(100, 100, 100, 100, 100, 100, 100, 100),
+            { it.dynamicEq.releases },
+            { copy(dynamicEq = dynamicEq.copy(releases = it)) },
+        )
+    val filterTypes =
+        intList(
+            "filterTypes",
+            listOf(0, 0, 0, 0, 0, 0, 0, 0),
+            { it.dynamicEq.filterTypes },
+            { copy(dynamicEq = dynamicEq.copy(filterTypes = it)) },
+        )
+}
+
+class ConvolverEffect : EffectGroupBuilder("convolver") {
+    val enable =
+        bool(
+            ViperParams.kParamConvolverEnable,
+            "enable",
+            false,
+            { it.convolver.enable },
+            { copy(convolver = convolver.copy(enable = it)) },
+        )
+    val kernelFile =
+        string(
+            -1,
+            "kernelFile",
+            "",
+            { it.convolver.kernelFile },
+            { copy(convolver = convolver.copy(kernelFile = it)) },
+        )
+    val crossChannel =
+        int(
+            ViperParams.kParamConvolverCrossChannel,
+            "crossChannel",
+            0,
+            { it.convolver.crossChannel },
+            { copy(convolver = convolver.copy(crossChannel = it)) },
+        )
+}
+
+class FieldSurroundEffect : EffectGroupBuilder("fieldSurround") {
+    val enable =
+        bool(
+            ViperParams.kParamFieldSurroundEnable,
+            "enable",
+            false,
+            { it.fieldSurround.enable },
+            { copy(fieldSurround = fieldSurround.copy(enable = it)) },
+        )
+    val widening =
+        int(
+            ViperParams.kParamFieldSurroundWidening,
+            "widening",
+            0,
+            { it.fieldSurround.widening },
+            { copy(fieldSurround = fieldSurround.copy(widening = it)) },
+        )
+    val midImage =
+        int(
+            ViperParams.kParamFieldSurroundMidImage,
+            "midImage",
+            5,
+            { it.fieldSurround.midImage },
+            { copy(fieldSurround = fieldSurround.copy(midImage = it)) },
+        )
+    val depth =
+        int(
+            ViperParams.kParamFieldSurroundDepth,
+            "depth",
+            0,
+            { it.fieldSurround.depth },
+            { copy(fieldSurround = fieldSurround.copy(depth = it)) },
+        )
+}
+
+class DiffSurroundEffect : EffectGroupBuilder("diffSurround") {
+    val enable =
+        bool(
+            ViperParams.kParamDiffSurroundEnable,
+            "enable",
+            false,
+            { it.diffSurround.enable },
+            { copy(diffSurround = diffSurround.copy(enable = it)) },
+        )
+    val delay =
+        int(
+            ViperParams.kParamDiffSurroundDelay,
+            "delay",
+            5,
+            { it.diffSurround.delay },
+            { copy(diffSurround = diffSurround.copy(delay = it)) },
+        )
+    val reverse =
+        bool(
+            ViperParams.kParamDiffSurroundReverse,
+            "reverse",
+            false,
+            { it.diffSurround.reverse },
+            { copy(diffSurround = diffSurround.copy(reverse = it)) },
+        )
+    val wetDryMix =
+        int(
+            ViperParams.kParamDiffSurroundWetDryMix,
+            "wetDryMix",
+            100,
+            { it.diffSurround.wetDryMix },
+            { copy(diffSurround = diffSurround.copy(wetDryMix = it)) },
+        )
+    val lpCutoff =
+        int(
+            ViperParams.kParamDiffSurroundLpCutoff,
+            "lpCutoff",
+            0,
+            { it.diffSurround.lpCutoff },
+            { copy(diffSurround = diffSurround.copy(lpCutoff = it)) },
+        )
+}
+
+class StereoImagerEffect : EffectGroupBuilder("stereoImager") {
+    val enable =
+        bool(
+            ViperParams.kParamStereoImagerEnable,
+            "enable",
+            false,
+            { it.stereoImager.enable },
+            { copy(stereoImager = stereoImager.copy(enable = it)) },
+        )
+    val lowWidth =
+        int(
+            ViperParams.kParamStereoImagerLowWidth,
+            "lowWidth",
+            100,
+            { it.stereoImager.lowWidth },
+            { copy(stereoImager = stereoImager.copy(lowWidth = it)) },
+        )
+    val midWidth =
+        int(
+            ViperParams.kParamStereoImagerMidWidth,
+            "midWidth",
+            100,
+            { it.stereoImager.midWidth },
+            { copy(stereoImager = stereoImager.copy(midWidth = it)) },
+        )
+    val highWidth =
+        int(
+            ViperParams.kParamStereoImagerHighWidth,
+            "highWidth",
+            100,
+            { it.stereoImager.highWidth },
+            { copy(stereoImager = stereoImager.copy(highWidth = it)) },
+        )
+    val lowCrossover =
+        int(
+            ViperParams.kParamStereoImagerLowCrossover,
+            "lowCrossover",
+            200,
+            { it.stereoImager.lowCrossover },
+            { copy(stereoImager = stereoImager.copy(lowCrossover = it)) },
+        )
+    val highCrossover =
+        int(
+            ViperParams.kParamStereoImagerHighCrossover,
+            "highCrossover",
+            4000,
+            { it.stereoImager.highCrossover },
+            { copy(stereoImager = stereoImager.copy(highCrossover = it)) },
+        )
+}
+
+class HeadphoneSurroundEffect : EffectGroupBuilder("headphoneSurround") {
+    val enable =
+        bool(
+            ViperParams.kParamHeadphoneSurroundEnable,
+            "enable",
+            false,
+            { it.headphoneSurround.enable },
+            { copy(headphoneSurround = headphoneSurround.copy(enable = it)) },
+        )
+    val quality =
+        int(
+            ViperParams.kParamHeadphoneSurroundQuality,
+            "quality",
+            0,
+            { it.headphoneSurround.quality },
+            { copy(headphoneSurround = headphoneSurround.copy(quality = it)) },
+        )
+}
+
+class ReverbEffect : EffectGroupBuilder("reverb") {
+    val enable =
+        bool(
+            ViperParams.kParamReverbEnable,
+            "enable",
+            false,
+            { it.reverb.enable },
+            { copy(reverb = reverb.copy(enable = it)) },
+        )
+    val roomSize =
+        int(
+            ViperParams.kParamReverbRoomSize,
+            "roomSize",
+            0,
+            { it.reverb.roomSize },
+            { copy(reverb = reverb.copy(roomSize = it)) },
+        )
+    val width =
+        int(
+            ViperParams.kParamReverbWidth,
+            "width",
+            0,
+            { it.reverb.width },
+            { copy(reverb = reverb.copy(width = it)) },
+        )
+    val damp =
+        int(
+            ViperParams.kParamReverbDamp,
+            "damp",
+            0,
+            { it.reverb.damp },
+            { copy(reverb = reverb.copy(damp = it)) },
+        )
+    val wet =
+        int(
+            ViperParams.kParamReverbWet,
+            "wet",
+            0,
+            { it.reverb.wet },
+            { copy(reverb = reverb.copy(wet = it)) },
+        )
+    val dry =
+        int(
+            ViperParams.kParamReverbDry,
+            "dry",
+            100,
+            { it.reverb.dry },
+            { copy(reverb = reverb.copy(dry = it)) },
+        )
+}
+
+class DynamicSystemEffect : EffectGroupBuilder("dynamicSystem") {
+    val enable =
+        bool(
+            ViperParams.kParamDynamicSystemEnable,
+            "enable",
+            false,
+            { it.dynamicSystem.enable },
+            { copy(dynamicSystem = dynamicSystem.copy(enable = it)) },
+        )
+    val presetId =
+        nullableLong(
+            "presetId",
+            { it.dynamicSystem.presetId },
+            { copy(dynamicSystem = dynamicSystem.copy(presetId = it)) },
+        )
+    val device =
+        int(
+            -1,
+            "device",
+            0,
+            { it.dynamicSystem.device },
+            { copy(dynamicSystem = dynamicSystem.copy(device = it)) },
+        )
+    val strength =
+        int(
+            -1,
+            "strength",
+            50,
+            { it.dynamicSystem.strength },
+            { copy(dynamicSystem = dynamicSystem.copy(strength = it)) },
+        )
+    val xLow =
+        int(
+            -1,
+            "xLow",
+            100,
+            { it.dynamicSystem.xLow },
+            { copy(dynamicSystem = dynamicSystem.copy(xLow = it)) },
+        )
+    val xHigh =
+        int(
+            -1,
+            "xHigh",
+            5600,
+            { it.dynamicSystem.xHigh },
+            { copy(dynamicSystem = dynamicSystem.copy(xHigh = it)) },
+        )
+    val yLow =
+        int(
+            -1,
+            "yLow",
+            40,
+            { it.dynamicSystem.yLow },
+            { copy(dynamicSystem = dynamicSystem.copy(yLow = it)) },
+        )
+    val yHigh =
+        int(
+            -1,
+            "yHigh",
+            80,
+            { it.dynamicSystem.yHigh },
+            { copy(dynamicSystem = dynamicSystem.copy(yHigh = it)) },
+        )
+    val sideGainLow =
+        int(
+            -1,
+            "sideGainLow",
+            50,
+            { it.dynamicSystem.sideGainLow },
+            { copy(dynamicSystem = dynamicSystem.copy(sideGainLow = it)) },
+        )
+    val sideGainHigh =
+        int(
+            -1,
+            "sideGainHigh",
+            50,
+            { it.dynamicSystem.sideGainHigh },
+            { copy(dynamicSystem = dynamicSystem.copy(sideGainHigh = it)) },
+        )
+}
+
+class PsychoacousticBassEffect : EffectGroupBuilder("psychoacousticBass") {
+    val enable =
+        bool(
+            ViperParams.kParamPsychoacousticBassEnable,
+            "enable",
+            false,
+            { it.psychoacousticBass.enable },
+            { copy(psychoacousticBass = psychoacousticBass.copy(enable = it)) },
+        )
+    val cutoff =
+        int(
+            ViperParams.kParamPsychoacousticBassCutoff,
+            "cutoff",
+            80,
+            { it.psychoacousticBass.cutoff },
+            { copy(psychoacousticBass = psychoacousticBass.copy(cutoff = it)) },
+        )
+    val intensity =
+        int(
+            ViperParams.kParamPsychoacousticBassIntensity,
+            "intensity",
+            50,
+            { it.psychoacousticBass.intensity },
+            { copy(psychoacousticBass = psychoacousticBass.copy(intensity = it)) },
+        )
+    val harmonicOrder =
+        int(
+            ViperParams.kParamPsychoacousticBassHarmonicOrder,
+            "harmonicOrder",
+            3,
+            { it.psychoacousticBass.harmonicOrder },
+            { copy(psychoacousticBass = psychoacousticBass.copy(harmonicOrder = it)) },
+        )
+    val originalLevel =
+        int(
+            ViperParams.kParamPsychoacousticBassOriginalLevel,
+            "originalLevel",
+            100,
+            { it.psychoacousticBass.originalLevel },
+            { copy(psychoacousticBass = psychoacousticBass.copy(originalLevel = it)) },
+        )
+}
+
+class BassEffect : EffectGroupBuilder("bass") {
+    val enable =
+        bool(
+            ViperParams.kParamBassEnable,
+            "enable",
+            false,
+            { it.bass.enable },
+            { copy(bass = bass.copy(enable = it)) },
+        )
+    val mode =
+        int(
+            ViperParams.kParamBassMode,
+            "mode",
+            0,
+            { it.bass.mode },
+            { copy(bass = bass.copy(mode = it)) },
+        )
+    val frequency =
+        int(
+            ViperParams.kParamBassFrequency,
+            "frequency",
+            55,
+            { it.bass.frequency },
+            { copy(bass = bass.copy(frequency = it)) },
+        )
+    val gain =
+        int(
+            ViperParams.kParamBassGain,
+            "gain",
+            50,
+            { it.bass.gain },
+            { copy(bass = bass.copy(gain = it)) },
+        )
+    val antiPop =
+        bool(
+            ViperParams.kParamBassAntiPop,
+            "antiPop",
+            false,
+            { it.bass.antiPop },
+            { copy(bass = bass.copy(antiPop = it)) },
+        )
+}
+
+class BassMonoEffect : EffectGroupBuilder("bassMono") {
+    val enable =
+        bool(
+            ViperParams.kParamBassMonoEnable,
+            "enable",
+            false,
+            { it.bassMono.enable },
+            { copy(bassMono = bassMono.copy(enable = it)) },
+        )
+    val mode =
+        int(
+            ViperParams.kParamBassMonoMode,
+            "mode",
+            0,
+            { it.bassMono.mode },
+            { copy(bassMono = bassMono.copy(mode = it)) },
+        )
+    val frequency =
+        int(
+            ViperParams.kParamBassMonoFrequency,
+            "frequency",
+            55,
+            { it.bassMono.frequency },
+            { copy(bassMono = bassMono.copy(frequency = it)) },
+        )
+    val gain =
+        int(
+            ViperParams.kParamBassMonoGain,
+            "gain",
+            50,
+            { it.bassMono.gain },
+            { copy(bassMono = bassMono.copy(gain = it)) },
+        )
+    val antiPop =
+        bool(
+            ViperParams.kParamBassMonoAntiPop,
+            "antiPop",
+            false,
+            { it.bassMono.antiPop },
+            { copy(bassMono = bassMono.copy(antiPop = it)) },
+        )
+}
+
+class ClarityEffect : EffectGroupBuilder("clarity") {
+    val enable =
+        bool(
+            ViperParams.kParamClarityEnable,
+            "enable",
+            false,
+            { it.clarity.enable },
+            { copy(clarity = clarity.copy(enable = it)) },
+        )
+    val mode =
+        int(
+            ViperParams.kParamClarityMode,
+            "mode",
+            0,
+            { it.clarity.mode },
+            { copy(clarity = clarity.copy(mode = it)) },
+        )
+    val gain =
+        int(
+            ViperParams.kParamClarityGain,
+            "gain",
+            50,
+            { it.clarity.gain },
+            { copy(clarity = clarity.copy(gain = it)) },
+        )
+}
+
+class CureEffect : EffectGroupBuilder("cure") {
+    val enable =
+        bool(
+            ViperParams.kParamCureEnable,
+            "enable",
+            false,
+            { it.cure.enable },
+            { copy(cure = cure.copy(enable = it)) },
+        )
+    val crossfeedPreset =
+        int(
+            ViperParams.kParamCureCrossfeedPreset,
+            "crossfeedPreset",
+            0,
+            { it.cure.crossfeedPreset },
+            { copy(cure = cure.copy(crossfeedPreset = it)) },
+        )
+}
+
+class TubeSimulatorEffect : EffectGroupBuilder("tubeSimulator") {
+    val enable =
+        bool(
+            ViperParams.kParamTubeSimulatorEnable,
+            "enable",
+            false,
+            { it.tubeSimulator.enable },
+            { copy(tubeSimulator = tubeSimulator.copy(enable = it)) },
+        )
+}
+
+class AnalogXEffect : EffectGroupBuilder("analogX") {
+    val enable =
+        bool(
+            ViperParams.kParamAnalogXEnable,
+            "enable",
+            false,
+            { it.analogX.enable },
+            { copy(analogX = analogX.copy(enable = it)) },
+        )
+    val mode =
+        int(
+            ViperParams.kParamAnalogXMode,
+            "mode",
+            0,
+            { it.analogX.mode },
+            { copy(analogX = analogX.copy(mode = it)) },
+        )
+}
+
+class SpeakerCorrectionEffect : EffectGroupBuilder("speakerCorrection") {
+    val enable =
+        bool(
+            ViperParams.kParamSpeakerCorrectionEnable,
+            "enable",
+            false,
+            { it.speakerCorrection.enable },
+            { copy(speakerCorrection = speakerCorrection.copy(enable = it)) },
+        )
+}
+
+object Effects {
+    val masterEnable: BoolPref =
+        BoolPref(
+            effectKey = "",
+            paramId = -1,
+            jsonKey = "masterEnable",
+            defaultValue = false,
+            get = { it.masterEnable },
+            set = { copy(masterEnable = it) },
+        )
+
+    val masterLimiter = MasterLimiterEffect()
+    val playbackGainControl = PlaybackGainControlEffect()
+    val lufs = LufsEffect()
+    val fetCompressor = FetCompressorEffect()
+    val multibandCompressor = MultibandCompressorEffect()
+    val ddc = DdcEffect()
+    val spectrumExtension = SpectrumExtensionEffect()
+    val equalizer = EqualizerEffect()
+    val dynamicEq = DynamicEqEffect()
+    val convolver = ConvolverEffect()
+    val fieldSurround = FieldSurroundEffect()
+    val diffSurround = DiffSurroundEffect()
+    val stereoImager = StereoImagerEffect()
+    val headphoneSurround = HeadphoneSurroundEffect()
+    val reverb = ReverbEffect()
+    val dynamicSystem = DynamicSystemEffect()
+    val psychoacousticBass = PsychoacousticBassEffect()
+    val bass = BassEffect()
+    val bassMono = BassMonoEffect()
+    val clarity = ClarityEffect()
+    val cure = CureEffect()
+    val tubeSimulator = TubeSimulatorEffect()
+    val analogX = AnalogXEffect()
+    val speakerCorrection = SpeakerCorrectionEffect()
+}
+
+val EFFECT_GROUPS: List<EffectGroup> =
+    listOf(
+        Effects.masterLimiter,
+        Effects.playbackGainControl,
+        Effects.lufs,
+        Effects.fetCompressor,
+        Effects.multibandCompressor,
+        Effects.ddc,
+        Effects.spectrumExtension,
+        Effects.equalizer,
+        Effects.dynamicEq,
+        Effects.convolver,
+        Effects.fieldSurround,
+        Effects.diffSurround,
+        Effects.stereoImager,
+        Effects.headphoneSurround,
+        Effects.reverb,
+        Effects.dynamicSystem,
+        Effects.psychoacousticBass,
+        Effects.bass,
+        Effects.bassMono,
+        Effects.clarity,
+        Effects.cure,
+        Effects.tubeSimulator,
+        Effects.analogX,
+        Effects.speakerCorrection,
+    ).map { it.toGroup() }
 
 val EFFECT_PREFS: List<EffectPref<*>> =
-    listOf(
-        BoolPref(
-            hpPrefKey = ViperRepository.PREF_MASTER_ENABLE,
-            spkPrefKey = "spk_${ViperRepository.PREF_MASTER_ENABLE}",
-            jsonKey = "masterEnabled",
-            spkJsonKey = "spkMasterEnabled",
-            defaultValue = false,
-            getHp = { it.masterEnabled },
-            setHp = { copy(masterEnabled = it) },
-            getSp = { it.spkMasterEnabled },
-            setSp = { copy(spkMasterEnabled = it) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_OUTPUT_VOLUME}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_OUTPUT_VOLUME}",
-            jsonKey = "outputVolume",
-            spkJsonKey = "spkOutputVolume",
-            defaultValue = 100,
-            getHp = { it.out.hp.volume },
-            setHp = { copy(out = out.copy(hp = out.hp.copy(volume = it))) },
-            getSp = { it.out.spk.volume },
-            setSp = { copy(out = out.copy(spk = out.spk.copy(volume = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_CHANNEL_PAN}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_CHANNEL_PAN}",
-            jsonKey = "channelPan",
-            spkJsonKey = "spkChannelPan",
-            defaultValue = 0,
-            getHp = { it.out.hp.channelPan },
-            setHp = { copy(out = out.copy(hp = out.hp.copy(channelPan = it))) },
-            getSp = { it.out.spk.channelPan },
-            setSp = { copy(out = out.copy(spk = out.spk.copy(channelPan = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_LIMITER}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_LIMITER}",
-            jsonKey = "limiter",
-            spkJsonKey = "spkLimiter",
-            defaultValue = 100,
-            getHp = { it.out.hp.limiter },
-            setHp = { copy(out = out.copy(hp = out.hp.copy(limiter = it))) },
-            getSp = { it.out.spk.limiter },
-            setSp = { copy(out = out.copy(spk = out.spk.copy(limiter = it))) },
-        ),
-        // AGC
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_AGC_ENABLE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_AGC_ENABLE}",
-            jsonKey = "agcEnabled",
-            spkJsonKey = "spkAgcEnabled",
-            defaultValue = false,
-            getHp = { it.agc.hp.enabled },
-            setHp = { copy(agc = agc.copy(hp = agc.hp.copy(enabled = it))) },
-            getSp = { it.agc.spk.enabled },
-            setSp = { copy(agc = agc.copy(spk = agc.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_AGC_RATIO}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_AGC_RATIO}",
-            jsonKey = "agcStrength",
-            spkJsonKey = "spkAgcStrength",
-            defaultValue = 100,
-            getHp = { it.agc.hp.strength },
-            setHp = { copy(agc = agc.copy(hp = agc.hp.copy(strength = it))) },
-            getSp = { it.agc.spk.strength },
-            setSp = { copy(agc = agc.copy(spk = agc.spk.copy(strength = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_AGC_MAX_SCALER}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_AGC_MAX_SCALER}",
-            jsonKey = "agcMaxGain",
-            spkJsonKey = "spkAgcMaxGain",
-            defaultValue = 100,
-            getHp = { it.agc.hp.maxGain },
-            setHp = { copy(agc = agc.copy(hp = agc.hp.copy(maxGain = it))) },
-            getSp = { it.agc.spk.maxGain },
-            setSp = { copy(agc = agc.copy(spk = agc.spk.copy(maxGain = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_AGC_VOLUME}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_AGC_VOLUME}",
-            jsonKey = "agcOutputThreshold",
-            spkJsonKey = "spkAgcOutputThreshold",
-            defaultValue = 100,
-            getHp = { it.agc.hp.outputThreshold },
-            setHp = { copy(agc = agc.copy(hp = agc.hp.copy(outputThreshold = it))) },
-            getSp = { it.agc.spk.outputThreshold },
-            setSp = { copy(agc = agc.copy(spk = agc.spk.copy(outputThreshold = it))) },
-        ),
-        // LUFS
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_LUFS_ENABLE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_LUFS_ENABLE}",
-            jsonKey = "lufsEnabled",
-            spkJsonKey = "spkLufsEnabled",
-            defaultValue = false,
-            getHp = { it.lufs.hp.enabled },
-            setHp = { copy(lufs = lufs.copy(hp = lufs.hp.copy(enabled = it))) },
-            getSp = { it.lufs.spk.enabled },
-            setSp = { copy(lufs = lufs.copy(spk = lufs.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_LUFS_TARGET}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_LUFS_TARGET}",
-            jsonKey = "lufsTarget",
-            spkJsonKey = "spkLufsTarget",
-            defaultValue = 140,
-            getHp = { it.lufs.hp.target },
-            setHp = { copy(lufs = lufs.copy(hp = lufs.hp.copy(target = it))) },
-            getSp = { it.lufs.spk.target },
-            setSp = { copy(lufs = lufs.copy(spk = lufs.spk.copy(target = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_LUFS_MAX_GAIN}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_LUFS_MAX_GAIN}",
-            jsonKey = "lufsMaxGain",
-            spkJsonKey = "spkLufsMaxGain",
-            defaultValue = 60,
-            getHp = { it.lufs.hp.maxGain },
-            setHp = { copy(lufs = lufs.copy(hp = lufs.hp.copy(maxGain = it))) },
-            getSp = { it.lufs.spk.maxGain },
-            setSp = { copy(lufs = lufs.copy(spk = lufs.spk.copy(maxGain = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_LUFS_SPEED}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_LUFS_SPEED}",
-            jsonKey = "lufsSpeed",
-            spkJsonKey = "spkLufsSpeed",
-            defaultValue = 1,
-            getHp = { it.lufs.hp.speed },
-            setHp = { copy(lufs = lufs.copy(hp = lufs.hp.copy(speed = it))) },
-            getSp = { it.lufs.spk.speed },
-            setSp = { copy(lufs = lufs.copy(spk = lufs.spk.copy(speed = it))) },
-        ),
-        // FET Compressor
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_ENABLE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_ENABLE}",
-            jsonKey = "fetEnabled",
-            spkJsonKey = "spkFetEnabled",
-            defaultValue = false,
-            getHp = { it.fet.hp.enabled },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(enabled = it))) },
-            getSp = { it.fet.spk.enabled },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_THRESHOLD}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_THRESHOLD}",
-            jsonKey = "fetThreshold",
-            spkJsonKey = "spkFetThreshold",
-            defaultValue = 100,
-            getHp = { it.fet.hp.threshold },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(threshold = it))) },
-            getSp = { it.fet.spk.threshold },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(threshold = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_RATIO}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_RATIO}",
-            jsonKey = "fetRatio",
-            spkJsonKey = "spkFetRatio",
-            defaultValue = 100,
-            getHp = { it.fet.hp.ratio },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(ratio = it))) },
-            getSp = { it.fet.spk.ratio },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(ratio = it))) },
-        ),
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_KNEE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_KNEE}",
-            jsonKey = "fetAutoKnee",
-            spkJsonKey = "spkFetAutoKnee",
-            defaultValue = true,
-            getHp = { it.fet.hp.autoKnee },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(autoKnee = it))) },
-            getSp = { it.fet.spk.autoKnee },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(autoKnee = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE}",
-            jsonKey = "fetKnee",
-            spkJsonKey = "spkFetKnee",
-            defaultValue = 0,
-            getHp = { it.fet.hp.knee },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(knee = it))) },
-            getSp = { it.fet.spk.knee },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(knee = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_KNEE_MULTI}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_KNEE_MULTI}",
-            jsonKey = "fetKneeMulti",
-            spkJsonKey = "spkFetKneeMulti",
-            defaultValue = 0,
-            getHp = { it.fet.hp.kneeMulti },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(kneeMulti = it))) },
-            getSp = { it.fet.spk.kneeMulti },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(kneeMulti = it))) },
-        ),
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_GAIN}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_GAIN}",
-            jsonKey = "fetAutoGain",
-            spkJsonKey = "spkFetAutoGain",
-            defaultValue = true,
-            getHp = { it.fet.hp.autoGain },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(autoGain = it))) },
-            getSp = { it.fet.spk.autoGain },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(autoGain = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_GAIN}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_GAIN}",
-            jsonKey = "fetGain",
-            spkJsonKey = "spkFetGain",
-            defaultValue = 0,
-            getHp = { it.fet.hp.gain },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(gain = it))) },
-            getSp = { it.fet.spk.gain },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(gain = it))) },
-        ),
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_ATTACK}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_ATTACK}",
-            jsonKey = "fetAutoAttack",
-            spkJsonKey = "spkFetAutoAttack",
-            defaultValue = true,
-            getHp = { it.fet.hp.autoAttack },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(autoAttack = it))) },
-            getSp = { it.fet.spk.autoAttack },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(autoAttack = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_ATTACK}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_ATTACK}",
-            jsonKey = "fetAttack",
-            spkJsonKey = "spkFetAttack",
-            defaultValue = 20,
-            getHp = { it.fet.hp.attack },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(attack = it))) },
-            getSp = { it.fet.spk.attack },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(attack = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_MAX_ATTACK}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_MAX_ATTACK}",
-            jsonKey = "fetMaxAttack",
-            spkJsonKey = "spkFetMaxAttack",
-            defaultValue = 80,
-            getHp = { it.fet.hp.maxAttack },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(maxAttack = it))) },
-            getSp = { it.fet.spk.maxAttack },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(maxAttack = it))) },
-        ),
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_AUTO_RELEASE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_AUTO_RELEASE}",
-            jsonKey = "fetAutoRelease",
-            spkJsonKey = "spkFetAutoRelease",
-            defaultValue = true,
-            getHp = { it.fet.hp.autoRelease },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(autoRelease = it))) },
-            getSp = { it.fet.spk.autoRelease },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(autoRelease = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_RELEASE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_RELEASE}",
-            jsonKey = "fetRelease",
-            spkJsonKey = "spkFetRelease",
-            defaultValue = 50,
-            getHp = { it.fet.hp.release },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(release = it))) },
-            getSp = { it.fet.spk.release },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(release = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_MAX_RELEASE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_MAX_RELEASE}",
-            jsonKey = "fetMaxRelease",
-            spkJsonKey = "spkFetMaxRelease",
-            defaultValue = 100,
-            getHp = { it.fet.hp.maxRelease },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(maxRelease = it))) },
-            getSp = { it.fet.spk.maxRelease },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(maxRelease = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_CREST}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_CREST}",
-            jsonKey = "fetCrest",
-            spkJsonKey = "spkFetCrest",
-            defaultValue = 100,
-            getHp = { it.fet.hp.crest },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(crest = it))) },
-            getSp = { it.fet.spk.crest },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(crest = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_ADAPT}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_ADAPT}",
-            jsonKey = "fetAdapt",
-            spkJsonKey = "spkFetAdapt",
-            defaultValue = 50,
-            getHp = { it.fet.hp.adapt },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(adapt = it))) },
-            getSp = { it.fet.spk.adapt },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(adapt = it))) },
-        ),
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FET_COMPRESSOR_NO_CLIP}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_FET_COMPRESSOR_NO_CLIP}",
-            jsonKey = "fetNoClip",
-            spkJsonKey = "spkFetNoClip",
-            defaultValue = true,
-            getHp = { it.fet.hp.noClip },
-            setHp = { copy(fet = fet.copy(hp = fet.hp.copy(noClip = it))) },
-            getSp = { it.fet.spk.noClip },
-            setSp = { copy(fet = fet.copy(spk = fet.spk.copy(noClip = it))) },
-        ),
-        // Multiband Compressor
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_MULTIBAND_COMP_ENABLE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_MULTIBAND_COMP_ENABLE}",
-            jsonKey = "mbcEnabled",
-            spkJsonKey = "spkMbcEnabled",
-            defaultValue = false,
-            getHp = { it.mbc.hp.enabled },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(enabled = it))) },
-            getSp = { it.mbc.spk.enabled },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(enabled = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_band_enables",
-            spkPrefKey = "spk_mbc_band_enables",
-            jsonKey = "mbcBandEnables",
-            spkJsonKey = "spkMbcBandEnables",
-            defaultValue = "1;1;1;1;1",
-            getHp = { it.mbc.hp.bandEnables },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(bandEnables = it))) },
-            getSp = { it.mbc.spk.bandEnables },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(bandEnables = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_crossovers",
-            spkPrefKey = "spk_mbc_crossovers",
-            jsonKey = "mbcCrossovers",
-            spkJsonKey = "spkMbcCrossovers",
-            defaultValue = "120;500;4000;8000",
-            getHp = { it.mbc.hp.crossovers },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(crossovers = it))) },
-            getSp = { it.mbc.spk.crossovers },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(crossovers = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_thresholds",
-            spkPrefKey = "spk_mbc_thresholds",
-            jsonKey = "mbcThresholds",
-            spkJsonKey = "spkMbcThresholds",
-            defaultValue = "-18;-18;-18;-18;-18",
-            getHp = { it.mbc.hp.thresholds },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(thresholds = it))) },
-            getSp = { it.mbc.spk.thresholds },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(thresholds = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_ratios",
-            spkPrefKey = "spk_mbc_ratios",
-            jsonKey = "mbcRatios",
-            spkJsonKey = "spkMbcRatios",
-            defaultValue = "50;50;50;50;50",
-            getHp = { it.mbc.hp.ratios },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(ratios = it))) },
-            getSp = { it.mbc.spk.ratios },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(ratios = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_gains",
-            spkPrefKey = "spk_mbc_gains",
-            jsonKey = "mbcGains",
-            spkJsonKey = "spkMbcGains",
-            defaultValue = "24;24;24;24;24",
-            getHp = { it.mbc.hp.gains },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(gains = it))) },
-            getSp = { it.mbc.spk.gains },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(gains = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_knees",
-            spkPrefKey = "spk_mbc_knees",
-            jsonKey = "mbcKnees",
-            spkJsonKey = "spkMbcKnees",
-            defaultValue = "0;0;0;0;0",
-            getHp = { it.mbc.hp.knees },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(knees = it))) },
-            getSp = { it.mbc.spk.knees },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(knees = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_knee_multis",
-            spkPrefKey = "spk_mbc_knee_multis",
-            jsonKey = "mbcKneeMultis",
-            spkJsonKey = "spkMbcKneeMultis",
-            defaultValue = "0;0;0;0;0",
-            getHp = { it.mbc.hp.kneeMultis },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(kneeMultis = it))) },
-            getSp = { it.mbc.spk.kneeMultis },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(kneeMultis = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_attacks",
-            spkPrefKey = "spk_mbc_attacks",
-            jsonKey = "mbcAttacks",
-            spkJsonKey = "spkMbcAttacks",
-            defaultValue = "1;1;1;1;1",
-            getHp = { it.mbc.hp.attacks },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(attacks = it))) },
-            getSp = { it.mbc.spk.attacks },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(attacks = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_max_attacks",
-            spkPrefKey = "spk_mbc_max_attacks",
-            jsonKey = "mbcMaxAttacks",
-            spkJsonKey = "spkMbcMaxAttacks",
-            defaultValue = "44;44;44;44;44",
-            getHp = { it.mbc.hp.maxAttacks },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(maxAttacks = it))) },
-            getSp = { it.mbc.spk.maxAttacks },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(maxAttacks = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_releases",
-            spkPrefKey = "spk_mbc_releases",
-            jsonKey = "mbcReleases",
-            spkJsonKey = "spkMbcReleases",
-            defaultValue = "100;100;100;100;100",
-            getHp = { it.mbc.hp.releases },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(releases = it))) },
-            getSp = { it.mbc.spk.releases },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(releases = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_max_releases",
-            spkPrefKey = "spk_mbc_max_releases",
-            jsonKey = "mbcMaxReleases",
-            spkJsonKey = "spkMbcMaxReleases",
-            defaultValue = "200;200;200;200;200",
-            getHp = { it.mbc.hp.maxReleases },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(maxReleases = it))) },
-            getSp = { it.mbc.spk.maxReleases },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(maxReleases = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_crests",
-            spkPrefKey = "spk_mbc_crests",
-            jsonKey = "mbcCrests",
-            spkJsonKey = "spkMbcCrests",
-            defaultValue = "100;100;100;100;100",
-            getHp = { it.mbc.hp.crests },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(crests = it))) },
-            getSp = { it.mbc.spk.crests },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(crests = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_adapts",
-            spkPrefKey = "spk_mbc_adapts",
-            jsonKey = "mbcAdapts",
-            spkJsonKey = "spkMbcAdapts",
-            defaultValue = "50;50;50;50;50",
-            getHp = { it.mbc.hp.adapts },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(adapts = it))) },
-            getSp = { it.mbc.spk.adapts },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(adapts = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_auto_knees",
-            spkPrefKey = "spk_mbc_auto_knees",
-            jsonKey = "mbcAutoKnees",
-            spkJsonKey = "spkMbcAutoKnees",
-            defaultValue = "1;1;1;1;1",
-            getHp = { it.mbc.hp.autoKnees },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(autoKnees = it))) },
-            getSp = { it.mbc.spk.autoKnees },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(autoKnees = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_auto_gains",
-            spkPrefKey = "spk_mbc_auto_gains",
-            jsonKey = "mbcAutoGains",
-            spkJsonKey = "spkMbcAutoGains",
-            defaultValue = "1;1;1;1;1",
-            getHp = { it.mbc.hp.autoGains },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(autoGains = it))) },
-            getSp = { it.mbc.spk.autoGains },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(autoGains = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_auto_attacks",
-            spkPrefKey = "spk_mbc_auto_attacks",
-            jsonKey = "mbcAutoAttacks",
-            spkJsonKey = "spkMbcAutoAttacks",
-            defaultValue = "1;1;1;1;1",
-            getHp = { it.mbc.hp.autoAttacks },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(autoAttacks = it))) },
-            getSp = { it.mbc.spk.autoAttacks },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(autoAttacks = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_auto_releases",
-            spkPrefKey = "spk_mbc_auto_releases",
-            jsonKey = "mbcAutoReleases",
-            spkJsonKey = "spkMbcAutoReleases",
-            defaultValue = "1;1;1;1;1",
-            getHp = { it.mbc.hp.autoReleases },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(autoReleases = it))) },
-            getSp = { it.mbc.spk.autoReleases },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(autoReleases = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "mbc_no_clips",
-            spkPrefKey = "spk_mbc_no_clips",
-            jsonKey = "mbcNoClips",
-            spkJsonKey = "spkMbcNoClips",
-            defaultValue = "1;1;1;1;1",
-            getHp = { it.mbc.hp.noClips },
-            setHp = { copy(mbc = mbc.copy(hp = mbc.hp.copy(noClips = it))) },
-            getSp = { it.mbc.spk.noClips },
-            setSp = { copy(mbc = mbc.copy(spk = mbc.spk.copy(noClips = it))) },
-        ),
-        // DDC
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DDC_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_DDC_ENABLE}",
-            jsonKey = "ddcEnabled",
-            spkJsonKey = "spkDdcEnabled",
-            defaultValue = false,
-            getHp = { it.ddc.hp.enabled },
-            setHp = { copy(ddc = ddc.copy(hp = ddc.hp.copy(enabled = it))) },
-            getSp = { it.ddc.spk.enabled },
-            setSp = { copy(ddc = ddc.copy(spk = ddc.spk.copy(enabled = it))) },
-        ),
-        StringPref(
-            hpPrefKey = ViperRepository.PREF_DDC_DEVICE,
-            spkPrefKey = "spk_${ViperRepository.PREF_DDC_DEVICE}",
-            jsonKey = "ddcDevice",
-            spkJsonKey = "spkDdcDevice",
-            defaultValue = "",
-            getHp = { it.ddc.hp.device },
-            setHp = { copy(ddc = ddc.copy(hp = ddc.hp.copy(device = it))) },
-            getSp = { it.ddc.spk.device },
-            setSp = { copy(ddc = ddc.copy(spk = ddc.spk.copy(device = it))) },
-        ),
-        // Spectrum Extension
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_SPECTRUM_EXTENSION_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_ENABLE}",
-            jsonKey = "vseEnabled",
-            spkJsonKey = "spkVseEnabled",
-            defaultValue = false,
-            getHp = { it.vse.hp.enabled },
-            setHp = { copy(vse = vse.copy(hp = vse.hp.copy(enabled = it))) },
-            getSp = { it.vse.spk.enabled },
-            setSp = { copy(vse = vse.copy(spk = vse.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_SPECTRUM_EXTENSION_BARK}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_BARK}",
-            jsonKey = "vseStrength",
-            spkJsonKey = "spkVseStrength",
-            defaultValue = 7600,
-            getHp = { it.vse.hp.strength },
-            setHp = { copy(vse = vse.copy(hp = vse.hp.copy(strength = it))) },
-            getSp = { it.vse.spk.strength },
-            setSp = { copy(vse = vse.copy(spk = vse.spk.copy(strength = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_SPECTRUM_EXTENSION_BARK_RECONSTRUCT}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_SPECTRUM_EXTENSION_BARK_RECONSTRUCT}",
-            jsonKey = "vseExciter",
-            spkJsonKey = "spkVseExciter",
-            defaultValue = 0,
-            getHp = { it.vse.hp.exciter },
-            setHp = { copy(vse = vse.copy(hp = vse.hp.copy(exciter = it))) },
-            getSp = { it.vse.spk.exciter },
-            setSp = { copy(vse = vse.copy(spk = vse.spk.copy(exciter = it))) },
-        ),
-        // EQ
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_EQ_ENABLE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_EQ_ENABLE}",
-            jsonKey = "eqEnabled",
-            spkJsonKey = "spkEqEnabled",
-            defaultValue = false,
-            getHp = { it.eq.hp.enabled },
-            setHp = { copy(eq = eq.copy(hp = eq.hp.copy(enabled = it))) },
-            getSp = { it.eq.spk.enabled },
-            setSp = { copy(eq = eq.copy(spk = eq.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_EQ_BAND_COUNT}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_EQ_BAND_COUNT}",
-            jsonKey = "eqBandCount",
-            spkJsonKey = "spkEqBandCount",
-            defaultValue = 10,
-            getHp = { it.eq.hp.bandCount },
-            setHp = { copy(eq = eq.copy(hp = eq.hp.copy(bandCount = it))) },
-            getSp = { it.eq.spk.bandCount },
-            setSp = { copy(eq = eq.copy(spk = eq.spk.copy(bandCount = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_EQ_BAND_LEVEL}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_EQ_BAND_LEVEL}",
-            jsonKey = "eqBands",
-            spkJsonKey = "spkEqBands",
-            defaultValue = "0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;",
-            getHp = { it.eq.hp.bands },
-            setHp = { copy(eq = eq.copy(hp = eq.hp.copy(bands = it))) },
-            getSp = { it.eq.spk.bands },
-            setSp = { copy(eq = eq.copy(spk = eq.spk.copy(bands = it))) },
-        ),
-        NullableLongPref(
-            hpPrefKey = ViperRepository.PREF_EQ_PRESET_ID,
-            spkPrefKey = "spk_${ViperRepository.PREF_EQ_PRESET_ID}",
-            jsonKey = "eqPresetId",
-            spkJsonKey = "spkEqPresetId",
-            getHp = { it.eq.hp.presetId },
-            setHp = { copy(eq = eq.copy(hp = eq.hp.copy(presetId = it))) },
-            getSp = { it.eq.spk.presetId },
-            setSp = { copy(eq = eq.copy(spk = eq.spk.copy(presetId = it))) },
-        ),
-        // Dynamic EQ
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_EQ_ENABLE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_DYNAMIC_EQ_ENABLE}",
-            jsonKey = "dynamicEqEnabled",
-            spkJsonKey = "spkDynamicEqEnabled",
-            defaultValue = false,
-            getHp = { it.dynamicEq.hp.enabled },
-            setHp = { copy(dynamicEq = dynamicEq.copy(hp = dynamicEq.hp.copy(enabled = it))) },
-            getSp = { it.dynamicEq.spk.enabled },
-            setSp = { copy(dynamicEq = dynamicEq.copy(spk = dynamicEq.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "dynamic_eq_band_count",
-            spkPrefKey = "spk_dynamic_eq_band_count",
-            jsonKey = "dynamicEqBandCount",
-            spkJsonKey = "spkDynamicEqBandCount",
-            defaultValue = 3,
-            getHp = { it.dynamicEq.hp.bandCount },
-            setHp = { copy(dynamicEq = dynamicEq.copy(hp = dynamicEq.hp.copy(bandCount = it))) },
-            getSp = { it.dynamicEq.spk.bandCount },
-            setSp = { copy(dynamicEq = dynamicEq.copy(spk = dynamicEq.spk.copy(bandCount = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "dynamic_eq_freqs",
-            spkPrefKey = "spk_dynamic_eq_freqs",
-            jsonKey = "dynamicEqFreqs",
-            spkJsonKey = "spkDynamicEqFreqs",
-            defaultValue = "60;150;400;1000;2500;5000;8000;12000",
-            getHp = { it.dynamicEq.hp.freqs },
-            setHp = { copy(dynamicEq = dynamicEq.copy(hp = dynamicEq.hp.copy(freqs = it))) },
-            getSp = { it.dynamicEq.spk.freqs },
-            setSp = { copy(dynamicEq = dynamicEq.copy(spk = dynamicEq.spk.copy(freqs = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "dynamic_eq_qs",
-            spkPrefKey = "spk_dynamic_eq_qs",
-            jsonKey = "dynamicEqQs",
-            spkJsonKey = "spkDynamicEqQs",
-            defaultValue = "100;100;150;150;150;200;200;200",
-            getHp = { it.dynamicEq.hp.qs },
-            setHp = { copy(dynamicEq = dynamicEq.copy(hp = dynamicEq.hp.copy(qs = it))) },
-            getSp = { it.dynamicEq.spk.qs },
-            setSp = { copy(dynamicEq = dynamicEq.copy(spk = dynamicEq.spk.copy(qs = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "dynamic_eq_gains",
-            spkPrefKey = "spk_dynamic_eq_gains",
-            jsonKey = "dynamicEqGains",
-            spkJsonKey = "spkDynamicEqGains",
-            defaultValue = "0;0;0;0;0;0;0;0",
-            getHp = { it.dynamicEq.hp.gains },
-            setHp = { copy(dynamicEq = dynamicEq.copy(hp = dynamicEq.hp.copy(gains = it))) },
-            getSp = { it.dynamicEq.spk.gains },
-            setSp = { copy(dynamicEq = dynamicEq.copy(spk = dynamicEq.spk.copy(gains = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "dynamic_eq_thresholds",
-            spkPrefKey = "spk_dynamic_eq_thresholds",
-            jsonKey = "dynamicEqThresholds",
-            spkJsonKey = "spkDynamicEqThresholds",
-            defaultValue = "-300;-300;-250;-250;-200;-200;-200;-200",
-            getHp = { it.dynamicEq.hp.thresholds },
-            setHp = { copy(dynamicEq = dynamicEq.copy(hp = dynamicEq.hp.copy(thresholds = it))) },
-            getSp = { it.dynamicEq.spk.thresholds },
-            setSp = { copy(dynamicEq = dynamicEq.copy(spk = dynamicEq.spk.copy(thresholds = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "dynamic_eq_attacks",
-            spkPrefKey = "spk_dynamic_eq_attacks",
-            jsonKey = "dynamicEqAttacks",
-            spkJsonKey = "spkDynamicEqAttacks",
-            defaultValue = "10;10;10;10;10;10;10;10",
-            getHp = { it.dynamicEq.hp.attacks },
-            setHp = { copy(dynamicEq = dynamicEq.copy(hp = dynamicEq.hp.copy(attacks = it))) },
-            getSp = { it.dynamicEq.spk.attacks },
-            setSp = { copy(dynamicEq = dynamicEq.copy(spk = dynamicEq.spk.copy(attacks = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "dynamic_eq_releases",
-            spkPrefKey = "spk_dynamic_eq_releases",
-            jsonKey = "dynamicEqReleases",
-            spkJsonKey = "spkDynamicEqReleases",
-            defaultValue = "100;100;100;100;100;100;100;100",
-            getHp = { it.dynamicEq.hp.releases },
-            setHp = { copy(dynamicEq = dynamicEq.copy(hp = dynamicEq.hp.copy(releases = it))) },
-            getSp = { it.dynamicEq.spk.releases },
-            setSp = { copy(dynamicEq = dynamicEq.copy(spk = dynamicEq.spk.copy(releases = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "dynamic_eq_filter_types",
-            spkPrefKey = "spk_dynamic_eq_filter_types",
-            jsonKey = "dynamicEqFilterTypes",
-            spkJsonKey = "spkDynamicEqFilterTypes",
-            defaultValue = "0;0;0;0;0;0;0;0",
-            getHp = { it.dynamicEq.hp.filterTypes },
-            setHp = { copy(dynamicEq = dynamicEq.copy(hp = dynamicEq.hp.copy(filterTypes = it))) },
-            getSp = { it.dynamicEq.spk.filterTypes },
-            setSp = { copy(dynamicEq = dynamicEq.copy(spk = dynamicEq.spk.copy(filterTypes = it))) },
-        ),
-        // Convolver
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_CONVOLVER_ENABLE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_CONVOLVER_ENABLE}",
-            jsonKey = "convolverEnabled",
-            spkJsonKey = "spkConvolverEnabled",
-            defaultValue = false,
-            getHp = { it.convolver.hp.enabled },
-            setHp = { copy(convolver = convolver.copy(hp = convolver.hp.copy(enabled = it))) },
-            getSp = { it.convolver.spk.enabled },
-            setSp = { copy(convolver = convolver.copy(spk = convolver.spk.copy(enabled = it))) },
-        ),
-        StringPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_CONVOLVER_SET_KERNEL}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_CONVOLVER_SET_KERNEL}",
-            jsonKey = "convolverKernel",
-            spkJsonKey = "spkConvolverKernel",
-            defaultValue = "",
-            getHp = { it.convolver.hp.kernel },
-            setHp = { copy(convolver = convolver.copy(hp = convolver.hp.copy(kernel = it))) },
-            getSp = { it.convolver.spk.kernel },
-            setSp = { copy(convolver = convolver.copy(spk = convolver.spk.copy(kernel = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_CONVOLVER_CROSS_CHANNEL}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_CONVOLVER_CROSS_CHANNEL}",
-            jsonKey = "convolverCrossChannel",
-            spkJsonKey = "spkConvolverCrossChannel",
-            defaultValue = 0,
-            getHp = { it.convolver.hp.crossChannel },
-            setHp = { copy(convolver = convolver.copy(hp = convolver.hp.copy(crossChannel = it))) },
-            getSp = { it.convolver.spk.crossChannel },
-            setSp = { copy(convolver = convolver.copy(spk = convolver.spk.copy(crossChannel = it))) },
-        ),
-        // Field Surround
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FIELD_SURROUND_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_FIELD_SURROUND_ENABLE}",
-            jsonKey = "fieldSurroundEnabled",
-            spkJsonKey = "spkFieldSurroundEnabled",
-            defaultValue = false,
-            getHp = { it.fieldSurround.hp.enabled },
-            setHp = { copy(fieldSurround = fieldSurround.copy(hp = fieldSurround.hp.copy(enabled = it))) },
-            getSp = { it.fieldSurround.spk.enabled },
-            setSp = { copy(fieldSurround = fieldSurround.copy(spk = fieldSurround.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FIELD_SURROUND_WIDENING}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_FIELD_SURROUND_WIDENING}",
-            jsonKey = "fieldSurroundWidening",
-            spkJsonKey = "spkFieldSurroundWidening",
-            defaultValue = 0,
-            getHp = { it.fieldSurround.hp.widening },
-            setHp = { copy(fieldSurround = fieldSurround.copy(hp = fieldSurround.hp.copy(widening = it))) },
-            getSp = { it.fieldSurround.spk.widening },
-            setSp = { copy(fieldSurround = fieldSurround.copy(spk = fieldSurround.spk.copy(widening = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FIELD_SURROUND_MID_IMAGE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_FIELD_SURROUND_MID_IMAGE}",
-            jsonKey = "fieldSurroundMidImage",
-            spkJsonKey = "spkFieldSurroundMidImage",
-            defaultValue = 5,
-            getHp = { it.fieldSurround.hp.midImage },
-            setHp = { copy(fieldSurround = fieldSurround.copy(hp = fieldSurround.hp.copy(midImage = it))) },
-            getSp = { it.fieldSurround.spk.midImage },
-            setSp = { copy(fieldSurround = fieldSurround.copy(spk = fieldSurround.spk.copy(midImage = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_FIELD_SURROUND_DEPTH}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_FIELD_SURROUND_DEPTH}",
-            jsonKey = "fieldSurroundDepth",
-            spkJsonKey = "spkFieldSurroundDepth",
-            defaultValue = 0,
-            getHp = { it.fieldSurround.hp.depth },
-            setHp = { copy(fieldSurround = fieldSurround.copy(hp = fieldSurround.hp.copy(depth = it))) },
-            getSp = { it.fieldSurround.spk.depth },
-            setSp = { copy(fieldSurround = fieldSurround.copy(spk = fieldSurround.spk.copy(depth = it))) },
-        ),
-        // Diff Surround
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DIFF_SURROUND_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_DIFF_SURROUND_ENABLE}",
-            jsonKey = "diffSurroundEnabled",
-            spkJsonKey = "spkDiffSurroundEnabled",
-            defaultValue = false,
-            getHp = { it.diffSurround.hp.enabled },
-            setHp = { copy(diffSurround = diffSurround.copy(hp = diffSurround.hp.copy(enabled = it))) },
-            getSp = { it.diffSurround.spk.enabled },
-            setSp = { copy(diffSurround = diffSurround.copy(spk = diffSurround.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DIFF_SURROUND_DELAY}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_DIFF_SURROUND_DELAY}",
-            jsonKey = "diffSurroundDelay",
-            spkJsonKey = "spkDiffSurroundDelay",
-            defaultValue = 5,
-            getHp = { it.diffSurround.hp.delay },
-            setHp = { copy(diffSurround = diffSurround.copy(hp = diffSurround.hp.copy(delay = it))) },
-            getSp = { it.diffSurround.spk.delay },
-            setSp = { copy(diffSurround = diffSurround.copy(spk = diffSurround.spk.copy(delay = it))) },
-        ),
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DIFF_SURROUND_REVERSE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_DIFF_SURROUND_REVERSE}",
-            jsonKey = "diffSurroundReverse",
-            spkJsonKey = "spkDiffSurroundReverse",
-            defaultValue = false,
-            getHp = { it.diffSurround.hp.reverse },
-            setHp = { copy(diffSurround = diffSurround.copy(hp = diffSurround.hp.copy(reverse = it))) },
-            getSp = { it.diffSurround.spk.reverse },
-            setSp = { copy(diffSurround = diffSurround.copy(spk = diffSurround.spk.copy(reverse = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DIFF_SURROUND_WET_DRY_MIX}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_DIFF_SURROUND_WET_DRY_MIX}",
-            jsonKey = "diffSurroundWetDryMix",
-            spkJsonKey = "spkDiffSurroundWetDryMix",
-            defaultValue = 100,
-            getHp = { it.diffSurround.hp.wetDryMix },
-            setHp = { copy(diffSurround = diffSurround.copy(hp = diffSurround.hp.copy(wetDryMix = it))) },
-            getSp = { it.diffSurround.spk.wetDryMix },
-            setSp = { copy(diffSurround = diffSurround.copy(spk = diffSurround.spk.copy(wetDryMix = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DIFF_SURROUND_LP_CUTOFF}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_DIFF_SURROUND_LP_CUTOFF}",
-            jsonKey = "diffSurroundLpCutoff",
-            spkJsonKey = "spkDiffSurroundLpCutoff",
-            defaultValue = 0,
-            getHp = { it.diffSurround.hp.lpCutoff },
-            setHp = { copy(diffSurround = diffSurround.copy(hp = diffSurround.hp.copy(lpCutoff = it))) },
-            getSp = { it.diffSurround.spk.lpCutoff },
-            setSp = { copy(diffSurround = diffSurround.copy(spk = diffSurround.spk.copy(lpCutoff = it))) },
-        ),
-        // Stereo Imager
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_STEREO_IMAGER_ENABLE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_STEREO_IMAGER_ENABLE}",
-            jsonKey = "stereoImgEnabled",
-            spkJsonKey = "spkStereoImgEnabled",
-            defaultValue = false,
-            getHp = { it.stereoImg.hp.enabled },
-            setHp = { copy(stereoImg = stereoImg.copy(hp = stereoImg.hp.copy(enabled = it))) },
-            getSp = { it.stereoImg.spk.enabled },
-            setSp = { copy(stereoImg = stereoImg.copy(spk = stereoImg.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_STEREO_IMAGER_LOW_WIDTH}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_STEREO_IMAGER_LOW_WIDTH}",
-            jsonKey = "stereoImgLowWidth",
-            spkJsonKey = "spkStereoImgLowWidth",
-            defaultValue = 100,
-            getHp = { it.stereoImg.hp.lowWidth },
-            setHp = { copy(stereoImg = stereoImg.copy(hp = stereoImg.hp.copy(lowWidth = it))) },
-            getSp = { it.stereoImg.spk.lowWidth },
-            setSp = { copy(stereoImg = stereoImg.copy(spk = stereoImg.spk.copy(lowWidth = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_STEREO_IMAGER_MID_WIDTH}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_STEREO_IMAGER_MID_WIDTH}",
-            jsonKey = "stereoImgMidWidth",
-            spkJsonKey = "spkStereoImgMidWidth",
-            defaultValue = 100,
-            getHp = { it.stereoImg.hp.midWidth },
-            setHp = { copy(stereoImg = stereoImg.copy(hp = stereoImg.hp.copy(midWidth = it))) },
-            getSp = { it.stereoImg.spk.midWidth },
-            setSp = { copy(stereoImg = stereoImg.copy(spk = stereoImg.spk.copy(midWidth = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_STEREO_IMAGER_HIGH_WIDTH}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_STEREO_IMAGER_HIGH_WIDTH}",
-            jsonKey = "stereoImgHighWidth",
-            spkJsonKey = "spkStereoImgHighWidth",
-            defaultValue = 100,
-            getHp = { it.stereoImg.hp.highWidth },
-            setHp = { copy(stereoImg = stereoImg.copy(hp = stereoImg.hp.copy(highWidth = it))) },
-            getSp = { it.stereoImg.spk.highWidth },
-            setSp = { copy(stereoImg = stereoImg.copy(spk = stereoImg.spk.copy(highWidth = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_STEREO_IMAGER_LOW_CROSSOVER}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_STEREO_IMAGER_LOW_CROSSOVER}",
-            jsonKey = "stereoImgLowCrossover",
-            spkJsonKey = "spkStereoImgLowCrossover",
-            defaultValue = 200,
-            getHp = { it.stereoImg.hp.lowCrossover },
-            setHp = { copy(stereoImg = stereoImg.copy(hp = stereoImg.hp.copy(lowCrossover = it))) },
-            getSp = { it.stereoImg.spk.lowCrossover },
-            setSp = { copy(stereoImg = stereoImg.copy(spk = stereoImg.spk.copy(lowCrossover = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_STEREO_IMAGER_HIGH_CROSSOVER}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_STEREO_IMAGER_HIGH_CROSSOVER}",
-            jsonKey = "stereoImgHighCrossover",
-            spkJsonKey = "spkStereoImgHighCrossover",
-            defaultValue = 4000,
-            getHp = { it.stereoImg.hp.highCrossover },
-            setHp = { copy(stereoImg = stereoImg.copy(hp = stereoImg.hp.copy(highCrossover = it))) },
-            getSp = { it.stereoImg.spk.highCrossover },
-            setSp = { copy(stereoImg = stereoImg.copy(spk = stereoImg.spk.copy(highCrossover = it))) },
-        ),
-        // VHE (Headphone Surround)
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_HEADPHONE_SURROUND_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_HEADPHONE_SURROUND_ENABLE}",
-            jsonKey = "vheEnabled",
-            spkJsonKey = "spkVheEnabled",
-            defaultValue = false,
-            getHp = { it.vhe.hp.enabled },
-            setHp = { copy(vhe = vhe.copy(hp = vhe.hp.copy(enabled = it))) },
-            getSp = { it.vhe.spk.enabled },
-            setSp = { copy(vhe = vhe.copy(spk = vhe.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_HEADPHONE_SURROUND_STRENGTH}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_HEADPHONE_SURROUND_STRENGTH}",
-            jsonKey = "vheQuality",
-            spkJsonKey = "spkVheQuality",
-            defaultValue = 0,
-            getHp = { it.vhe.hp.quality },
-            setHp = { copy(vhe = vhe.copy(hp = vhe.hp.copy(quality = it))) },
-            getSp = { it.vhe.spk.quality },
-            setSp = { copy(vhe = vhe.copy(spk = vhe.spk.copy(quality = it))) },
-        ),
-        // Reverb
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_REVERB_ENABLE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_REVERB_ENABLE}",
-            jsonKey = "reverbEnabled",
-            spkJsonKey = "spkReverbEnabled",
-            defaultValue = false,
-            getHp = { it.reverb.hp.enabled },
-            setHp = { copy(reverb = reverb.copy(hp = reverb.hp.copy(enabled = it))) },
-            getSp = { it.reverb.spk.enabled },
-            setSp = { copy(reverb = reverb.copy(spk = reverb.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_REVERB_ROOM_SIZE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_REVERB_ROOM_SIZE}",
-            jsonKey = "reverbRoomSize",
-            spkJsonKey = "spkReverbRoomSize",
-            defaultValue = 0,
-            getHp = { it.reverb.hp.roomSize },
-            setHp = { copy(reverb = reverb.copy(hp = reverb.hp.copy(roomSize = it))) },
-            getSp = { it.reverb.spk.roomSize },
-            setSp = { copy(reverb = reverb.copy(spk = reverb.spk.copy(roomSize = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_REVERB_ROOM_WIDTH}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_REVERB_ROOM_WIDTH}",
-            jsonKey = "reverbWidth",
-            spkJsonKey = "spkReverbWidth",
-            defaultValue = 0,
-            getHp = { it.reverb.hp.width },
-            setHp = { copy(reverb = reverb.copy(hp = reverb.hp.copy(width = it))) },
-            getSp = { it.reverb.spk.width },
-            setSp = { copy(reverb = reverb.copy(spk = reverb.spk.copy(width = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_REVERB_ROOM_DAMPENING}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_REVERB_ROOM_DAMPENING}",
-            jsonKey = "reverbDampening",
-            spkJsonKey = "spkReverbDampening",
-            defaultValue = 0,
-            getHp = { it.reverb.hp.dampening },
-            setHp = { copy(reverb = reverb.copy(hp = reverb.hp.copy(dampening = it))) },
-            getSp = { it.reverb.spk.dampening },
-            setSp = { copy(reverb = reverb.copy(spk = reverb.spk.copy(dampening = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_REVERB_ROOM_WET_SIGNAL}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_REVERB_ROOM_WET_SIGNAL}",
-            jsonKey = "reverbWet",
-            spkJsonKey = "spkReverbWet",
-            defaultValue = 0,
-            getHp = { it.reverb.hp.wet },
-            setHp = { copy(reverb = reverb.copy(hp = reverb.hp.copy(wet = it))) },
-            getSp = { it.reverb.spk.wet },
-            setSp = { copy(reverb = reverb.copy(spk = reverb.spk.copy(wet = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_REVERB_ROOM_DRY_SIGNAL}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_REVERB_ROOM_DRY_SIGNAL}",
-            jsonKey = "reverbDry",
-            spkJsonKey = "spkReverbDry",
-            defaultValue = 50,
-            getHp = { it.reverb.hp.dry },
-            setHp = { copy(reverb = reverb.copy(hp = reverb.hp.copy(dry = it))) },
-            getSp = { it.reverb.spk.dry },
-            setSp = { copy(reverb = reverb.copy(spk = reverb.spk.copy(dry = it))) },
-        ),
-        // Dynamic System
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_ENABLE}",
-            jsonKey = "dynamicSystemEnabled",
-            spkJsonKey = "spkDynamicSystemEnabled",
-            defaultValue = false,
-            getHp = { it.dynamicSystem.hp.enabled },
-            setHp = { copy(dynamicSystem = dynamicSystem.copy(hp = dynamicSystem.hp.copy(enabled = it))) },
-            getSp = { it.dynamicSystem.spk.enabled },
-            setSp = { copy(dynamicSystem = dynamicSystem.copy(spk = dynamicSystem.spk.copy(enabled = it))) },
-        ),
-        NullableLongPref(
-            hpPrefKey = ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID,
-            spkPrefKey = "spk_${ViperRepository.PERF_DYNAMIC_SYS_PRESET_ID}",
-            jsonKey = "dsPresetId",
-            spkJsonKey = "spkDsPresetId",
-            getHp = { it.dynamicSystem.hp.presetId },
-            setHp = { copy(dynamicSystem = dynamicSystem.copy(hp = dynamicSystem.hp.copy(presetId = it))) },
-            getSp = { it.dynamicSystem.spk.presetId },
-            setSp = { copy(dynamicSystem = dynamicSystem.copy(spk = dynamicSystem.spk.copy(presetId = it))) },
-        ),
-        IntPref(
-            hpPrefKey = ViperRepository.PERF_DYNAMIC_SYS_DEVICE,
-            spkPrefKey = "spk_${ViperRepository.PERF_DYNAMIC_SYS_DEVICE}",
-            jsonKey = "dynamicSystemDevice",
-            spkJsonKey = "spkDynamicSystemDevice",
-            defaultValue = 0,
-            getHp = { it.dynamicSystem.hp.device },
-            setHp = { copy(dynamicSystem = dynamicSystem.copy(hp = dynamicSystem.hp.copy(device = it))) },
-            getSp = { it.dynamicSystem.spk.device },
-            setSp = { copy(dynamicSystem = dynamicSystem.copy(spk = dynamicSystem.spk.copy(device = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_STRENGTH}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_STRENGTH}",
-            jsonKey = "dynamicSystemStrength",
-            spkJsonKey = "spkDynamicSystemStrength",
-            defaultValue = 50,
-            getHp = { it.dynamicSystem.hp.strength },
-            setHp = { copy(dynamicSystem = dynamicSystem.copy(hp = dynamicSystem.hp.copy(strength = it))) },
-            getSp = { it.dynamicSystem.spk.strength },
-            setSp = { copy(dynamicSystem = dynamicSystem.copy(spk = dynamicSystem.spk.copy(strength = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_X_COEFFICIENTS}_low",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_X_COEFFICIENTS}_low",
-            jsonKey = "dsXLow",
-            spkJsonKey = "spkDsXLow",
-            defaultValue = 100,
-            getHp = { it.dynamicSystem.hp.xLow },
-            setHp = { copy(dynamicSystem = dynamicSystem.copy(hp = dynamicSystem.hp.copy(xLow = it))) },
-            getSp = { it.dynamicSystem.spk.xLow },
-            setSp = { copy(dynamicSystem = dynamicSystem.copy(spk = dynamicSystem.spk.copy(xLow = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_X_COEFFICIENTS}_high",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_X_COEFFICIENTS}_high",
-            jsonKey = "dsXHigh",
-            spkJsonKey = "spkDsXHigh",
-            defaultValue = 5600,
-            getHp = { it.dynamicSystem.hp.xHigh },
-            setHp = { copy(dynamicSystem = dynamicSystem.copy(hp = dynamicSystem.hp.copy(xHigh = it))) },
-            getSp = { it.dynamicSystem.spk.xHigh },
-            setSp = { copy(dynamicSystem = dynamicSystem.copy(spk = dynamicSystem.spk.copy(xHigh = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_Y_COEFFICIENTS}_low",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_Y_COEFFICIENTS}_low",
-            jsonKey = "dsYLow",
-            spkJsonKey = "spkDsYLow",
-            defaultValue = 40,
-            getHp = { it.dynamicSystem.hp.yLow },
-            setHp = { copy(dynamicSystem = dynamicSystem.copy(hp = dynamicSystem.hp.copy(yLow = it))) },
-            getSp = { it.dynamicSystem.spk.yLow },
-            setSp = { copy(dynamicSystem = dynamicSystem.copy(spk = dynamicSystem.spk.copy(yLow = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_Y_COEFFICIENTS}_high",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_Y_COEFFICIENTS}_high",
-            jsonKey = "dsYHigh",
-            spkJsonKey = "spkDsYHigh",
-            defaultValue = 80,
-            getHp = { it.dynamicSystem.hp.yHigh },
-            setHp = { copy(dynamicSystem = dynamicSystem.copy(hp = dynamicSystem.hp.copy(yHigh = it))) },
-            getSp = { it.dynamicSystem.spk.yHigh },
-            setSp = { copy(dynamicSystem = dynamicSystem.copy(spk = dynamicSystem.spk.copy(yHigh = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN}_low",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_SIDE_GAIN}_low",
-            jsonKey = "dsSideGainLow",
-            spkJsonKey = "spkDsSideGainLow",
-            defaultValue = 50,
-            getHp = { it.dynamicSystem.hp.sideGainLow },
-            setHp = { copy(dynamicSystem = dynamicSystem.copy(hp = dynamicSystem.hp.copy(sideGainLow = it))) },
-            getSp = { it.dynamicSystem.spk.sideGainLow },
-            setSp = { copy(dynamicSystem = dynamicSystem.copy(spk = dynamicSystem.spk.copy(sideGainLow = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_DYNAMIC_SYSTEM_SIDE_GAIN}_high",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_DYNAMIC_SYSTEM_SIDE_GAIN}_high",
-            jsonKey = "dsSideGainHigh",
-            spkJsonKey = "spkDsSideGainHigh",
-            defaultValue = 50,
-            getHp = { it.dynamicSystem.hp.sideGainHigh },
-            setHp = { copy(dynamicSystem = dynamicSystem.copy(hp = dynamicSystem.hp.copy(sideGainHigh = it))) },
-            getSp = { it.dynamicSystem.spk.sideGainHigh },
-            setSp = { copy(dynamicSystem = dynamicSystem.copy(spk = dynamicSystem.spk.copy(sideGainHigh = it))) },
-        ),
-        // Tube Simulator
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_TUBE_SIMULATOR_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_TUBE_SIMULATOR_ENABLE}",
-            jsonKey = "tubeSimulatorEnabled",
-            spkJsonKey = "spkTubeSimulatorEnabled",
-            defaultValue = false,
-            getHp = { it.tube.hp.enabled },
-            setHp = { copy(tube = tube.copy(hp = tube.hp.copy(enabled = it))) },
-            getSp = { it.tube.spk.enabled },
-            setSp = { copy(tube = tube.copy(spk = tube.spk.copy(enabled = it))) },
-        ),
-        // Psycho Bass
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_PSYCHO_BASS_ENABLE}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_PSYCHO_BASS_ENABLE}",
-            jsonKey = "psychoBassEnabled",
-            spkJsonKey = "spkPsychoBassEnabled",
-            defaultValue = false,
-            getHp = { it.psychoBass.hp.enabled },
-            setHp = { copy(psychoBass = psychoBass.copy(hp = psychoBass.hp.copy(enabled = it))) },
-            getSp = { it.psychoBass.spk.enabled },
-            setSp = { copy(psychoBass = psychoBass.copy(spk = psychoBass.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_PSYCHO_BASS_CUTOFF}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_PSYCHO_BASS_CUTOFF}",
-            jsonKey = "psychoBassCutoff",
-            spkJsonKey = "spkPsychoBassCutoff",
-            defaultValue = 80,
-            getHp = { it.psychoBass.hp.cutoff },
-            setHp = { copy(psychoBass = psychoBass.copy(hp = psychoBass.hp.copy(cutoff = it))) },
-            getSp = { it.psychoBass.spk.cutoff },
-            setSp = { copy(psychoBass = psychoBass.copy(spk = psychoBass.spk.copy(cutoff = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_PSYCHO_BASS_INTENSITY}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_PSYCHO_BASS_INTENSITY}",
-            jsonKey = "psychoBassIntensity",
-            spkJsonKey = "spkPsychoBassIntensity",
-            defaultValue = 50,
-            getHp = { it.psychoBass.hp.intensity },
-            setHp = { copy(psychoBass = psychoBass.copy(hp = psychoBass.hp.copy(intensity = it))) },
-            getSp = { it.psychoBass.spk.intensity },
-            setSp = { copy(psychoBass = psychoBass.copy(spk = psychoBass.spk.copy(intensity = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_PSYCHO_BASS_HARMONIC_ORDER}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_PSYCHO_BASS_HARMONIC_ORDER}",
-            jsonKey = "psychoBassHarmonicOrder",
-            spkJsonKey = "spkPsychoBassHarmonicOrder",
-            defaultValue = 3,
-            getHp = { it.psychoBass.hp.harmonicOrder },
-            setHp = { copy(psychoBass = psychoBass.copy(hp = psychoBass.hp.copy(harmonicOrder = it))) },
-            getSp = { it.psychoBass.spk.harmonicOrder },
-            setSp = { copy(psychoBass = psychoBass.copy(spk = psychoBass.spk.copy(harmonicOrder = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_PSYCHO_BASS_ORIGINAL_LEVEL}",
-            spkPrefKey = "${ViperParams.PARAM_SPK_PSYCHO_BASS_ORIGINAL_LEVEL}",
-            jsonKey = "psychoBassOriginalLevel",
-            spkJsonKey = "spkPsychoBassOriginalLevel",
-            defaultValue = 100,
-            getHp = { it.psychoBass.hp.originalLevel },
-            setHp = { copy(psychoBass = psychoBass.copy(hp = psychoBass.hp.copy(originalLevel = it))) },
-            getSp = { it.psychoBass.spk.originalLevel },
-            setSp = { copy(psychoBass = psychoBass.copy(spk = psychoBass.spk.copy(originalLevel = it))) },
-        ),
-        // Bass
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_BASS_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_ENABLE}",
-            jsonKey = "bassEnabled",
-            spkJsonKey = "spkBassEnabled",
-            defaultValue = false,
-            getHp = { it.bass.hp.enabled },
-            setHp = { copy(bass = bass.copy(hp = bass.hp.copy(enabled = it))) },
-            getSp = { it.bass.spk.enabled },
-            setSp = { copy(bass = bass.copy(spk = bass.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_BASS_MODE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_MODE}",
-            jsonKey = "bassMode",
-            spkJsonKey = "spkBassMode",
-            defaultValue = 0,
-            getHp = { it.bass.hp.mode },
-            setHp = { copy(bass = bass.copy(hp = bass.hp.copy(mode = it))) },
-            getSp = { it.bass.spk.mode },
-            setSp = { copy(bass = bass.copy(spk = bass.spk.copy(mode = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_BASS_FREQUENCY}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_FREQUENCY}",
-            jsonKey = "bassFrequency",
-            spkJsonKey = "spkBassFrequency",
-            defaultValue = 55,
-            getHp = { it.bass.hp.frequency },
-            setHp = { copy(bass = bass.copy(hp = bass.hp.copy(frequency = it))) },
-            getSp = { it.bass.spk.frequency },
-            setSp = { copy(bass = bass.copy(spk = bass.spk.copy(frequency = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_BASS_GAIN}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_GAIN}",
-            jsonKey = "bassGain",
-            spkJsonKey = "spkBassGain",
-            defaultValue = 50,
-            getHp = { it.bass.hp.gain },
-            setHp = { copy(bass = bass.copy(hp = bass.hp.copy(gain = it))) },
-            getSp = { it.bass.spk.gain },
-            setSp = { copy(bass = bass.copy(spk = bass.spk.copy(gain = it))) },
-        ),
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_BASS_ANTI_POP}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_ANTI_POP}",
-            jsonKey = "bassAntiPop",
-            spkJsonKey = "spkBassAntiPop",
-            defaultValue = true,
-            getHp = { it.bass.hp.antiPop },
-            setHp = { copy(bass = bass.copy(hp = bass.hp.copy(antiPop = it))) },
-            getSp = { it.bass.spk.antiPop },
-            setSp = { copy(bass = bass.copy(spk = bass.spk.copy(antiPop = it))) },
-        ),
-        // Bass Mono
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_BASS_MONO_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_MONO_ENABLE}",
-            jsonKey = "bassMonoEnabled",
-            spkJsonKey = "spkBassMonoEnabled",
-            defaultValue = false,
-            getHp = { it.bassMono.hp.enabled },
-            setHp = { copy(bassMono = bassMono.copy(hp = bassMono.hp.copy(enabled = it))) },
-            getSp = { it.bassMono.spk.enabled },
-            setSp = { copy(bassMono = bassMono.copy(spk = bassMono.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_BASS_MONO_MODE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_MONO_MODE}",
-            jsonKey = "bassMonoMode",
-            spkJsonKey = "spkBassMonoMode",
-            defaultValue = 0,
-            getHp = { it.bassMono.hp.mode },
-            setHp = { copy(bassMono = bassMono.copy(hp = bassMono.hp.copy(mode = it))) },
-            getSp = { it.bassMono.spk.mode },
-            setSp = { copy(bassMono = bassMono.copy(spk = bassMono.spk.copy(mode = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_BASS_MONO_FREQUENCY}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_MONO_FREQUENCY}",
-            jsonKey = "bassMonoFrequency",
-            spkJsonKey = "spkBassMonoFrequency",
-            defaultValue = 55,
-            getHp = { it.bassMono.hp.frequency },
-            setHp = { copy(bassMono = bassMono.copy(hp = bassMono.hp.copy(frequency = it))) },
-            getSp = { it.bassMono.spk.frequency },
-            setSp = { copy(bassMono = bassMono.copy(spk = bassMono.spk.copy(frequency = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_BASS_MONO_GAIN}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_MONO_GAIN}",
-            jsonKey = "bassMonoGain",
-            spkJsonKey = "spkBassMonoGain",
-            defaultValue = 50,
-            getHp = { it.bassMono.hp.gain },
-            setHp = { copy(bassMono = bassMono.copy(hp = bassMono.hp.copy(gain = it))) },
-            getSp = { it.bassMono.spk.gain },
-            setSp = { copy(bassMono = bassMono.copy(spk = bassMono.spk.copy(gain = it))) },
-        ),
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_BASS_MONO_ANTI_POP}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_BASS_MONO_ANTI_POP}",
-            jsonKey = "bassMonoAntiPop",
-            spkJsonKey = "spkBassMonoAntiPop",
-            defaultValue = true,
-            getHp = { it.bassMono.hp.antiPop },
-            setHp = { copy(bassMono = bassMono.copy(hp = bassMono.hp.copy(antiPop = it))) },
-            getSp = { it.bassMono.spk.antiPop },
-            setSp = { copy(bassMono = bassMono.copy(spk = bassMono.spk.copy(antiPop = it))) },
-        ),
-        // Clarity
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_CLARITY_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_CLARITY_ENABLE}",
-            jsonKey = "clarityEnabled",
-            spkJsonKey = "spkClarityEnabled",
-            defaultValue = false,
-            getHp = { it.clarity.hp.enabled },
-            setHp = { copy(clarity = clarity.copy(hp = clarity.hp.copy(enabled = it))) },
-            getSp = { it.clarity.spk.enabled },
-            setSp = { copy(clarity = clarity.copy(spk = clarity.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_CLARITY_MODE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_CLARITY_MODE}",
-            jsonKey = "clarityMode",
-            spkJsonKey = "spkClarityMode",
-            defaultValue = 0,
-            getHp = { it.clarity.hp.mode },
-            setHp = { copy(clarity = clarity.copy(hp = clarity.hp.copy(mode = it))) },
-            getSp = { it.clarity.spk.mode },
-            setSp = { copy(clarity = clarity.copy(spk = clarity.spk.copy(mode = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_CLARITY_GAIN}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_CLARITY_GAIN}",
-            jsonKey = "clarityGain",
-            spkJsonKey = "spkClarityGain",
-            defaultValue = 50,
-            getHp = { it.clarity.hp.gain },
-            setHp = { copy(clarity = clarity.copy(hp = clarity.hp.copy(gain = it))) },
-            getSp = { it.clarity.spk.gain },
-            setSp = { copy(clarity = clarity.copy(spk = clarity.spk.copy(gain = it))) },
-        ),
-        // Cure
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_CURE_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_CURE_ENABLE}",
-            jsonKey = "cureEnabled",
-            spkJsonKey = "spkCureEnabled",
-            defaultValue = false,
-            getHp = { it.cure.hp.enabled },
-            setHp = { copy(cure = cure.copy(hp = cure.hp.copy(enabled = it))) },
-            getSp = { it.cure.spk.enabled },
-            setSp = { copy(cure = cure.copy(spk = cure.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_CURE_STRENGTH}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_CURE_STRENGTH}",
-            jsonKey = "cureStrength",
-            spkJsonKey = "spkCureStrength",
-            defaultValue = 0,
-            getHp = { it.cure.hp.strength },
-            setHp = { copy(cure = cure.copy(hp = cure.hp.copy(strength = it))) },
-            getSp = { it.cure.spk.strength },
-            setSp = { copy(cure = cure.copy(spk = cure.spk.copy(strength = it))) },
-        ),
-        // AnalogX
-        BoolPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_ANALOGX_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_ANALOGX_ENABLE}",
-            jsonKey = "analogxEnabled",
-            spkJsonKey = "spkAnalogxEnabled",
-            defaultValue = false,
-            getHp = { it.analog.hp.enabled },
-            setHp = { copy(analog = analog.copy(hp = analog.hp.copy(enabled = it))) },
-            getSp = { it.analog.spk.enabled },
-            setSp = { copy(analog = analog.copy(spk = analog.spk.copy(enabled = it))) },
-        ),
-        IntPref(
-            hpPrefKey = "${ViperParams.PARAM_HP_ANALOGX_MODE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_ANALOGX_MODE}",
-            jsonKey = "analogxMode",
-            spkJsonKey = "spkAnalogxMode",
-            defaultValue = 0,
-            getHp = { it.analog.hp.mode },
-            setHp = { copy(analog = analog.copy(hp = analog.hp.copy(mode = it))) },
-            getSp = { it.analog.spk.mode },
-            setSp = { copy(analog = analog.copy(spk = analog.spk.copy(mode = it))) },
-        ),
-        // Speaker Correction
-        BoolPref(
-            hpPrefKey = "spk_${ViperParams.PARAM_SPK_SPEAKER_CORRECTION_ENABLE}",
-            spkPrefKey = "spk_${ViperParams.PARAM_SPK_SPEAKER_CORRECTION_ENABLE}",
-            jsonKey = "speakerOptEnabled",
-            spkJsonKey = "speakerOptEnabled",
-            defaultValue = false,
-            getHp = { it.speakerCorrection.hp.enabled },
-            setHp = {
-                copy(
-                    speakerCorrection =
-                        speakerCorrection.copy(
-                            hp = speakerCorrection.hp.copy(enabled = it),
-                        ),
-                )
-            },
-            getSp = { it.speakerCorrection.spk.enabled },
-            setSp = {
-                copy(
-                    speakerCorrection =
-                        speakerCorrection.copy(
-                            spk = speakerCorrection.spk.copy(enabled = it),
-                        ),
-                )
-            },
-        ),
-    )
+    listOf(Effects.masterEnable) + EFFECT_GROUPS.flatMap { it.prefs }
+
+val EFFECT_PREFS_BY_PARAM_ID: Map<Int, EffectPref<*>> =
+    EFFECT_PREFS.filter { it.paramId != -1 }.associateBy { it.paramId }
+
+private fun spJoinInts(list: List<Int>): String = list.joinToString(";")
+
+private fun spSplitInts(
+    s: String,
+    default: List<Int>,
+): List<Int> {
+    if (s.isBlank()) return default
+    val parts = s.split(";").filter { it.isNotBlank() }
+    if (parts.isEmpty()) return default
+    return parts.mapNotNull { it.toIntOrNull() }
+}
+
+private fun spJoinBools(list: List<Boolean>): String = list.joinToString(";") { if (it) "1" else "0" }
+
+private fun spSplitBools(
+    s: String,
+    default: List<Boolean>,
+): List<Boolean> {
+    if (s.isBlank()) return default
+    val parts = s.split(";").filter { it.isNotBlank() }
+    if (parts.isEmpty()) return default
+    return parts.map { it == "1" }
+}
+
+private fun spJoinDoubles(list: List<Double>): String = list.joinToString(";") { String.format(java.util.Locale.US, "%.1f", it) }
+
+private fun spSplitDoubles(
+    s: String,
+    default: List<Double>,
+): List<Double> {
+    if (s.isBlank()) return default
+    val parts = s.split(";").filter { it.isNotBlank() }
+    if (parts.isEmpty()) return default
+    return parts.mapNotNull { it.toDoubleOrNull() }
+}
 
 suspend fun loadEffectPrefs(
     repository: ViperRepository,
-    isSpk: Boolean,
     state: MainUiState = MainUiState(),
 ): MainUiState {
     var s = state
@@ -1529,28 +1350,35 @@ suspend fun loadEffectPrefs(
         s =
             when (pref) {
                 is IntPref -> {
-                    val key = if (isSpk) pref.spkPrefKey else pref.hpPrefKey
-                    val value = repository.getIntPreference(key, pref.defaultValue).first()
-                    if (isSpk) pref.setSpk(s, value) else pref.setHp(s, value)
+                    pref.set(s, repository.getIntPreference(pref.prefKey, pref.defaultValue).first())
                 }
 
                 is BoolPref -> {
-                    val key = if (isSpk) pref.spkPrefKey else pref.hpPrefKey
-                    val value = repository.getBooleanPreference(key, pref.defaultValue).first()
-                    if (isSpk) pref.setSpk(s, value) else pref.setHp(s, value)
+                    pref.set(s, repository.getBooleanPreference(pref.prefKey, pref.defaultValue).first())
                 }
 
                 is StringPref -> {
-                    val key = if (isSpk) pref.spkPrefKey else pref.hpPrefKey
-                    val value = repository.getStringPreference(key, pref.defaultValue).first()
-                    if (isSpk) pref.setSpk(s, value) else pref.setHp(s, value)
+                    pref.set(s, repository.getStringPreference(pref.prefKey, pref.defaultValue).first())
                 }
 
                 is NullableLongPref -> {
-                    val key = if (isSpk) pref.spkPrefKey else pref.hpPrefKey
-                    val raw = repository.getIntPreference(key, -1).first()
-                    val value = if (raw < 0) null else raw.toLong()
-                    if (isSpk) pref.setSpk(s, value) else pref.setHp(s, value)
+                    val raw = repository.getIntPreference(pref.prefKey, -1).first()
+                    pref.set(s, if (raw < 0) null else raw.toLong())
+                }
+
+                is IntListPref -> {
+                    val raw = repository.getStringPreference(pref.prefKey, spJoinInts(pref.defaultValue)).first()
+                    pref.set(s, spSplitInts(raw, pref.defaultValue))
+                }
+
+                is BoolListPref -> {
+                    val raw = repository.getStringPreference(pref.prefKey, spJoinBools(pref.defaultValue)).first()
+                    pref.set(s, spSplitBools(raw, pref.defaultValue))
+                }
+
+                is DoubleListPref -> {
+                    val raw = repository.getStringPreference(pref.prefKey, spJoinDoubles(pref.defaultValue)).first()
+                    pref.set(s, spSplitDoubles(raw, pref.defaultValue))
                 }
             }
     }
@@ -1560,102 +1388,156 @@ suspend fun loadEffectPrefs(
 suspend fun saveEffectPrefs(
     repository: ViperRepository,
     state: MainUiState,
-    isSpk: Boolean,
 ) {
     for (pref in EFFECT_PREFS) {
         when (pref) {
-            is IntPref -> {
-                val key = if (isSpk) pref.spkPrefKey else pref.hpPrefKey
-                val value = if (isSpk) pref.getSpk(state) else pref.getHp(state)
-                repository.setIntPreference(key, value)
-            }
-
-            is BoolPref -> {
-                val key = if (isSpk) pref.spkPrefKey else pref.hpPrefKey
-                val value = if (isSpk) pref.getSpk(state) else pref.getHp(state)
-                repository.setBooleanPreference(key, value)
-            }
-
-            is StringPref -> {
-                val key = if (isSpk) pref.spkPrefKey else pref.hpPrefKey
-                val value = if (isSpk) pref.getSpk(state) else pref.getHp(state)
-                repository.setStringPreference(key, value)
-            }
-
-            is NullableLongPref -> {
-                val key = if (isSpk) pref.spkPrefKey else pref.hpPrefKey
-                val value = if (isSpk) pref.getSpk(state) else pref.getHp(state)
-                repository.setIntPreference(key, value?.toInt() ?: -1)
-            }
+            is IntPref -> repository.setIntPreference(pref.prefKey, pref.get(state))
+            is BoolPref -> repository.setBooleanPreference(pref.prefKey, pref.get(state))
+            is StringPref -> repository.setStringPreference(pref.prefKey, pref.get(state))
+            is NullableLongPref -> repository.setIntPreference(pref.prefKey, pref.get(state)?.toInt() ?: -1)
+            is IntListPref -> repository.setStringPreference(pref.prefKey, spJoinInts(pref.get(state)))
+            is BoolListPref -> repository.setStringPreference(pref.prefKey, spJoinBools(pref.get(state)))
+            is DoubleListPref -> repository.setStringPreference(pref.prefKey, spJoinDoubles(pref.get(state)))
         }
     }
 }
 
+const val PRESET_SCHEMA_VERSION = 2
+private const val KEY_SCHEMA_VERSION = "schemaVersion"
+private const val KEY_NAME = "name"
+private const val KEY_CREATED_AT = "createdAt"
+
+fun serializeEffectPrefs(state: MainUiState): JSONObject = serializeEffectPrefs(state, name = null, createdAt = null)
+
 fun serializeEffectPrefs(
     state: MainUiState,
-    isSpk: Boolean,
+    name: String?,
+    createdAt: Long?,
 ): JSONObject {
-    val obj = JSONObject()
-    for (pref in EFFECT_PREFS) {
-        val jsonKey = if (isSpk) pref.spkJsonKey else pref.jsonKey
-        when (pref) {
-            is IntPref -> {
-                val value = if (isSpk) pref.getSpk(state) else pref.getHp(state)
-                obj.put(jsonKey, value)
-            }
+    val root = JSONObject()
+    if (name != null || createdAt != null) {
+        root.put(KEY_SCHEMA_VERSION, PRESET_SCHEMA_VERSION)
+        if (name != null) root.put(KEY_NAME, name)
+        if (createdAt != null) root.put(KEY_CREATED_AT, createdAt)
+    }
+    putPrefValue(root, Effects.masterEnable, state)
+    for (group in EFFECT_GROUPS) {
+        val obj = JSONObject()
+        for (pref in group.prefs) {
+            putPrefValue(obj, pref, state)
+        }
+        root.put(group.effectKey, obj)
+    }
+    return root
+}
 
-            is BoolPref -> {
-                val value = if (isSpk) pref.getSpk(state) else pref.getHp(state)
-                obj.put(jsonKey, value)
-            }
+private fun putPrefValue(
+    obj: JSONObject,
+    pref: EffectPref<*>,
+    state: MainUiState,
+) {
+    when (pref) {
+        is IntPref -> {
+            obj.put(pref.jsonKey, pref.get(state))
+        }
 
-            is StringPref -> {
-                val value = if (isSpk) pref.getSpk(state) else pref.getHp(state)
-                obj.put(jsonKey, value)
-            }
+        is BoolPref -> {
+            obj.put(pref.jsonKey, pref.get(state))
+        }
 
-            is NullableLongPref -> {
-                val value = if (isSpk) pref.getSpk(state) else pref.getHp(state)
-                obj.put(jsonKey, value ?: -1)
-            }
+        is StringPref -> {
+            obj.put(pref.jsonKey, pref.get(state))
+        }
+
+        is NullableLongPref -> {
+            val v = pref.get(state)
+            if (v == null) obj.put(pref.jsonKey, JSONObject.NULL) else obj.put(pref.jsonKey, v)
+        }
+
+        is IntListPref -> {
+            val arr = org.json.JSONArray()
+            for (v in pref.get(state)) arr.put(v)
+            obj.put(pref.jsonKey, arr)
+        }
+
+        is BoolListPref -> {
+            val arr = org.json.JSONArray()
+            for (v in pref.get(state)) arr.put(v)
+            obj.put(pref.jsonKey, arr)
+        }
+
+        is DoubleListPref -> {
+            val arr = org.json.JSONArray()
+            for (v in pref.get(state)) arr.put(v)
+            obj.put(pref.jsonKey, arr)
         }
     }
-    return obj
 }
 
 fun deserializeEffectPrefs(
     obj: JSONObject,
     state: MainUiState,
-    isSpk: Boolean,
 ): MainUiState {
     var s = state
-    for (pref in EFFECT_PREFS) {
-        val jsonKey = if (isSpk) pref.spkJsonKey else pref.jsonKey
-        s =
-            when (pref) {
-                is IntPref -> {
-                    val fallback = if (isSpk) pref.getSpk(s) else pref.getHp(s)
-                    val value = obj.optInt(jsonKey, fallback)
-                    if (isSpk) pref.setSpk(s, value) else pref.setHp(s, value)
-                }
-
-                is BoolPref -> {
-                    val fallback = if (isSpk) pref.getSpk(s) else pref.getHp(s)
-                    val value = obj.optBoolean(jsonKey, fallback)
-                    if (isSpk) pref.setSpk(s, value) else pref.setHp(s, value)
-                }
-
-                is StringPref -> {
-                    val fallback = if (isSpk) pref.getSpk(s) else pref.getHp(s)
-                    val value = obj.optString(jsonKey, fallback)
-                    if (isSpk) pref.setSpk(s, value) else pref.setHp(s, value)
-                }
-
-                is NullableLongPref -> {
-                    val value = obj.optInt(jsonKey, -1).let { if (it < 0) null else it.toLong() }
-                    if (isSpk) pref.setSpk(s, value) else pref.setHp(s, value)
-                }
-            }
+    s = applyPrefFromJson(s, Effects.masterEnable, obj)
+    for (group in EFFECT_GROUPS) {
+        val sub = obj.optJSONObject(group.effectKey) ?: continue
+        for (pref in group.prefs) {
+            s = applyPrefFromJson(s, pref, sub)
+        }
     }
     return s
+}
+
+private fun applyPrefFromJson(
+    state: MainUiState,
+    pref: EffectPref<*>,
+    obj: JSONObject,
+): MainUiState {
+    if (!obj.has(pref.jsonKey)) return state
+    return when (pref) {
+        is IntPref -> {
+            pref.set(state, obj.optInt(pref.jsonKey, pref.get(state)))
+        }
+
+        is BoolPref -> {
+            pref.set(state, obj.optBoolean(pref.jsonKey, pref.get(state)))
+        }
+
+        is StringPref -> {
+            pref.set(state, obj.optString(pref.jsonKey, pref.get(state)))
+        }
+
+        is NullableLongPref -> {
+            val v =
+                if (obj.isNull(pref.jsonKey)) {
+                    null
+                } else {
+                    val raw = obj.optInt(pref.jsonKey, -1)
+                    if (raw < 0) null else raw.toLong()
+                }
+            pref.set(state, v)
+        }
+
+        is IntListPref -> {
+            val arr = obj.optJSONArray(pref.jsonKey) ?: return state
+            val list = mutableListOf<Int>()
+            for (i in 0 until arr.length()) list.add(arr.optInt(i, 0))
+            pref.set(state, list.toList())
+        }
+
+        is BoolListPref -> {
+            val arr = obj.optJSONArray(pref.jsonKey) ?: return state
+            val list = mutableListOf<Boolean>()
+            for (i in 0 until arr.length()) list.add(arr.optBoolean(i, false))
+            pref.set(state, list.toList())
+        }
+
+        is DoubleListPref -> {
+            val arr = obj.optJSONArray(pref.jsonKey) ?: return state
+            val list = mutableListOf<Double>()
+            for (i in 0 until arr.length()) list.add(arr.optDouble(i, 0.0))
+            pref.set(state, list.toList())
+        }
+    }
 }
