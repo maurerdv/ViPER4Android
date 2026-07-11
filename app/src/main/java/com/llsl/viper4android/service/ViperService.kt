@@ -126,21 +126,11 @@ class ViperService : LifecycleService() {
                         "Service",
                         "Device changed: $currentServiceDeviceId -> ${device.id} (${device.name})",
                     )
-                    saveOldDeviceToDb()
                     currentServiceDeviceId = device.id
                     reapplyForDevice(device)
                 }
             }
         }
-    }
-
-    private suspend fun saveOldDeviceToDb() {
-        val oldId = currentServiceDeviceId
-        val existing = repository.getDeviceSettings(oldId) ?: return
-        val currentState = EffectDispatcher.loadFullStateFromPrefs(repository)
-        val json = serializeEffectPrefs(currentState)
-        repository.saveDeviceSettings(existing.copy(settingsJson = json.toString()))
-        FileLogger.i("Service", "Saved device settings for $oldId")
     }
 
     private suspend fun reapplyForDevice(device: AudioDevice) {

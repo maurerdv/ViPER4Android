@@ -1,6 +1,5 @@
 package com.llsl.viper4android.ui.screens.main
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.app.NotificationManager
 import android.content.ComponentName
@@ -91,7 +90,7 @@ data class MainUiState(
     val activeDeviceId: String = "",
 )
 
-@SuppressLint("StaticFieldLeak")
+@Suppress("StaticFieldLeak")
 @HiltViewModel
 class MainViewModel
     @Inject
@@ -183,7 +182,6 @@ class MainViewModel
                 audioOutputDetector.activeDevice.collect { device ->
                     val currentId = _uiState.value.activeDeviceId
                     if (device.id != currentId) {
-                        saveCurrentDeviceSettings()
                         val dbName2 = repository.getDeviceSettings(device.id)?.deviceName ?: device.name
                         _uiState.update { it.copy(activeDeviceName = dbName2, activeDeviceId = device.id) }
                         loadDeviceSettings(device)

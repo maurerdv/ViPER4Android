@@ -1,6 +1,5 @@
 package com.llsl.viper4android.audio
 
-import android.annotation.SuppressLint
 import com.llsl.viper4android.ui.screens.main.MainUiState
 import com.llsl.viper4android.utils.FileLogger
 import com.llsl.viper4android.utils.RootShell
@@ -144,7 +143,7 @@ object ConfigChannel {
      * Note: VarHandle.releaseFence() is a `public static void` method, NOT
      * signature-polymorphic, so R8 minification cannot mangle it.
      */
-    @SuppressLint("NewApi")
+    @Suppress("NewApi")
     fun writeFullState(state: MainUiState) {
         ensureInitialized()
         synchronized(writeLock) {
