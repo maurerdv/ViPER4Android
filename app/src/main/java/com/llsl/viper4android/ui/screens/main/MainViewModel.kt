@@ -318,7 +318,7 @@ class MainViewModel
             viewModelScope.launch {
                 repository.setBooleanPreference(ViperRepository.PREF_MASTER_ENABLE, enabled)
             }
-            viperService?.setEffectEnabled(enabled)
+            viperService?.setMasterEnabled(enabled)
             if (enabled) dispatchFullState()
         }
 

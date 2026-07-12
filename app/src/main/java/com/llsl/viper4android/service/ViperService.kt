@@ -67,6 +67,7 @@ class ViperService : LifecycleService() {
     private var globalEffect: ViperEffect? = null
     private var useAidlTypeUuid: Boolean = true
     private var globalMode: Boolean = false
+    private var masterEnabled: Boolean = false
     private var audioOutputDetector: AudioOutputDetector? = null
     private var sessionMonitor: AudioSessionMonitor? = null
     private var stateProvider: (() -> MainUiState)? = null
@@ -83,10 +84,13 @@ class ViperService : LifecycleService() {
         lifecycleScope.launch {
             useAidlTypeUuid = repository.aidlMode
             globalMode = repository.getBooleanPreference(MainViewModel.PREF_GLOBAL_MODE).first()
-            if (globalMode) {
-                initGlobalEffect()
-            } else {
-                startSessionMonitor()
+            masterEnabled = repository.getBooleanPreference(ViperRepository.PREF_MASTER_ENABLE).first()
+            if (masterEnabled) {
+                if (globalMode) {
+                    initGlobalEffect()
+                } else {
+                    startSessionMonitor()
+                }
             }
             startAudioOutputMonitor()
         }
@@ -275,6 +279,13 @@ class ViperService : LifecycleService() {
         sessionId: Int,
         packageName: String,
     ) {
+        if (!masterEnabled) {
+            FileLogger.d(
+                "Service",
+                "Master off: skipping per-app session $sessionId ($packageName)",
+            )
+            return
+        }
         if (globalMode) {
             FileLogger.d(
                 "Service",
@@ -579,13 +590,6 @@ class ViperService : LifecycleService() {
         ConfigChannel.writeBulkDdc(a.size, flat)
     }
 
-    fun setEffectEnabled(enabled: Boolean) {
-        globalEffect?.enabled = enabled
-        for (i in 0 until sessions.size) {
-            sessions.valueAt(i).enabled = enabled
-        }
-    }
-
     fun getActiveEffect(): ViperEffect? {
         globalEffect?.let { if (it.isCreated) return it }
         for (i in 0 until sessions.size) {
@@ -595,20 +599,38 @@ class ViperService : LifecycleService() {
         return null
     }
 
-    fun recreateGlobalEffect(aidlType: Boolean) {
-        globalEffect?.let {
-            it.enabled = false
-            it.release()
-        }
-        globalEffect = null
-        useAidlTypeUuid = aidlType
-        if (globalMode) {
-            initGlobalEffect()
+    fun setMasterEnabled(enabled: Boolean) {
+        if (masterEnabled == enabled) return
+        masterEnabled = enabled
+        if (enabled) {
+            if (globalMode) {
+                if (globalEffect == null) initGlobalEffect()
+            } else {
+                startSessionMonitor()
+            }
+        } else {
+            stopSessionMonitor()
+            releaseAllSessions()
+            globalEffect?.let {
+                it.enabled = false
+                it.release()
+            }
+            globalEffect = null
         }
     }
 
     fun setGlobalMode(enabled: Boolean) {
         globalMode = enabled
+        if (!masterEnabled) {
+            stopSessionMonitor()
+            releaseAllSessions()
+            globalEffect?.let {
+                it.enabled = false
+                it.release()
+            }
+            globalEffect = null
+            return
+        }
         if (enabled) {
             stopSessionMonitor()
             releaseAllSessions()
