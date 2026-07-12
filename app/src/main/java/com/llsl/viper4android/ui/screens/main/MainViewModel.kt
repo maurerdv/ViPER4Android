@@ -486,6 +486,7 @@ class MainViewModel
         }
 
         fun setEqBands(bands: List<Double>) {
+            applyPref(Effects.equalizer.presetId, null)
             applyPref(Effects.equalizer.bands, bands)
             _uiState.update { state ->
                 val updatedMap =
@@ -586,36 +587,43 @@ class MainViewModel
         }
 
         fun setDynamicSystemXLow(value: Int) {
+            applyPref(Effects.dynamicSystem.presetId, null)
             applyPref(Effects.dynamicSystem.xLow, value)
             dispatchDynamicSystem()
         }
 
         fun setDynamicSystemXHigh(value: Int) {
+            applyPref(Effects.dynamicSystem.presetId, null)
             applyPref(Effects.dynamicSystem.xHigh, value)
             dispatchDynamicSystem()
         }
 
         fun setDynamicSystemYLow(value: Int) {
+            applyPref(Effects.dynamicSystem.presetId, null)
             applyPref(Effects.dynamicSystem.yLow, value)
             dispatchDynamicSystem()
         }
 
         fun setDynamicSystemYHigh(value: Int) {
+            applyPref(Effects.dynamicSystem.presetId, null)
             applyPref(Effects.dynamicSystem.yHigh, value)
             dispatchDynamicSystem()
         }
 
         fun setDynamicSystemSideGainLow(value: Int) {
+            applyPref(Effects.dynamicSystem.presetId, null)
             applyPref(Effects.dynamicSystem.sideGainLow, value)
             dispatchDynamicSystem()
         }
 
         fun setDynamicSystemSideGainHigh(value: Int) {
+            applyPref(Effects.dynamicSystem.presetId, null)
             applyPref(Effects.dynamicSystem.sideGainHigh, value)
             dispatchDynamicSystem()
         }
 
         fun setDynamicSystemStrength(value: Int) {
+            applyPref(Effects.dynamicSystem.presetId, null)
             applyPref(Effects.dynamicSystem.strength, value)
             dispatchDynamicSystem()
         }
