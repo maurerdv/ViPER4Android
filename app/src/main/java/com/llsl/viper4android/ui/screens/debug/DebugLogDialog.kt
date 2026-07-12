@@ -39,6 +39,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.llsl.viper4android.R
+import com.llsl.viper4android.ui.theme.log_level_debug
+import com.llsl.viper4android.ui.theme.log_level_error
+import com.llsl.viper4android.ui.theme.log_level_info
+import com.llsl.viper4android.ui.theme.log_level_unspecified
+import com.llsl.viper4android.ui.theme.log_level_warn
+import com.llsl.viper4android.ui.theme.log_source_app
+import com.llsl.viper4android.ui.theme.log_source_driver
 
 private enum class SourceFilter { ALL, APP, DRIVER }
 
@@ -287,25 +294,25 @@ private fun matchesLevel(
 
 private fun colorForSource(source: SourceFilter): Color =
     when (source) {
-        SourceFilter.ALL -> Color.Unspecified
-        SourceFilter.APP -> Color(0xFF66BB6A)
-        SourceFilter.DRIVER -> Color(0xFFAB47BC)
+        SourceFilter.ALL -> log_level_unspecified
+        SourceFilter.APP -> log_source_app
+        SourceFilter.DRIVER -> log_source_driver
     }
 
 private fun colorForLevel(level: LevelFilter): Color =
     when (level) {
-        LevelFilter.ALL -> Color.Unspecified
-        LevelFilter.INFO -> Color(0xFF42A5F5)
-        LevelFilter.DEBUG -> Color.Gray
-        LevelFilter.WARN -> Color(0xFFFFA726)
-        LevelFilter.ERROR -> Color(0xFFEF5350)
+        LevelFilter.ALL -> log_level_unspecified
+        LevelFilter.INFO -> log_level_info
+        LevelFilter.DEBUG -> log_level_debug
+        LevelFilter.WARN -> log_level_warn
+        LevelFilter.ERROR -> log_level_error
     }
 
 private fun colorForEntry(entry: LogEntry): Color =
     when (entry.level) {
-        LogLevel.ERROR -> Color(0xFFEF5350)
-        LogLevel.WARN -> Color(0xFFFFA726)
-        LogLevel.INFO -> Color(0xFF42A5F5)
-        LogLevel.DEBUG -> Color.Gray
-        LogLevel.UNKNOWN -> Color.Unspecified
+        LogLevel.ERROR -> log_level_error
+        LogLevel.WARN -> log_level_warn
+        LogLevel.INFO -> log_level_info
+        LogLevel.DEBUG -> log_level_debug
+        LogLevel.UNKNOWN -> log_level_unspecified
     }

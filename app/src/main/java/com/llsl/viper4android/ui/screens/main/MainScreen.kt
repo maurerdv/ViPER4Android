@@ -42,7 +42,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -61,6 +60,7 @@ import com.llsl.viper4android.ui.theme.master_on_container_dark
 import com.llsl.viper4android.ui.theme.master_on_container_light
 import com.llsl.viper4android.ui.theme.master_on_onContainer_dark
 import com.llsl.viper4android.ui.theme.master_on_onContainer_light
+import com.llsl.viper4android.ui.theme.status_active_green
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -233,7 +233,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                         if (deviceName.isNotEmpty()) {
                             val dotColor =
                                 if (state.masterEnable) {
-                                    Color(0xFF43A047)
+                                    status_active_green
                                 } else {
                                     MaterialTheme.colorScheme.onSurfaceVariant
                                 }

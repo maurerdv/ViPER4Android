@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.llsl.viper4android.R
 import com.llsl.viper4android.data.model.DeviceSettings
+import com.llsl.viper4android.ui.theme.status_active_green
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -252,7 +253,7 @@ private fun DeviceListView(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (isActive) {
                             Canvas(modifier = Modifier.size(8.dp)) {
-                                drawCircle(Color(0xFF4CAF50))
+                                drawCircle(status_active_green)
                             }
                             Spacer(modifier = Modifier.width(6.dp))
                         }
