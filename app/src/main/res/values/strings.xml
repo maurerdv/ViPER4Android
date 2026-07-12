@@ -40,6 +40,10 @@
     <string name="label_strong">Strong</string>
     <string name="label_deleted">Deleted</string>
 
+    <!-- Numeric input dialog -->
+    <string name="dialog_value_range">Range: %1$s \u2013 %2$s</string>
+    <string name="dialog_value_range_unit">Range: %1$s \u2013 %2$s %3$s</string>
+
     <!-- Output / Master limiter -->
     <string name="section_output">Master Limiter</string>
     <string name="label_output_volume">Output Gain</string>
