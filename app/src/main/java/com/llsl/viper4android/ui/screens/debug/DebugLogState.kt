@@ -73,24 +73,32 @@ internal class DebugLogState {
     fun clear() {
         scope.launch {
             epoch++
-            withContext(Dispatchers.IO) { FileLogger.clearLogs() }
+            driverJob?.cancel()
+            withContext(Dispatchers.IO) {
+                FileLogger.clearLogs()
+                flushDriverLogBuffer()
+            }
             synchronized(recentAppMessagesLock) { recentAppMessages.clear() }
             withContext(Dispatchers.Main) {
                 visibleEntries.clear()
                 totalCount = 0
             }
-            restartDriverStream()
+            startDriverStream(useNowTimestamp = true)
+        }
+    }
+
+    private fun flushDriverLogBuffer() {
+        if (!RootShell.isRootAvailable()) return
+        try {
+            RootShell.exec("logcat -c").destroy()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to flush driver log buffer", e)
         }
     }
 
     fun shutdown() {
         FileLogger.setListener(null)
         scope.cancel()
-    }
-
-    private fun restartDriverStream() {
-        driverJob?.cancel()
-        startDriverStream(useNowTimestamp = true)
     }
 
     private fun startDriverStream(useNowTimestamp: Boolean) {
