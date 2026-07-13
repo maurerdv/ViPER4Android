@@ -156,7 +156,6 @@ class MainViewModel
                     viperService = localBinder.service
                     serviceBound = true
                     viperService?.setStateProvider { _uiState.value }
-                    dispatchFullState()
                     queryDriverStatus()
                 }
 
