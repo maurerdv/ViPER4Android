@@ -1,17 +1,17 @@
-package com.llsl.viper4android.audio
+package com.llsl.viper4android.viper
 
 import com.llsl.viper4android.R
 import com.llsl.viper4android.data.repository.ViperRepository
-import com.llsl.viper4android.ui.screens.main.DynamicSystemState
-import com.llsl.viper4android.ui.screens.main.MainUiState
-import com.llsl.viper4android.ui.screens.main.loadEffectPrefs
+import com.llsl.viper4android.effect.DynamicSystemState
+import com.llsl.viper4android.effect.EffectState
+import com.llsl.viper4android.effect.loadEffectPrefs
 import com.llsl.viper4android.utils.FileLogger
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.ln
 import kotlin.math.roundToInt
 
-object EffectDispatcher {
+object ViperDispatcher {
     fun fetCompressorThresholdToRaw(dB: Int): Int = (dB / -60.0 * 100.0).roundToInt()
 
     fun fetCompressorKneeToRaw(dB: Int): Int = (dB / 60.0 * 100.0).roundToInt()
@@ -480,7 +480,7 @@ object EffectDispatcher {
 
     fun dispatchFullState(
         effect: ViperEffect,
-        state: MainUiState,
+        state: EffectState,
         masterEnabled: Boolean,
     ) {
         FileLogger.d(
@@ -492,7 +492,7 @@ object EffectDispatcher {
 
     fun dispatchState(
         effect: ViperEffect,
-        state: MainUiState,
+        state: EffectState,
     ) {
         // Output
         effect.setParameter(ViperParams.PARAM_MASTER_LIMITER_OUTPUT_VOLUME, state.out.volume)
@@ -793,7 +793,7 @@ object EffectDispatcher {
         effect.setParameter(ViperParams.PARAM_DYNAMIC_SYSTEM_SIDE_GAIN, state.sideGainLow, state.sideGainHigh)
     }
 
-    suspend fun loadFullStateFromPrefs(repository: ViperRepository): MainUiState {
+    suspend fun loadFullStateFromPrefs(repository: ViperRepository): EffectState {
         val s = loadEffectPrefs(repository)
         val eqBands = ensureBandCount(s.eq.bands, s.eq.bandCount)
         return s.copy(eq = s.eq.copy(bands = eqBands))

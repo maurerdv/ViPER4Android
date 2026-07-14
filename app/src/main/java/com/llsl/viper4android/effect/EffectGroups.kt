@@ -1,102 +1,11 @@
-package com.llsl.viper4android.ui.screens.main
+package com.llsl.viper4android.effect
 
-import com.llsl.viper4android.audio.ViperParams
-import com.llsl.viper4android.data.repository.ViperRepository
-import kotlinx.coroutines.flow.first
-import org.json.JSONObject
+import com.llsl.viper4android.viper.ViperParams
 
-sealed class EffectPref<T>(
+data class EffectGroup(
     val effectKey: String,
-    val paramId: Int,
-    val jsonKey: String,
-    val defaultValue: T,
-    val get: (MainUiState) -> T,
-    val set: MainUiState.(T) -> MainUiState,
-) {
-    val prefKey: String =
-        if (paramId != -1) {
-            paramId.toString()
-        } else if (effectKey.isEmpty()) {
-            jsonKey
-        } else {
-            "${effectKey}_$jsonKey"
-        }
-
-    abstract fun toRaw(value: T): Int
-}
-
-class IntPref(
-    effectKey: String,
-    paramId: Int,
-    jsonKey: String,
-    defaultValue: Int,
-    get: (MainUiState) -> Int,
-    set: MainUiState.(Int) -> MainUiState,
-) : EffectPref<Int>(effectKey, paramId, jsonKey, defaultValue, get, set) {
-    override fun toRaw(value: Int): Int = value
-}
-
-class BoolPref(
-    effectKey: String,
-    paramId: Int,
-    jsonKey: String,
-    defaultValue: Boolean,
-    get: (MainUiState) -> Boolean,
-    set: MainUiState.(Boolean) -> MainUiState,
-) : EffectPref<Boolean>(effectKey, paramId, jsonKey, defaultValue, get, set) {
-    override fun toRaw(value: Boolean): Int = if (value) 1 else 0
-}
-
-class StringPref(
-    effectKey: String,
-    paramId: Int,
-    jsonKey: String,
-    defaultValue: String,
-    get: (MainUiState) -> String,
-    set: MainUiState.(String) -> MainUiState,
-) : EffectPref<String>(effectKey, paramId, jsonKey, defaultValue, get, set) {
-    override fun toRaw(value: String): Int = 0
-}
-
-class NullableLongPref(
-    effectKey: String,
-    jsonKey: String,
-    get: (MainUiState) -> Long?,
-    set: MainUiState.(Long?) -> MainUiState,
-) : EffectPref<Long?>(effectKey, -1, jsonKey, null, get, set) {
-    override fun toRaw(value: Long?): Int = value?.toInt() ?: -1
-}
-
-class IntListPref(
-    effectKey: String,
-    jsonKey: String,
-    defaultValue: List<Int>,
-    get: (MainUiState) -> List<Int>,
-    set: MainUiState.(List<Int>) -> MainUiState,
-) : EffectPref<List<Int>>(effectKey, -1, jsonKey, defaultValue, get, set) {
-    override fun toRaw(value: List<Int>): Int = 0
-}
-
-class BoolListPref(
-    effectKey: String,
-    jsonKey: String,
-    defaultValue: List<Boolean>,
-    get: (MainUiState) -> List<Boolean>,
-    set: MainUiState.(List<Boolean>) -> MainUiState,
-) : EffectPref<List<Boolean>>(effectKey, -1, jsonKey, defaultValue, get, set) {
-    override fun toRaw(value: List<Boolean>): Int = 0
-}
-
-class DoubleListPref(
-    effectKey: String,
-    paramId: Int,
-    jsonKey: String,
-    defaultValue: List<Double>,
-    get: (MainUiState) -> List<Double>,
-    set: MainUiState.(List<Double>) -> MainUiState,
-) : EffectPref<List<Double>>(effectKey, paramId, jsonKey, defaultValue, get, set) {
-    override fun toRaw(value: List<Double>): Int = 0
-}
+    val prefs: List<EffectPref<*>>,
+)
 
 abstract class EffectGroupBuilder(
     val effectKey: String,
@@ -107,8 +16,8 @@ abstract class EffectGroupBuilder(
         paramId: Int,
         jsonKey: String,
         default: Int,
-        get: (MainUiState) -> Int,
-        set: MainUiState.(Int) -> MainUiState,
+        get: (EffectState) -> Int,
+        set: EffectState.(Int) -> EffectState,
     ): IntPref {
         val pref = IntPref(effectKey, paramId, jsonKey, default, get, set)
         prefList += pref
@@ -119,8 +28,8 @@ abstract class EffectGroupBuilder(
         paramId: Int,
         jsonKey: String,
         default: Boolean,
-        get: (MainUiState) -> Boolean,
-        set: MainUiState.(Boolean) -> MainUiState,
+        get: (EffectState) -> Boolean,
+        set: EffectState.(Boolean) -> EffectState,
     ): BoolPref {
         val pref = BoolPref(effectKey, paramId, jsonKey, default, get, set)
         prefList += pref
@@ -131,8 +40,8 @@ abstract class EffectGroupBuilder(
         paramId: Int,
         jsonKey: String,
         default: String,
-        get: (MainUiState) -> String,
-        set: MainUiState.(String) -> MainUiState,
+        get: (EffectState) -> String,
+        set: EffectState.(String) -> EffectState,
     ): StringPref {
         val pref = StringPref(effectKey, paramId, jsonKey, default, get, set)
         prefList += pref
@@ -141,8 +50,8 @@ abstract class EffectGroupBuilder(
 
     protected fun nullableLong(
         jsonKey: String,
-        get: (MainUiState) -> Long?,
-        set: MainUiState.(Long?) -> MainUiState,
+        get: (EffectState) -> Long?,
+        set: EffectState.(Long?) -> EffectState,
     ): NullableLongPref {
         val pref = NullableLongPref(effectKey, jsonKey, get, set)
         prefList += pref
@@ -152,8 +61,8 @@ abstract class EffectGroupBuilder(
     protected fun intList(
         jsonKey: String,
         default: List<Int>,
-        get: (MainUiState) -> List<Int>,
-        set: MainUiState.(List<Int>) -> MainUiState,
+        get: (EffectState) -> List<Int>,
+        set: EffectState.(List<Int>) -> EffectState,
     ): IntListPref {
         val pref = IntListPref(effectKey, jsonKey, default, get, set)
         prefList += pref
@@ -163,8 +72,8 @@ abstract class EffectGroupBuilder(
     protected fun boolList(
         jsonKey: String,
         default: List<Boolean>,
-        get: (MainUiState) -> List<Boolean>,
-        set: MainUiState.(List<Boolean>) -> MainUiState,
+        get: (EffectState) -> List<Boolean>,
+        set: EffectState.(List<Boolean>) -> EffectState,
     ): BoolListPref {
         val pref = BoolListPref(effectKey, jsonKey, default, get, set)
         prefList += pref
@@ -175,8 +84,8 @@ abstract class EffectGroupBuilder(
         paramId: Int,
         jsonKey: String,
         default: List<Double>,
-        get: (MainUiState) -> List<Double>,
-        set: MainUiState.(List<Double>) -> MainUiState,
+        get: (EffectState) -> List<Double>,
+        set: EffectState.(List<Double>) -> EffectState,
     ): DoubleListPref {
         val pref = DoubleListPref(effectKey, paramId, jsonKey, default, get, set)
         prefList += pref
@@ -185,11 +94,6 @@ abstract class EffectGroupBuilder(
 
     fun toGroup(): EffectGroup = EffectGroup(effectKey, prefList.toList())
 }
-
-data class EffectGroup(
-    val effectKey: String,
-    val prefs: List<EffectPref<*>>,
-)
 
 class MasterLimiterEffect : EffectGroupBuilder("masterLimiter") {
     val threshold =
@@ -1298,253 +1202,3 @@ val EFFECT_GROUPS: List<EffectGroup> =
         Effects.analogX,
         Effects.speakerCorrection,
     ).map { it.toGroup() }
-
-val EFFECT_PREFS: List<EffectPref<*>> =
-    listOf(Effects.masterEnable) + EFFECT_GROUPS.flatMap { it.prefs }
-
-val EFFECT_PREFS_BY_PARAM_ID: Map<Int, EffectPref<*>> =
-    EFFECT_PREFS.filter { it.paramId != -1 }.associateBy { it.paramId }
-
-val ENABLE_PREF_BY_EFFECT_KEY: Map<String, BoolPref> =
-    EFFECT_GROUPS
-        .mapNotNull { group ->
-            val enable = group.prefs.firstOrNull { it.jsonKey == "enable" } as? BoolPref
-            enable?.let { group.effectKey to it }
-        }.toMap()
-
-private fun spJoinInts(list: List<Int>): String = list.joinToString(";")
-
-private fun spSplitInts(
-    s: String,
-    default: List<Int>,
-): List<Int> {
-    if (s.isBlank()) return default
-    val parts = s.split(";").filter { it.isNotBlank() }
-    if (parts.isEmpty()) return default
-    return parts.mapNotNull { it.toIntOrNull() }
-}
-
-private fun spJoinBools(list: List<Boolean>): String = list.joinToString(";") { if (it) "1" else "0" }
-
-private fun spSplitBools(
-    s: String,
-    default: List<Boolean>,
-): List<Boolean> {
-    if (s.isBlank()) return default
-    val parts = s.split(";").filter { it.isNotBlank() }
-    if (parts.isEmpty()) return default
-    return parts.map { it == "1" }
-}
-
-private fun spJoinDoubles(list: List<Double>): String = list.joinToString(";") { String.format(java.util.Locale.US, "%.1f", it) }
-
-private fun spSplitDoubles(
-    s: String,
-    default: List<Double>,
-): List<Double> {
-    if (s.isBlank()) return default
-    val parts = s.split(";").filter { it.isNotBlank() }
-    if (parts.isEmpty()) return default
-    return parts.mapNotNull { it.toDoubleOrNull() }
-}
-
-suspend fun loadEffectPrefs(
-    repository: ViperRepository,
-    state: MainUiState = MainUiState(),
-): MainUiState {
-    var s = state
-    for (pref in EFFECT_PREFS) {
-        s =
-            when (pref) {
-                is IntPref -> {
-                    pref.set(s, repository.getIntPreference(pref.prefKey, pref.defaultValue).first())
-                }
-
-                is BoolPref -> {
-                    pref.set(s, repository.getBooleanPreference(pref.prefKey, pref.defaultValue).first())
-                }
-
-                is StringPref -> {
-                    pref.set(s, repository.getStringPreference(pref.prefKey, pref.defaultValue).first())
-                }
-
-                is NullableLongPref -> {
-                    val raw = repository.getIntPreference(pref.prefKey, -1).first()
-                    pref.set(s, if (raw < 0) null else raw.toLong())
-                }
-
-                is IntListPref -> {
-                    val raw = repository.getStringPreference(pref.prefKey, spJoinInts(pref.defaultValue)).first()
-                    pref.set(s, spSplitInts(raw, pref.defaultValue))
-                }
-
-                is BoolListPref -> {
-                    val raw = repository.getStringPreference(pref.prefKey, spJoinBools(pref.defaultValue)).first()
-                    pref.set(s, spSplitBools(raw, pref.defaultValue))
-                }
-
-                is DoubleListPref -> {
-                    val raw = repository.getStringPreference(pref.prefKey, spJoinDoubles(pref.defaultValue)).first()
-                    pref.set(s, spSplitDoubles(raw, pref.defaultValue))
-                }
-            }
-    }
-    return s
-}
-
-suspend fun saveEffectPrefs(
-    repository: ViperRepository,
-    state: MainUiState,
-) {
-    for (pref in EFFECT_PREFS) {
-        when (pref) {
-            is IntPref -> repository.setIntPreference(pref.prefKey, pref.get(state))
-            is BoolPref -> repository.setBooleanPreference(pref.prefKey, pref.get(state))
-            is StringPref -> repository.setStringPreference(pref.prefKey, pref.get(state))
-            is NullableLongPref -> repository.setIntPreference(pref.prefKey, pref.get(state)?.toInt() ?: -1)
-            is IntListPref -> repository.setStringPreference(pref.prefKey, spJoinInts(pref.get(state)))
-            is BoolListPref -> repository.setStringPreference(pref.prefKey, spJoinBools(pref.get(state)))
-            is DoubleListPref -> repository.setStringPreference(pref.prefKey, spJoinDoubles(pref.get(state)))
-        }
-    }
-}
-
-const val PRESET_SCHEMA_VERSION = 2
-private const val KEY_SCHEMA_VERSION = "schemaVersion"
-private const val KEY_NAME = "name"
-private const val KEY_CREATED_AT = "createdAt"
-
-fun serializeEffectPrefs(state: MainUiState): JSONObject = serializeEffectPrefs(state, name = null, createdAt = null)
-
-fun serializeEffectPrefs(
-    state: MainUiState,
-    name: String?,
-    createdAt: Long?,
-): JSONObject {
-    val root = JSONObject()
-    if (name != null || createdAt != null) {
-        root.put(KEY_SCHEMA_VERSION, PRESET_SCHEMA_VERSION)
-        if (name != null) root.put(KEY_NAME, name)
-        if (createdAt != null) root.put(KEY_CREATED_AT, createdAt)
-    }
-    putPrefValue(root, Effects.masterEnable, state)
-    for (group in EFFECT_GROUPS) {
-        val obj = JSONObject()
-        for (pref in group.prefs) {
-            putPrefValue(obj, pref, state)
-        }
-        root.put(group.effectKey, obj)
-    }
-    return root
-}
-
-private fun putPrefValue(
-    obj: JSONObject,
-    pref: EffectPref<*>,
-    state: MainUiState,
-) {
-    when (pref) {
-        is IntPref -> {
-            obj.put(pref.jsonKey, pref.get(state))
-        }
-
-        is BoolPref -> {
-            obj.put(pref.jsonKey, pref.get(state))
-        }
-
-        is StringPref -> {
-            obj.put(pref.jsonKey, pref.get(state))
-        }
-
-        is NullableLongPref -> {
-            val v = pref.get(state)
-            if (v == null) obj.put(pref.jsonKey, JSONObject.NULL) else obj.put(pref.jsonKey, v)
-        }
-
-        is IntListPref -> {
-            val arr = org.json.JSONArray()
-            for (v in pref.get(state)) arr.put(v)
-            obj.put(pref.jsonKey, arr)
-        }
-
-        is BoolListPref -> {
-            val arr = org.json.JSONArray()
-            for (v in pref.get(state)) arr.put(v)
-            obj.put(pref.jsonKey, arr)
-        }
-
-        is DoubleListPref -> {
-            val arr = org.json.JSONArray()
-            for (v in pref.get(state)) arr.put(v)
-            obj.put(pref.jsonKey, arr)
-        }
-    }
-}
-
-fun deserializeEffectPrefs(
-    obj: JSONObject,
-    state: MainUiState,
-): MainUiState {
-    var s = state
-    s = applyPrefFromJson(s, Effects.masterEnable, obj)
-    for (group in EFFECT_GROUPS) {
-        val sub = obj.optJSONObject(group.effectKey) ?: continue
-        for (pref in group.prefs) {
-            s = applyPrefFromJson(s, pref, sub)
-        }
-    }
-    return s
-}
-
-private fun applyPrefFromJson(
-    state: MainUiState,
-    pref: EffectPref<*>,
-    obj: JSONObject,
-): MainUiState {
-    if (!obj.has(pref.jsonKey)) return state
-    return when (pref) {
-        is IntPref -> {
-            pref.set(state, obj.optInt(pref.jsonKey, pref.get(state)))
-        }
-
-        is BoolPref -> {
-            pref.set(state, obj.optBoolean(pref.jsonKey, pref.get(state)))
-        }
-
-        is StringPref -> {
-            pref.set(state, obj.optString(pref.jsonKey, pref.get(state)))
-        }
-
-        is NullableLongPref -> {
-            val v =
-                if (obj.isNull(pref.jsonKey)) {
-                    null
-                } else {
-                    val raw = obj.optInt(pref.jsonKey, -1)
-                    if (raw < 0) null else raw.toLong()
-                }
-            pref.set(state, v)
-        }
-
-        is IntListPref -> {
-            val arr = obj.optJSONArray(pref.jsonKey) ?: return state
-            val list = mutableListOf<Int>()
-            for (i in 0 until arr.length()) list.add(arr.optInt(i, 0))
-            pref.set(state, list.toList())
-        }
-
-        is BoolListPref -> {
-            val arr = obj.optJSONArray(pref.jsonKey) ?: return state
-            val list = mutableListOf<Boolean>()
-            for (i in 0 until arr.length()) list.add(arr.optBoolean(i, false))
-            pref.set(state, list.toList())
-        }
-
-        is DoubleListPref -> {
-            val arr = obj.optJSONArray(pref.jsonKey) ?: return state
-            val list = mutableListOf<Double>()
-            for (i in 0 until arr.length()) list.add(arr.optDouble(i, 0.0))
-            pref.set(state, list.toList())
-        }
-    }
-}

@@ -1,6 +1,6 @@
-package com.llsl.viper4android.audio
+package com.llsl.viper4android.viper
 
-import com.llsl.viper4android.ui.screens.main.MainUiState
+import com.llsl.viper4android.effect.EffectState
 import com.llsl.viper4android.utils.FileLogger
 import com.llsl.viper4android.utils.RootShell
 import java.io.File
@@ -144,7 +144,7 @@ object ConfigChannel {
      * signature-polymorphic, so R8 minification cannot mangle it.
      */
     @Suppress("NewApi")
-    fun writeFullState(state: MainUiState) {
+    fun writeFullState(state: EffectState) {
         ensureInitialized()
         synchronized(writeLock) {
             val buf =

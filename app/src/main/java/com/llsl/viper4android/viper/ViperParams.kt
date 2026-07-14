@@ -1,4 +1,4 @@
-package com.llsl.viper4android.audio
+package com.llsl.viper4android.viper
 
 object ViperParams {
     const val PARAM_GET_ENABLED = 1

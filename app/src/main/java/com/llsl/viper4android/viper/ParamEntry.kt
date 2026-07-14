@@ -1,4 +1,4 @@
-package com.llsl.viper4android.audio
+package com.llsl.viper4android.viper
 
 data class ParamEntry(
     val paramId: Int,

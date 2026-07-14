@@ -1,5 +1,8 @@
 package com.llsl.viper4android.ui.screens.main
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,11 +41,14 @@ import androidx.compose.material.icons.filled.SurroundSound
 import androidx.compose.material.icons.filled.VerticalAlignCenter
 import androidx.compose.material.icons.filled.Waves
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -51,14 +57,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.llsl.viper4android.R
-import com.llsl.viper4android.ui.components.EffectSection
+import com.llsl.viper4android.effect.EffectState
+import com.llsl.viper4android.effect.Effects
 import com.llsl.viper4android.ui.components.EqCurveGraph
 import com.llsl.viper4android.ui.components.EqEditDialog
 import com.llsl.viper4android.ui.components.LabeledDropdown
@@ -76,8 +86,85 @@ private fun rawToDb(raw: Number): Double = 20.0 * log10(raw.toDouble() / 100.0)
 private fun dbToRaw(db: Double): Int = (10.0.pow(db / 20.0) * 100.0).roundToInt()
 
 @Composable
+fun EffectSection(
+    title: String,
+    enabled: Boolean,
+    onEnabledChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    hasEnableSwitch: Boolean = true,
+    toggleOnly: Boolean = false,
+    initiallyExpanded: Boolean = false,
+    content: @Composable () -> Unit,
+) {
+    var expanded by rememberSaveable { mutableStateOf(initiallyExpanded) }
+
+    Card(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            ),
+    ) {
+        Column {
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .then(if (toggleOnly) Modifier else Modifier.clickable { expanded = !expanded })
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (icon != null) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                }
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f),
+                )
+                if (hasEnableSwitch) {
+                    Switch(
+                        checked = enabled,
+                        onCheckedChange = onEnabledChange,
+                    )
+                }
+            }
+
+            if (!toggleOnly) {
+                AnimatedVisibility(
+                    visible = expanded,
+                    enter = expandVertically(),
+                    exit = shrinkVertically(),
+                ) {
+                    Column(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                    ) {
+                        content()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun MasterLimiterRows(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val outputVolume = state.out.volume
@@ -139,7 +226,7 @@ fun MasterLimiterRows(
 
 @Composable
 fun PlaybackGainSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.playbackGainControl
@@ -205,7 +292,7 @@ fun PlaybackGainSection(
 
 @Composable
 fun LUFSTargetingSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.lufs
@@ -270,7 +357,7 @@ fun LUFSTargetingSection(
 
 @Composable
 fun FetCompressorSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.fetCompressor
@@ -496,7 +583,7 @@ fun FetCompressorSection(
 
 @Composable
 fun MultibandCompressorSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val multibandCompressorVals = state.multibandCompressor
@@ -826,7 +913,7 @@ fun MultibandCompressorSection(
 
 @Composable
 fun DdcSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.ddc
@@ -858,7 +945,7 @@ fun DdcSection(
 
 @Composable
 fun SpectrumExtensionSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.spectrumExtension
@@ -908,7 +995,7 @@ fun SpectrumExtensionSection(
 
 @Composable
 fun EqualizerSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val eqVals = state.eq
@@ -981,7 +1068,7 @@ fun EqualizerSection(
 
 @Composable
 fun DynamicEqSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val dynVals = state.dynamicEq
@@ -1209,7 +1296,7 @@ fun DynamicEqSection(
 
 @Composable
 fun ConvolverSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.convolver
@@ -1255,7 +1342,7 @@ fun ConvolverSection(
 
 @Composable
 fun FieldSurroundSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.fieldSurround
@@ -1318,7 +1405,7 @@ fun FieldSurroundSection(
 
 @Composable
 fun DiffSurroundSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.diffSurround
@@ -1391,7 +1478,7 @@ fun DiffSurroundSection(
 
 @Composable
 fun StereoImagerSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.stereoImager
@@ -1490,7 +1577,7 @@ fun StereoImagerSection(
 
 @Composable
 fun HeadphoneSurroundSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.headphoneSurround
@@ -1522,7 +1609,7 @@ fun HeadphoneSurroundSection(
 
 @Composable
 fun ReverberationSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.reverb
@@ -1616,7 +1703,7 @@ fun ReverberationSection(
 
 @Composable
 fun DynamicSystemSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.dynamicSystem
@@ -1847,7 +1934,7 @@ fun DynamicSystemSection(
 
 @Composable
 fun TubeSimulatorSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.tubeSimulator
@@ -1864,7 +1951,7 @@ fun TubeSimulatorSection(
 
 @Composable
 fun PsychoacousticBassSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.psychoacousticBass
@@ -1948,7 +2035,7 @@ fun PsychoacousticBassSection(
 
 @Composable
 fun ViperBassSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.bass
@@ -2020,7 +2107,7 @@ fun ViperBassSection(
 
 @Composable
 fun ViperBassMonoSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.bassMono
@@ -2092,7 +2179,7 @@ fun ViperBassMonoSection(
 
 @Composable
 fun ViperClaritySection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.clarity
@@ -2139,7 +2226,7 @@ fun ViperClaritySection(
 
 @Composable
 fun AuditoryProtectionSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.cure
@@ -2172,7 +2259,7 @@ fun AuditoryProtectionSection(
 
 @Composable
 fun AnalogXSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     val vals = state.analogX
@@ -2203,7 +2290,7 @@ fun AnalogXSection(
 
 @Composable
 fun SpeakerOptSection(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
 ) {
     EffectSection(

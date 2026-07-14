@@ -1,4 +1,4 @@
-package com.llsl.viper4android.ui.screens.main
+package com.llsl.viper4android.effect
 
 import com.llsl.viper4android.data.model.DsPreset
 import com.llsl.viper4android.data.model.EqPreset
@@ -201,4 +201,34 @@ data class TubeSimulatorState(
 
 data class SpeakerCorrectionState(
     val enable: Boolean = false,
+)
+
+data class EffectState(
+    val masterEnable: Boolean = false,
+    val out: OutputState = OutputState(),
+    val playbackGainControl: PlaybackGainControlState = PlaybackGainControlState(),
+    val lufs: LufsState = LufsState(),
+    val fetCompressor: FetCompressorState = FetCompressorState(),
+    val multibandCompressor: MultibandCompressorState = MultibandCompressorState(),
+    val ddc: DdcState = DdcState(),
+    val spectrumExtension: SpectrumExtensionState = SpectrumExtensionState(),
+    val eq: EqState = EqState(),
+    val dynamicEq: DynamicEqState = DynamicEqState(),
+    val convolver: ConvolverState = ConvolverState(),
+    val fieldSurround: FieldSurroundState = FieldSurroundState(),
+    val diffSurround: DiffSurroundState = DiffSurroundState(),
+    val stereoImager: StereoImagerState = StereoImagerState(),
+    val headphoneSurround: HeadphoneSurroundState = HeadphoneSurroundState(),
+    val reverb: ReverbState = ReverbState(),
+    val dynamicSystem: DynamicSystemState = DynamicSystemState(),
+    val psychoacousticBass: PsychoacousticBassState = PsychoacousticBassState(),
+    val bass: BassState = BassState(),
+    val bassMono: BassMonoState = BassMonoState(),
+    val clarity: ClarityState = ClarityState(),
+    val cure: CureState = CureState(),
+    val analogX: AnalogXState = AnalogXState(),
+    val tubeSimulator: TubeSimulatorState = TubeSimulatorState(),
+    val speakerCorrection: SpeakerCorrectionState = SpeakerCorrectionState(),
+    val activeDeviceName: String = "",
+    val activeDeviceId: String = "",
 )

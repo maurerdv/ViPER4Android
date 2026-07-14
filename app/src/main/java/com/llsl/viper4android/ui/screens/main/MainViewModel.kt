@@ -14,20 +14,38 @@ import androidx.lifecycle.viewModelScope
 import com.llsl.viper4android.BULK_OP_CHANNEL_ID
 import com.llsl.viper4android.audio.AudioDevice
 import com.llsl.viper4android.audio.AudioOutputDetector
-import com.llsl.viper4android.audio.ConfigChannel
-import com.llsl.viper4android.audio.EffectDispatcher
-import com.llsl.viper4android.audio.ParamEntry
-import com.llsl.viper4android.audio.ViperEffect
-import com.llsl.viper4android.audio.ViperParams
-import com.llsl.viper4android.audio.WavDecoder
 import com.llsl.viper4android.data.model.DeviceSettings
 import com.llsl.viper4android.data.model.DsPreset
 import com.llsl.viper4android.data.model.EqPreset
 import com.llsl.viper4android.data.model.Preset
 import com.llsl.viper4android.data.repository.ViperRepository
+import com.llsl.viper4android.data.repository.ViperRepository.Companion.PREF_AUTO_START
+import com.llsl.viper4android.data.repository.ViperRepository.Companion.PREF_DEBUG_MODE
+import com.llsl.viper4android.data.repository.ViperRepository.Companion.PREF_GLOBAL_MODE
+import com.llsl.viper4android.effect.BoolListPref
+import com.llsl.viper4android.effect.BoolPref
+import com.llsl.viper4android.effect.DoubleListPref
+import com.llsl.viper4android.effect.ENABLE_PREF_BY_EFFECT_KEY
+import com.llsl.viper4android.effect.EffectPref
+import com.llsl.viper4android.effect.EffectState
+import com.llsl.viper4android.effect.Effects
+import com.llsl.viper4android.effect.IntListPref
+import com.llsl.viper4android.effect.IntPref
+import com.llsl.viper4android.effect.NullableLongPref
+import com.llsl.viper4android.effect.StringPref
+import com.llsl.viper4android.effect.deserializeEffectPrefs
+import com.llsl.viper4android.effect.loadEffectPrefs
+import com.llsl.viper4android.effect.saveEffectPrefs
+import com.llsl.viper4android.effect.serializeEffectPrefs
 import com.llsl.viper4android.service.ViperService
 import com.llsl.viper4android.utils.FileLogger
 import com.llsl.viper4android.utils.RootShell
+import com.llsl.viper4android.utils.WavDecoder
+import com.llsl.viper4android.viper.ConfigChannel
+import com.llsl.viper4android.viper.ParamEntry
+import com.llsl.viper4android.viper.ViperDispatcher
+import com.llsl.viper4android.viper.ViperEffect
+import com.llsl.viper4android.viper.ViperParams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -60,36 +78,6 @@ data class DriverStatus(
     val samplingRate: Int = 0,
 )
 
-data class MainUiState(
-    val masterEnable: Boolean = false,
-    val out: OutputState = OutputState(),
-    val playbackGainControl: PlaybackGainControlState = PlaybackGainControlState(),
-    val lufs: LufsState = LufsState(),
-    val fetCompressor: FetCompressorState = FetCompressorState(),
-    val multibandCompressor: MultibandCompressorState = MultibandCompressorState(),
-    val ddc: DdcState = DdcState(),
-    val spectrumExtension: SpectrumExtensionState = SpectrumExtensionState(),
-    val eq: EqState = EqState(),
-    val dynamicEq: DynamicEqState = DynamicEqState(),
-    val convolver: ConvolverState = ConvolverState(),
-    val fieldSurround: FieldSurroundState = FieldSurroundState(),
-    val diffSurround: DiffSurroundState = DiffSurroundState(),
-    val stereoImager: StereoImagerState = StereoImagerState(),
-    val headphoneSurround: HeadphoneSurroundState = HeadphoneSurroundState(),
-    val reverb: ReverbState = ReverbState(),
-    val dynamicSystem: DynamicSystemState = DynamicSystemState(),
-    val psychoacousticBass: PsychoacousticBassState = PsychoacousticBassState(),
-    val bass: BassState = BassState(),
-    val bassMono: BassMonoState = BassMonoState(),
-    val clarity: ClarityState = ClarityState(),
-    val cure: CureState = CureState(),
-    val analogX: AnalogXState = AnalogXState(),
-    val tubeSimulator: TubeSimulatorState = TubeSimulatorState(),
-    val speakerCorrection: SpeakerCorrectionState = SpeakerCorrectionState(),
-    val activeDeviceName: String = "",
-    val activeDeviceId: String = "",
-)
-
 @Suppress("StaticFieldLeak")
 @HiltViewModel
 class MainViewModel
@@ -99,9 +87,6 @@ class MainViewModel
         private val repository: ViperRepository,
     ) : AndroidViewModel(application) {
         companion object {
-            const val PREF_AUTO_START = "auto_start"
-            const val PREF_GLOBAL_MODE = "global_mode"
-            const val PREF_DEBUG_MODE = "debug_mode"
             private const val NOTIFY_ID_PRESET_IMPORT = 2
             private const val NOTIFY_ID_PRESET_CLEAR = 3
             private const val NOTIFY_ID_KERNEL_IMPORT = 4
@@ -110,8 +95,8 @@ class MainViewModel
             private const val PROGRESS_DRAIN_DELAY_MS = 250L
         }
 
-        private val _uiState = MutableStateFlow(MainUiState())
-        val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
+        private val _uiState = MutableStateFlow(EffectState())
+        val uiState: StateFlow<EffectState> = _uiState.asStateFlow()
 
         val presetList: StateFlow<List<Preset>> =
             repository.getAllPresets().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -585,7 +570,7 @@ class MainViewModel
                         ParamEntry(ViperParams.PARAM_DYNAMIC_SYSTEM_ENABLE, intArrayOf(if (v.enable) 1 else 0)),
                         ParamEntry(
                             ViperParams.PARAM_DYNAMIC_SYSTEM_STRENGTH,
-                            intArrayOf(EffectDispatcher.dynamicSystemStrengthToRaw(v.strength)),
+                            intArrayOf(ViperDispatcher.dynamicSystemStrengthToRaw(v.strength)),
                         ),
                         ParamEntry(ViperParams.PARAM_DYNAMIC_SYSTEM_X_COEFFICIENTS, intArrayOf(v.xLow, v.xHigh)),
                         ParamEntry(ViperParams.PARAM_DYNAMIC_SYSTEM_Y_COEFFICIENTS, intArrayOf(v.yLow, v.yHigh)),
@@ -1051,14 +1036,14 @@ class MainViewModel
                             ParamEntry(ViperParams.PARAM_FET_COMPRESSOR_ENABLE, intArrayOf(if (v.enable) 100 else 0)),
                             ParamEntry(
                                 ViperParams.PARAM_FET_COMPRESSOR_THRESHOLD,
-                                intArrayOf(EffectDispatcher.fetCompressorThresholdToRaw(v.threshold)),
+                                intArrayOf(ViperDispatcher.fetCompressorThresholdToRaw(v.threshold)),
                             ),
                             ParamEntry(ViperParams.PARAM_FET_COMPRESSOR_RATIO, intArrayOf(v.ratio)),
                             ParamEntry(ViperParams.PARAM_FET_COMPRESSOR_KNEE_AUTO, intArrayOf(if (v.kneeAuto) 100 else 0)),
-                            ParamEntry(ViperParams.PARAM_FET_COMPRESSOR_KNEE, intArrayOf(EffectDispatcher.fetCompressorKneeToRaw(v.knee))),
+                            ParamEntry(ViperParams.PARAM_FET_COMPRESSOR_KNEE, intArrayOf(ViperDispatcher.fetCompressorKneeToRaw(v.knee))),
                             ParamEntry(ViperParams.PARAM_FET_COMPRESSOR_KNEE_MULTI, intArrayOf(v.kneeMulti)),
                             ParamEntry(ViperParams.PARAM_FET_COMPRESSOR_GAIN_AUTO, intArrayOf(if (v.gainAuto) 100 else 0)),
-                            ParamEntry(ViperParams.PARAM_FET_COMPRESSOR_GAIN, intArrayOf(EffectDispatcher.fetCompressorGainToRaw(v.gain))),
+                            ParamEntry(ViperParams.PARAM_FET_COMPRESSOR_GAIN, intArrayOf(ViperDispatcher.fetCompressorGainToRaw(v.gain))),
                         ),
                     )
                 }
@@ -1101,7 +1086,7 @@ class MainViewModel
                             ParamEntry(ViperParams.PARAM_SPECTRUM_EXTENSION_STRENGTH, intArrayOf(v.strength)),
                             ParamEntry(
                                 ViperParams.PARAM_SPECTRUM_EXTENSION_EXCITER,
-                                intArrayOf(EffectDispatcher.spectrumExtensionExciterToRaw(v.exciter)),
+                                intArrayOf(ViperDispatcher.spectrumExtensionExciterToRaw(v.exciter)),
                             ),
                         ),
                     )
@@ -1159,15 +1144,15 @@ class MainViewModel
                             ParamEntry(ViperParams.PARAM_FIELD_SURROUND_ENABLE, intArrayOf(if (v.enable) 1 else 0)),
                             ParamEntry(
                                 ViperParams.PARAM_FIELD_SURROUND_WIDENING,
-                                intArrayOf(EffectDispatcher.fieldSurroundWideningToRaw(v.widening)),
+                                intArrayOf(ViperDispatcher.fieldSurroundWideningToRaw(v.widening)),
                             ),
                             ParamEntry(
                                 ViperParams.PARAM_FIELD_SURROUND_MID_IMAGE,
-                                intArrayOf(EffectDispatcher.fieldSurroundMidImageToRaw(v.midImage)),
+                                intArrayOf(ViperDispatcher.fieldSurroundMidImageToRaw(v.midImage)),
                             ),
                             ParamEntry(
                                 ViperParams.PARAM_FIELD_SURROUND_DEPTH,
-                                intArrayOf(EffectDispatcher.fieldSurroundDepthToRaw(v.depth)),
+                                intArrayOf(ViperDispatcher.fieldSurroundDepthToRaw(v.depth)),
                             ),
                         ),
                     )
@@ -1183,7 +1168,7 @@ class MainViewModel
                     viperService?.dispatchParamsBatch(
                         listOf(
                             ParamEntry(ViperParams.PARAM_DIFF_SURROUND_ENABLE, intArrayOf(if (v.enable) 1 else 0)),
-                            ParamEntry(ViperParams.PARAM_DIFF_SURROUND_DELAY, intArrayOf(EffectDispatcher.diffSurroundDelayToRaw(v.delay))),
+                            ParamEntry(ViperParams.PARAM_DIFF_SURROUND_DELAY, intArrayOf(ViperDispatcher.diffSurroundDelayToRaw(v.delay))),
                             ParamEntry(ViperParams.PARAM_DIFF_SURROUND_REVERSE, intArrayOf(if (v.reverse) 1 else 0)),
                             ParamEntry(ViperParams.PARAM_DIFF_SURROUND_WET_DRY_MIX, intArrayOf(v.wetDryMix)),
                             ParamEntry(ViperParams.PARAM_DIFF_SURROUND_LP_CUTOFF, intArrayOf(v.lpCutoff)),
@@ -1290,7 +1275,7 @@ class MainViewModel
                         listOf(
                             ParamEntry(ViperParams.PARAM_BASS_ENABLE, intArrayOf(if (v.enable) 1 else 0)),
                             ParamEntry(ViperParams.PARAM_BASS_MODE, intArrayOf(v.mode)),
-                            ParamEntry(ViperParams.PARAM_BASS_FREQUENCY, intArrayOf(EffectDispatcher.bassFrequencyToRaw(v.frequency))),
+                            ParamEntry(ViperParams.PARAM_BASS_FREQUENCY, intArrayOf(ViperDispatcher.bassFrequencyToRaw(v.frequency))),
                             ParamEntry(ViperParams.PARAM_BASS_GAIN, intArrayOf(v.gain)),
                             ParamEntry(ViperParams.PARAM_BASS_ANTI_POP, intArrayOf(if (v.antiPop) 1 else 0)),
                         ),
@@ -1308,7 +1293,7 @@ class MainViewModel
                         listOf(
                             ParamEntry(ViperParams.PARAM_BASS_MONO_ENABLE, intArrayOf(if (v.enable) 1 else 0)),
                             ParamEntry(ViperParams.PARAM_BASS_MONO_MODE, intArrayOf(v.mode)),
-                            ParamEntry(ViperParams.PARAM_BASS_MONO_FREQUENCY, intArrayOf(EffectDispatcher.bassFrequencyToRaw(v.frequency))),
+                            ParamEntry(ViperParams.PARAM_BASS_MONO_FREQUENCY, intArrayOf(ViperDispatcher.bassFrequencyToRaw(v.frequency))),
                             ParamEntry(ViperParams.PARAM_BASS_MONO_GAIN, intArrayOf(v.gain)),
                             ParamEntry(ViperParams.PARAM_BASS_MONO_ANTI_POP, intArrayOf(if (v.antiPop) 1 else 0)),
                         ),
@@ -1539,7 +1524,7 @@ class MainViewModel
                 val destDir = getFilesDir("Preset")
                 val baseState = _uiState.value
                 var count = 0
-                var lastParsed: MainUiState? = null
+                var lastParsed: EffectState? = null
                 for ((index, uri) in uris.withIndex()) {
                     try {
                         val tmpFile = copyUriToFile(uri, destDir, "import_$index.json")
@@ -1777,7 +1762,11 @@ class MainViewModel
                 try {
                     val file = File(getFilesDir("Preset"), "${preset.name}.json")
                     val fileJson =
-                        serializeEffectPrefs(_uiState.value, name = preset.name, createdAt = preset.createdAt).toString()
+                        serializeEffectPrefs(
+                            _uiState.value,
+                            name = preset.name,
+                            createdAt = preset.createdAt,
+                        ).toString()
                     FileOutputStream(file).use { fos ->
                         fos.write(fileJson.toByteArray(Charsets.UTF_8))
                         fos.fd.sync()

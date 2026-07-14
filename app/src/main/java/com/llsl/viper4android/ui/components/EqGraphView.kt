@@ -53,8 +53,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.llsl.viper4android.R
-import com.llsl.viper4android.audio.EffectDispatcher
 import com.llsl.viper4android.data.model.EqPreset
+import com.llsl.viper4android.viper.ViperDispatcher
 import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
@@ -71,7 +71,7 @@ fun EqCurveGraph(
     modifier: Modifier = Modifier,
     bandCount: Int = 10,
 ) {
-    val freqLabels = EffectDispatcher.eqGraphLabelsForCount(bandCount)
+    val freqLabels = ViperDispatcher.eqGraphLabelsForCount(bandCount)
     val primary = MaterialTheme.colorScheme.primary
     val surfaceDark = MaterialTheme.colorScheme.surfaceContainerHighest
     val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
@@ -389,7 +389,7 @@ fun EqEditDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                val bandLabels = EffectDispatcher.eqBandLabelsForCount(bandCount)
+                val bandLabels = ViperDispatcher.eqBandLabelsForCount(bandCount)
 
                 bandLabels.forEachIndexed { index, label ->
                     if (index < localBands.size) {

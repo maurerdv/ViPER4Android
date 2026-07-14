@@ -1,36 +1,36 @@
-package com.llsl.viper4android.audio
+package com.llsl.viper4android.viper
 
-import com.llsl.viper4android.ui.screens.main.AnalogXState
-import com.llsl.viper4android.ui.screens.main.BassMonoState
-import com.llsl.viper4android.ui.screens.main.BassState
-import com.llsl.viper4android.ui.screens.main.ClarityState
-import com.llsl.viper4android.ui.screens.main.ConvolverState
-import com.llsl.viper4android.ui.screens.main.CureState
-import com.llsl.viper4android.ui.screens.main.DdcState
-import com.llsl.viper4android.ui.screens.main.DiffSurroundState
-import com.llsl.viper4android.ui.screens.main.DynamicEqState
-import com.llsl.viper4android.ui.screens.main.DynamicSystemState
-import com.llsl.viper4android.ui.screens.main.EqState
-import com.llsl.viper4android.ui.screens.main.FetCompressorState
-import com.llsl.viper4android.ui.screens.main.FieldSurroundState
-import com.llsl.viper4android.ui.screens.main.HeadphoneSurroundState
-import com.llsl.viper4android.ui.screens.main.LufsState
-import com.llsl.viper4android.ui.screens.main.MainUiState
-import com.llsl.viper4android.ui.screens.main.MultibandCompressorState
-import com.llsl.viper4android.ui.screens.main.OutputState
-import com.llsl.viper4android.ui.screens.main.PlaybackGainControlState
-import com.llsl.viper4android.ui.screens.main.PsychoacousticBassState
-import com.llsl.viper4android.ui.screens.main.ReverbState
-import com.llsl.viper4android.ui.screens.main.SpeakerCorrectionState
-import com.llsl.viper4android.ui.screens.main.SpectrumExtensionState
-import com.llsl.viper4android.ui.screens.main.StereoImagerState
-import com.llsl.viper4android.ui.screens.main.TubeSimulatorState
+import com.llsl.viper4android.effect.AnalogXState
+import com.llsl.viper4android.effect.BassMonoState
+import com.llsl.viper4android.effect.BassState
+import com.llsl.viper4android.effect.ClarityState
+import com.llsl.viper4android.effect.ConvolverState
+import com.llsl.viper4android.effect.CureState
+import com.llsl.viper4android.effect.DdcState
+import com.llsl.viper4android.effect.DiffSurroundState
+import com.llsl.viper4android.effect.DynamicEqState
+import com.llsl.viper4android.effect.DynamicSystemState
+import com.llsl.viper4android.effect.EffectState
+import com.llsl.viper4android.effect.EqState
+import com.llsl.viper4android.effect.FetCompressorState
+import com.llsl.viper4android.effect.FieldSurroundState
+import com.llsl.viper4android.effect.HeadphoneSurroundState
+import com.llsl.viper4android.effect.LufsState
+import com.llsl.viper4android.effect.MultibandCompressorState
+import com.llsl.viper4android.effect.OutputState
+import com.llsl.viper4android.effect.PlaybackGainControlState
+import com.llsl.viper4android.effect.PsychoacousticBassState
+import com.llsl.viper4android.effect.ReverbState
+import com.llsl.viper4android.effect.SpeakerCorrectionState
+import com.llsl.viper4android.effect.SpectrumExtensionState
+import com.llsl.viper4android.effect.StereoImagerState
+import com.llsl.viper4android.effect.TubeSimulatorState
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.ln
 
 /**
- * Serialize a MainUiState to the byte layout of viper::ViPERParams as defined in ViperParamsLayout.kt.
+ * Serialize an EffectState to the byte layout of viper::ViPERParams as defined in ViperParamsLayout.kt.
  */
 object ViperParamsSerializer {
     private fun fetThresholdToFloat(dB: Int): Float = (dB / -60.0).toFloat()
@@ -73,7 +73,7 @@ object ViperParamsSerializer {
     fun write(
         buf: ByteBuffer,
         offset: Int,
-        state: MainUiState,
+        state: EffectState,
     ) {
         require(buf.order() == ByteOrder.LITTLE_ENDIAN) {
             "ByteBuffer must be little-endian to match C++ struct layout"

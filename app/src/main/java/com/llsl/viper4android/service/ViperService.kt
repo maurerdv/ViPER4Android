@@ -16,19 +16,18 @@ import com.llsl.viper4android.SERVICE_CHANNEL_ID
 import com.llsl.viper4android.audio.AudioDevice
 import com.llsl.viper4android.audio.AudioOutputDetector
 import com.llsl.viper4android.audio.AudioSessionMonitor
-import com.llsl.viper4android.audio.ConfigChannel
-import com.llsl.viper4android.audio.EffectDispatcher
-import com.llsl.viper4android.audio.ParamEntry
-import com.llsl.viper4android.audio.ViperEffect
-import com.llsl.viper4android.audio.ViperParams
 import com.llsl.viper4android.data.model.DeviceSettings
 import com.llsl.viper4android.data.repository.ViperRepository
-import com.llsl.viper4android.ui.screens.main.MainUiState
-import com.llsl.viper4android.ui.screens.main.MainViewModel
-import com.llsl.viper4android.ui.screens.main.deserializeEffectPrefs
-import com.llsl.viper4android.ui.screens.main.serializeEffectPrefs
+import com.llsl.viper4android.effect.EffectState
+import com.llsl.viper4android.effect.deserializeEffectPrefs
+import com.llsl.viper4android.effect.serializeEffectPrefs
 import com.llsl.viper4android.utils.FileLogger
 import com.llsl.viper4android.utils.RootShell
+import com.llsl.viper4android.viper.ConfigChannel
+import com.llsl.viper4android.viper.ParamEntry
+import com.llsl.viper4android.viper.ViperDispatcher
+import com.llsl.viper4android.viper.ViperEffect
+import com.llsl.viper4android.viper.ViperParams
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -70,10 +69,10 @@ class ViperService : LifecycleService() {
     private var masterEnabled: Boolean = false
     private var audioOutputDetector: AudioOutputDetector? = null
     private var sessionMonitor: AudioSessionMonitor? = null
-    private var stateProvider: (() -> MainUiState)? = null
-    private var lastUiState: MainUiState? = null
+    private var stateProvider: (() -> EffectState)? = null
+    private var lastUiState: EffectState? = null
 
-    fun setStateProvider(provider: () -> MainUiState) {
+    fun setStateProvider(provider: () -> EffectState) {
         stateProvider = provider
     }
 
@@ -83,7 +82,7 @@ class ViperService : LifecycleService() {
         FileLogger.i("Service", "Service created")
         lifecycleScope.launch {
             useAidlTypeUuid = repository.aidlMode
-            globalMode = repository.getBooleanPreference(MainViewModel.PREF_GLOBAL_MODE).first()
+            globalMode = repository.getBooleanPreference(ViperRepository.PREF_GLOBAL_MODE).first()
             masterEnabled = repository.getBooleanPreference(ViperRepository.PREF_MASTER_ENABLE).first()
             if (masterEnabled) {
                 if (globalMode) {
@@ -139,17 +138,17 @@ class ViperService : LifecycleService() {
 
     private suspend fun reapplyForDevice(device: AudioDevice) {
         val saved = repository.getDeviceSettings(device.id)
-        val state: MainUiState =
+        val state: EffectState =
             if (saved != null) {
                 FileLogger.i("Service", "Loading device settings from DB for ${device.id}")
-                val baseState = EffectDispatcher.loadFullStateFromPrefs(repository)
+                val baseState = ViperDispatcher.loadFullStateFromPrefs(repository)
                 val json = JSONObject(saved.settingsJson)
                 deserializeEffectPrefs(json, baseState).also {
                     repository.updateDeviceLastConnected(device.id)
                 }
             } else {
                 FileLogger.i("Service", "No DB entry for ${device.id}, using DataStore defaults")
-                val s = EffectDispatcher.loadFullStateFromPrefs(repository)
+                val s = ViperDispatcher.loadFullStateFromPrefs(repository)
                 val json = serializeEffectPrefs(s)
                 repository.saveDeviceSettings(
                     DeviceSettings(
@@ -170,7 +169,7 @@ class ViperService : LifecycleService() {
                 writeAidlFullState(state)
                 shmWritten = true
             } else {
-                EffectDispatcher.dispatchFullState(it, state, isMasterOn)
+                ViperDispatcher.dispatchFullState(it, state, isMasterOn)
             }
         }
         for (i in 0 until sessions.size) {
@@ -182,7 +181,7 @@ class ViperService : LifecycleService() {
                     shmWritten = true
                 }
             } else {
-                EffectDispatcher.dispatchFullState(effect, state, isMasterOn)
+                ViperDispatcher.dispatchFullState(effect, state, isMasterOn)
             }
         }
     }
@@ -191,7 +190,7 @@ class ViperService : LifecycleService() {
         effect: ViperEffect,
         skipShmWrite: Boolean = false,
     ) {
-        val state = EffectDispatcher.loadFullStateFromPrefs(repository)
+        val state = ViperDispatcher.loadFullStateFromPrefs(repository)
         val isMasterOn = state.masterEnable
         effect.enabled = isMasterOn
         if (useAidlTypeUuid) {
@@ -204,10 +203,10 @@ class ViperService : LifecycleService() {
             }
             return
         }
-        EffectDispatcher.dispatchFullState(effect, state, isMasterOn)
+        ViperDispatcher.dispatchFullState(effect, state, isMasterOn)
     }
 
-    private fun writeAidlFullState(state: MainUiState) {
+    private fun writeAidlFullState(state: EffectState) {
         lastUiState = state
         ConfigChannel.writeFullState(state)
         if (state.ddc.enable && state.ddc.device.isNotEmpty()) {
@@ -422,9 +421,9 @@ class ViperService : LifecycleService() {
                 sessions.valueAt(i).setParameter(ViperParams.PARAM_EQUALIZER_BAND_COUNT, bandCount)
             }
         }
-        globalEffect?.let { EffectDispatcher.dispatchEqBands(it, bands) }
+        globalEffect?.let { ViperDispatcher.dispatchEqBands(it, bands) }
         for (i in 0 until sessions.size) {
-            EffectDispatcher.dispatchEqBands(sessions.valueAt(i), bands)
+            ViperDispatcher.dispatchEqBands(sessions.valueAt(i), bands)
         }
     }
 
@@ -485,11 +484,11 @@ class ViperService : LifecycleService() {
             return
         }
         val effect = globalEffect ?: return
-        EffectDispatcher.dispatchDdcCoefficients(effect, sec44100, sec48000)
+        ViperDispatcher.dispatchDdcCoefficients(effect, sec44100, sec48000)
     }
 
     fun dispatchFullState(
-        state: MainUiState,
+        state: EffectState,
         masterEnabled: Boolean,
     ) {
         lastUiState = state
@@ -509,12 +508,12 @@ class ViperService : LifecycleService() {
         }
         globalEffect?.let { effect ->
             effect.enabled = masterEnabled
-            EffectDispatcher.dispatchFullState(effect, state, masterEnabled)
+            ViperDispatcher.dispatchFullState(effect, state, masterEnabled)
         }
         for (i in 0 until sessions.size) {
             val effect = sessions.valueAt(i)
             effect.enabled = masterEnabled
-            EffectDispatcher.dispatchFullState(effect, state, masterEnabled)
+            ViperDispatcher.dispatchFullState(effect, state, masterEnabled)
         }
     }
 

@@ -51,6 +51,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.llsl.viper4android.R
+import com.llsl.viper4android.effect.EffectState
 import com.llsl.viper4android.ui.screens.debug.DebugLogDialog
 import com.llsl.viper4android.ui.screens.device.DeviceDialog
 import com.llsl.viper4android.ui.screens.preset.PresetDialog
@@ -331,7 +332,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
 
 @Composable
 private fun EffectList(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
 ) {
