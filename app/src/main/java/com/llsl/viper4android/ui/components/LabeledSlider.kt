@@ -64,12 +64,10 @@ fun LabeledSlider(
             )
             val valueModifier =
                 if (canEdit) {
-                    Modifier
-                        .clickable { showEditDialog = true }
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                    Modifier.clickable { showEditDialog = true }
                 } else {
                     Modifier
-                }
+                }.padding(horizontal = 8.dp, vertical = 4.dp)
             Text(
                 text = valueLabel ?: value.roundToInt().toString(),
                 style = MaterialTheme.typography.bodyMedium,

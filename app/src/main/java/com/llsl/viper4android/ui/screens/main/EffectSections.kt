@@ -633,7 +633,6 @@ fun MultibandCompressorSection(
             value = threshold.toFloat(),
             onValueChange = { onThresholdChange(it.roundToInt()) },
             valueRange = -48f..0f,
-            enabled = bandEnabled,
             valueLabel = "$threshold dB",
             edit =
                 SliderEdit(
