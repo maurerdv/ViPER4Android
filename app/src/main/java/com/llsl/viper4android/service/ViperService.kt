@@ -70,6 +70,8 @@ class ViperService : LifecycleService() {
     private var sessionMonitor: AudioSessionMonitor? = null
     private var stateProvider: (() -> EffectState)? = null
     private var lastUiState: EffectState? = null
+    private var lastBulkDdcKey: String? = null
+    private var lastBulkConvolverKey: String? = null
 
     fun setStateProvider(provider: () -> EffectState) {
         stateProvider = provider
@@ -416,6 +418,7 @@ class ViperService : LifecycleService() {
         )
         if (useAidlTypeUuid) {
             ConfigChannel.writeBulkConvolverPath(stagedPath)
+            lastBulkConvolverKey = null
             return
         }
         val pathBytes = stagedPath.toByteArray(Charsets.UTF_8)
@@ -452,6 +455,7 @@ class ViperService : LifecycleService() {
                 off += sec.size
             }
             ConfigChannel.writeBulkDdc(perRateSize, flat)
+            lastBulkDdcKey = null
             return
         }
         val effect = globalEffect ?: return
@@ -489,6 +493,7 @@ class ViperService : LifecycleService() {
     }
 
     private fun pushBulkConvolverPath(fileName: String) {
+        if (fileName == lastBulkConvolverKey) return
         val kernelDir = File(getExternalFilesDir(null), "Kernel")
         val src = File(kernelDir, fileName)
         if (!src.exists()) {
@@ -506,9 +511,11 @@ class ViperService : LifecycleService() {
             FileLogger.d("Service", "Kernel already staged at $stagedPath")
         }
         ConfigChannel.writeBulkConvolverPath(stagedPath)
+        lastBulkConvolverKey = fileName
     }
 
     private fun pushBulkDdcFromVdcFile(name: String) {
+        if (name == lastBulkDdcKey) return
         val ddcDir = File(getExternalFilesDir(null), "DDC")
         val file = File(ddcDir, "$name.vdc")
         if (!file.exists()) {
@@ -558,6 +565,7 @@ class ViperService : LifecycleService() {
         System.arraycopy(a, 0, flat, 0, a.size)
         System.arraycopy(b, 0, flat, a.size, b.size)
         ConfigChannel.writeBulkDdc(a.size, flat)
+        lastBulkDdcKey = name
     }
 
     fun getActiveEffect(): ViperEffect? {

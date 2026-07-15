@@ -331,7 +331,7 @@ class MainViewModel
                 viewModelScope.launch(Dispatchers.IO) { stageAndDispatchKernel(state.convolver.kernelFile) }
             }
             if (state.ddc.enable && state.ddc.device.isNotEmpty()) {
-                streamDdcCoefficients(state.ddc.device)
+                viewModelScope.launch(Dispatchers.IO) { streamDdcCoefficients(state.ddc.device) }
             }
         }
 
