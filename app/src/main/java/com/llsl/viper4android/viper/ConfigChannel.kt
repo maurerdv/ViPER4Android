@@ -32,7 +32,14 @@ object ConfigChannel {
 
     private const val STATUS_SHM_SIZE = 256
     private const val PARAM_SHM_SIZE = 4096
-    private const val BULK_SHM_SIZE = 32 * 1024
+    private const val BULK_SHM_SIZE = 4 * 1024
+
+    // Bulk region is split into two independent sub-channels so a DDC write and a
+    // convolver write cannot clobber each other before the driver polls the slot.
+    private const val BULK_DDC_BASE = 0
+    private const val BULK_DDC_REGION_SIZE = 2 * 1024
+    private const val BULK_CONVOLVER_BASE = BULK_DDC_REGION_SIZE
+    private const val BULK_CONVOLVER_REGION_SIZE = 2 * 1024
 
     private const val STATUS_DATA_OFFSET = 20
 
@@ -58,7 +65,8 @@ object ConfigChannel {
 
     private var producerActiveSlot: Int = 1
     private var currentUpdateCount: Int = 0
-    private var currentBulkSeq: Int = 0
+    private var currentDdcSeq: Int = 0
+    private var currentConvolverSeq: Int = 0
 
     private var lastStatusSeq = 0
     private var lastProcessedFrames = 0L
@@ -183,22 +191,22 @@ object ConfigChannel {
                     "${perRateFloats * 2} (perRateFloats * 2 rates)"
             }
             val payloadSize = 8 + coeffs.size * 4
-            if (BULK_HEADER_SIZE + payloadSize > BULK_SHM_SIZE) {
+            if (BULK_HEADER_SIZE + payloadSize > BULK_DDC_REGION_SIZE) {
                 FileLogger.w(
                     "ConfigChannel",
-                    "writeBulkDdc: payload $payloadSize exceeds bulk region",
+                    "writeBulkDdc: payload $payloadSize exceeds DDC region",
                 )
                 return
             }
-            buf.putInt(BULK_COMMAND_OFFSET, BULK_CMD_DDC)
-            buf.putInt(BULK_DATA_SIZE_OFFSET, payloadSize)
-            buf.position(BULK_HEADER_SIZE)
+            buf.putInt(BULK_DDC_BASE + BULK_COMMAND_OFFSET, BULK_CMD_DDC)
+            buf.putInt(BULK_DDC_BASE + BULK_DATA_SIZE_OFFSET, payloadSize)
+            buf.position(BULK_DDC_BASE + BULK_HEADER_SIZE)
             buf.putInt(perRateFloats)
             buf.putInt(coeffs.size)
             for (f in coeffs) buf.putFloat(f)
 
-            currentBulkSeq++
-            buf.putInt(BULK_SEQ_OFFSET, currentBulkSeq)
+            currentDdcSeq++
+            buf.putInt(BULK_DDC_BASE + BULK_SEQ_OFFSET, currentDdcSeq)
         }
     }
 
@@ -214,20 +222,20 @@ object ConfigChannel {
                     return
                 }
             val pathBytes = path.toByteArray(Charsets.UTF_8)
-            if (BULK_HEADER_SIZE + pathBytes.size > BULK_SHM_SIZE) {
+            if (BULK_HEADER_SIZE + pathBytes.size > BULK_CONVOLVER_REGION_SIZE) {
                 FileLogger.w(
                     "ConfigChannel",
                     "writeBulkConvolverPath: path too long ${pathBytes.size}",
                 )
                 return
             }
-            buf.putInt(BULK_COMMAND_OFFSET, BULK_CMD_CONVOLVER_PATH)
-            buf.putInt(BULK_DATA_SIZE_OFFSET, pathBytes.size)
-            buf.position(BULK_HEADER_SIZE)
+            buf.putInt(BULK_CONVOLVER_BASE + BULK_COMMAND_OFFSET, BULK_CMD_CONVOLVER_PATH)
+            buf.putInt(BULK_CONVOLVER_BASE + BULK_DATA_SIZE_OFFSET, pathBytes.size)
+            buf.position(BULK_CONVOLVER_BASE + BULK_HEADER_SIZE)
             buf.put(pathBytes)
 
-            currentBulkSeq++
-            buf.putInt(BULK_SEQ_OFFSET, currentBulkSeq)
+            currentConvolverSeq++
+            buf.putInt(BULK_CONVOLVER_BASE + BULK_SEQ_OFFSET, currentConvolverSeq)
         }
     }
 
