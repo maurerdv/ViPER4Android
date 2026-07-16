@@ -4,6 +4,8 @@ import com.llsl.viper4android.data.repository.ViperRepository
 import kotlinx.coroutines.flow.first
 import org.json.JSONArray
 import org.json.JSONObject
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.util.Locale
 
 sealed class EffectPref<T>(
@@ -120,6 +122,15 @@ class DoubleListPref(
     set: EffectState.(List<Double>) -> EffectState,
 ) : EffectPref<List<Double>>(effectKey, paramId, jsonKey, defaultValue, get, set) {
     override fun toRaw(value: List<Double>): Int = 0
+
+    fun toRawArray(value: List<Double>): ByteArray {
+        val bytes = ByteArray(256)
+        val bb =
+            ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
+        bb.putInt(value.size)
+        for (v in value) bb.putFloat(v.toFloat())
+        return bytes
+    }
 }
 
 val EFFECT_PREFS: List<EffectPref<*>> =

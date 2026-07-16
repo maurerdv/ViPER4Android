@@ -193,13 +193,14 @@ class MainViewModel
             _uiState.update { pref.set(it, value) }
             viewModelScope.launch {
                 persistPref(pref, value)
-                if (pref.paramId != -1 &&
-                    pref !is IntListPref &&
-                    pref !is BoolListPref &&
-                    pref !is DoubleListPref &&
-                    _uiState.value.masterEnable &&
-                    shouldDispatch(pref)
-                ) {
+                if (pref.paramId == -1 || !_uiState.value.masterEnable || !shouldDispatch(pref)) {
+                    return@launch
+                }
+                if (pref is DoubleListPref) {
+                    @Suppress("UNCHECKED_CAST")
+                    val bytes = pref.toRawArray(value as List<Double>)
+                    viperService?.dispatchParam(pref.paramId, bytes, republishAidl = last)
+                } else if (pref !is IntListPref && pref !is BoolListPref) {
                     viperService?.dispatchParam(pref.paramId, pref.toRaw(value), republishAidl = last)
                 }
             }
@@ -507,9 +508,6 @@ class MainViewModel
                             .apply { put(state.eq.bandCount, bands) }
                     state.copy(eq = state.eq.copy(bandsMap = updatedMap))
                 }
-                if (_uiState.value.eq.enable) {
-                    ifMasterOn { viperService?.dispatchEqBands(bands) }
-                }
             }
         }
 
@@ -522,9 +520,6 @@ class MainViewModel
                         .toMutableMap()
                         .apply { put(state.eq.bandCount, bands) }
                 state.copy(eq = state.eq.copy(bandsMap = updatedMap))
-            }
-            if (_uiState.value.eq.enable) {
-                ifMasterOn { viperService?.dispatchEqBands(bands) }
             }
         }
 
@@ -554,13 +549,12 @@ class MainViewModel
                 list.joinToString(";") { String.format(Locale.US, "%.1f", it) }
             }
             viewModelScope.launch {
-                repository.setIntPreference(Effects.equalizer.bandCount.prefKey, count)
-                repository.setStringPreference(Effects.equalizer.bands.prefKey, joinDoubles(bands))
                 repository.setStringPreference("eq_bands_$oldCount", joinDoubles(state.eq.bands))
                 repository.setStringPreference("eq_bands_$count", joinDoubles(bands))
                 repository.setIntPreference(Effects.equalizer.presetId.prefKey, -1)
             }
-            if (_uiState.value.eq.enable) ifMasterOn { viperService?.dispatchEqBands(bands, count) }
+            applyPref(Effects.equalizer.bandCount, count, last = false)
+            applyPref(Effects.equalizer.bands, bands)
             loadEqPresetsForBandCount(count)
         }
 
@@ -827,9 +821,11 @@ class MainViewModel
         }
 
         fun setEqEnabled(enabled: Boolean) {
-            applyPref(Effects.equalizer.enable, enabled)
+            applyPref(Effects.equalizer.enable, enabled, last = !enabled)
             if (enabled) {
-                ifMasterOn { viperService?.dispatchEqBands(_uiState.value.eq.bands, republishAidl = false) }
+                val v = _uiState.value.eq
+                applyPref(Effects.equalizer.bandCount, v.bandCount, last = false)
+                applyPref(Effects.equalizer.bands, v.bands)
             }
         }
 

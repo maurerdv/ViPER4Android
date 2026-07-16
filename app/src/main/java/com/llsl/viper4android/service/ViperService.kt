@@ -379,27 +379,6 @@ class ViperService : LifecycleService() {
         }
     }
 
-    fun dispatchEqBands(
-        bands: List<Double>,
-        bandCount: Int = 0,
-        republishAidl: Boolean = true,
-    ) {
-        if (useAidlTypeUuid) {
-            if (republishAidl) republishLastStateOnAidl()
-            return
-        }
-        if (bandCount != 0) {
-            globalEffect?.setParameter(ViperParams.PARAM_EQUALIZER_BAND_COUNT, bandCount)
-            for (i in 0 until sessions.size) {
-                sessions.valueAt(i).setParameter(ViperParams.PARAM_EQUALIZER_BAND_COUNT, bandCount)
-            }
-        }
-        globalEffect?.let { ViperDispatcher.dispatchEqBands(it, bands) }
-        for (i in 0 until sessions.size) {
-            ViperDispatcher.dispatchEqBands(sessions.valueAt(i), bands)
-        }
-    }
-
     private fun republishLastStateOnAidl() {
         val state = stateProvider?.invoke() ?: lastUiState ?: return
         ConfigChannel.writeFullState(state)

@@ -610,7 +610,7 @@ object ViperDispatcher {
         effect.setParameter(ViperParams.PARAM_EQUALIZER_ENABLE, if (state.eq.enable) 1 else 0)
         if (state.eq.enable) {
             effect.setParameter(ViperParams.PARAM_EQUALIZER_BAND_COUNT, state.eq.bandCount)
-            dispatchEqBands(effect, state.eq.bands)
+            effect.setParameter(ViperParams.PARAM_EQUALIZER_BAND_LEVELS, eqBandLevelsToBytes(state.eq.bands))
         }
 
         // Dynamic EQ
@@ -743,14 +743,12 @@ object ViperDispatcher {
         effect.setParameter(ViperParams.PARAM_SPEAKER_CORRECTION_ENABLE, if (state.speakerCorrection.enable) 1 else 0)
     }
 
-    fun dispatchEqBands(
-        effect: ViperEffect,
-        bands: List<Double>,
-    ) {
-        for ((index, bandDb) in bands.withIndex()) {
-            val level = (bandDb * 100).toInt()
-            effect.setParameter(ViperParams.PARAM_EQUALIZER_BAND_LEVEL, index, level)
-        }
+    fun eqBandLevelsToBytes(bands: List<Double>): ByteArray {
+        val bytes = ByteArray(256)
+        val bb = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
+        bb.putInt(bands.size)
+        for (b in bands) bb.putFloat(b.toFloat())
+        return bytes
     }
 
     suspend fun loadFullStateFromPrefs(repository: ViperRepository): EffectState {

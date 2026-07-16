@@ -572,7 +572,7 @@ class EqualizerEffect : EffectGroupBuilder("equalizer") {
         )
     val bands =
         doubleList(
-            ViperParams.PARAM_EQUALIZER_BAND_LEVEL,
+            ViperParams.PARAM_EQUALIZER_BAND_LEVELS,
             "bands",
             List(10) { 0.0 },
             { it.eq.bands },
