@@ -745,9 +745,9 @@ object ViperDispatcher {
 
     fun eqBandLevelsToBytes(bands: List<Double>): ByteArray {
         val bytes = ByteArray(256)
-        val bb = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
-        bb.putInt(bands.size)
-        for (b in bands) bb.putFloat(b.toFloat())
+        val buf = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
+        buf.putInt(bands.size)
+        for (b in bands) buf.putFloat(b.toFloat())
         return bytes
     }
 
@@ -755,50 +755,5 @@ object ViperDispatcher {
         val s = loadEffectPrefs(repository)
         val eqBands = ensureBandCount(s.eq.bands, s.eq.bandCount)
         return s.copy(eq = s.eq.copy(bands = eqBands))
-    }
-
-    fun dispatchDdcCoefficients(
-        effect: ViperEffect,
-        sec44100: List<FloatArray>,
-        sec48000: List<FloatArray>,
-    ) {
-        if (sec44100.size != sec48000.size) {
-            FileLogger.w(
-                "Dispatch",
-                "dispatchDdcCoefficients: section count mismatch (44.1k=${sec44100.size} vs 48k=${sec48000.size})",
-            )
-            return
-        }
-        if (sec44100.any { it.size != 5 } || sec48000.any { it.size != 5 }) {
-            FileLogger.w("Dispatch", "dispatchDdcCoefficients: section size != 5")
-            return
-        }
-        val sectionCount = sec44100.size
-        val floatsPerRate = sectionCount * 5
-        val naturalSize = 4 + floatsPerRate * 4 * 2
-        val wireSize =
-            when {
-                naturalSize <= 256 -> {
-                    256
-                }
-
-                naturalSize <= 1024 -> {
-                    1024
-                }
-
-                else -> {
-                    FileLogger.w(
-                        "Dispatch",
-                        "dispatchDdcCoefficients: blob too large ($naturalSize bytes; max 1024)",
-                    )
-                    return
-                }
-            }
-        val bytes = ByteArray(wireSize)
-        val bb = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
-        bb.putInt(floatsPerRate)
-        for (s in sec44100) for (v in s) bb.putFloat(v)
-        for (s in sec48000) for (v in s) bb.putFloat(v)
-        effect.setParameter(ViperParams.PARAM_DDC_COEFFICIENTS, bytes)
     }
 }

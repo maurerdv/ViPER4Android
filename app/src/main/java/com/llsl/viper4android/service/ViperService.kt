@@ -23,6 +23,7 @@ import com.llsl.viper4android.effect.deserializeEffectPrefs
 import com.llsl.viper4android.effect.serializeEffectPrefs
 import com.llsl.viper4android.utils.FileLogger
 import com.llsl.viper4android.utils.RootShell
+import com.llsl.viper4android.utils.WavDecoder
 import com.llsl.viper4android.viper.ConfigChannel
 import com.llsl.viper4android.viper.ViperDispatcher
 import com.llsl.viper4android.viper.ViperEffect
@@ -34,6 +35,7 @@ import org.json.JSONObject
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.zip.CRC32
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -170,7 +172,7 @@ class ViperService : LifecycleService() {
                 writeAidlFullState(state)
                 shmWritten = true
             } else {
-                ViperDispatcher.dispatchFullState(it, state, isMasterOn)
+                applyFullStateHidl(it, state, isMasterOn)
             }
         }
         for (i in 0 until sessions.size) {
@@ -182,7 +184,7 @@ class ViperService : LifecycleService() {
                     shmWritten = true
                 }
             } else {
-                ViperDispatcher.dispatchFullState(effect, state, isMasterOn)
+                applyFullStateHidl(effect, state, isMasterOn)
             }
         }
     }
@@ -204,17 +206,31 @@ class ViperService : LifecycleService() {
             }
             return
         }
-        ViperDispatcher.dispatchFullState(effect, state, isMasterOn)
+        applyFullStateHidl(effect, state, isMasterOn)
     }
 
     private fun writeAidlFullState(state: EffectState) {
         lastUiState = state
         ConfigChannel.writeFullState(state)
         if (state.ddc.enable && state.ddc.device.isNotEmpty()) {
-            pushBulkDdcFromVdcFile(state.ddc.device)
+            applyDdcDeviceAidl(state.ddc.device)
         }
         if (state.convolver.enable && state.convolver.kernelFile.isNotEmpty()) {
-            pushBulkConvolverPath(state.convolver.kernelFile)
+            applyConvolverKernelAidl(state.convolver.kernelFile)
+        }
+    }
+
+    private fun applyFullStateHidl(
+        effect: ViperEffect,
+        state: EffectState,
+        masterEnabled: Boolean,
+    ) {
+        ViperDispatcher.dispatchFullState(effect, state, masterEnabled)
+        if (state.ddc.enable && state.ddc.device.isNotEmpty()) {
+            applyDdcDeviceHidl(state.ddc.device, effect)
+        }
+        if (state.convolver.enable && state.convolver.kernelFile.isNotEmpty()) {
+            applyConvolverKernelHidl(state.convolver.kernelFile, effect)
         }
     }
 
@@ -383,127 +399,41 @@ class ViperService : LifecycleService() {
         val state = stateProvider?.invoke() ?: lastUiState ?: return
         ConfigChannel.writeFullState(state)
         if (state.ddc.enable && state.ddc.device.isNotEmpty()) {
-            pushBulkDdcFromVdcFile(state.ddc.device)
+            applyDdcDeviceAidl(state.ddc.device)
         }
         if (state.convolver.enable && state.convolver.kernelFile.isNotEmpty()) {
-            pushBulkConvolverPath(state.convolver.kernelFile)
+            applyConvolverKernelAidl(state.convolver.kernelFile)
         }
-    }
-
-    fun dispatchConvolverKernelPath(stagedPath: String) {
-        FileLogger.i(
-            "Service",
-            "Convolver kernel path dispatch: '$stagedPath'",
-        )
-        if (useAidlTypeUuid) {
-            ConfigChannel.writeBulkConvolverPath(stagedPath)
-            lastBulkConvolverKey = null
-            return
-        }
-        val pathBytes = stagedPath.toByteArray(Charsets.UTF_8)
-        val buffer = ByteBuffer.allocate(256).order(ByteOrder.LITTLE_ENDIAN)
-        buffer.putInt(pathBytes.size)
-        if (pathBytes.isNotEmpty()) buffer.put(pathBytes)
-        globalEffect?.setParameter(ViperParams.PARAM_CONVOLVER_SET_KERNEL, buffer.array())
-        for (i in 0 until sessions.size) {
-            sessions.valueAt(i).setParameter(
-                ViperParams.PARAM_CONVOLVER_SET_KERNEL,
-                buffer.array(),
-            )
-        }
-    }
-
-    fun dispatchDdcCoefficients(
-        sec44100: List<FloatArray>,
-        sec48000: List<FloatArray>,
-    ) {
-        if (useAidlTypeUuid) {
-            val n = sec44100.size
-            require(n == sec48000.size) {
-                "DDC: section count mismatch ${sec44100.size} vs ${sec48000.size}"
-            }
-            val perRateSize = sec44100.sumOf { it.size }
-            val flat = FloatArray(perRateSize * 2)
-            var off = 0
-            for (sec in sec44100) {
-                System.arraycopy(sec, 0, flat, off, sec.size)
-                off += sec.size
-            }
-            for (sec in sec48000) {
-                System.arraycopy(sec, 0, flat, off, sec.size)
-                off += sec.size
-            }
-            ConfigChannel.writeBulkDdc(perRateSize, flat)
-            lastBulkDdcKey = null
-            return
-        }
-        val effect = globalEffect ?: return
-        ViperDispatcher.dispatchDdcCoefficients(effect, sec44100, sec48000)
     }
 
     fun dispatchFullState(
         state: EffectState,
         masterEnabled: Boolean,
     ) {
-        lastUiState = state
         if (useAidlTypeUuid) {
             FileLogger.d(
                 "Service",
                 "AIDL shm full state dispatch (master=$masterEnabled)",
             )
-            ConfigChannel.writeFullState(state)
-            if (state.ddc.enable && state.ddc.device.isNotEmpty()) {
-                pushBulkDdcFromVdcFile(state.ddc.device)
-            }
-            if (state.convolver.enable && state.convolver.kernelFile.isNotEmpty()) {
-                pushBulkConvolverPath(state.convolver.kernelFile)
-            }
+            writeAidlFullState(state)
             return
         }
+        lastUiState = state
         globalEffect?.let { effect ->
             effect.enabled = masterEnabled
-            ViperDispatcher.dispatchFullState(effect, state, masterEnabled)
+            applyFullStateHidl(effect, state, masterEnabled)
         }
         for (i in 0 until sessions.size) {
             val effect = sessions.valueAt(i)
             effect.enabled = masterEnabled
-            ViperDispatcher.dispatchFullState(effect, state, masterEnabled)
+            applyFullStateHidl(effect, state, masterEnabled)
         }
     }
 
-    private fun pushBulkConvolverPath(fileName: String) {
-        if (fileName == lastBulkConvolverKey) return
-        val kernelDir = File(getExternalFilesDir(null), "Kernel")
-        val src = File(kernelDir, fileName)
-        if (!src.exists()) {
-            FileLogger.w("Service", "Kernel src missing: $fileName")
-            return
-        }
-        val safeName = fileName.replace("'", "")
-        val stagedPath = "/data/local/tmp/v4a/kernel/$safeName"
-        val staged = File(stagedPath)
-        val needCopy = !(staged.exists() && staged.length() == src.length())
-        if (needCopy) {
-            FileLogger.d("Service", "Staging kernel '$fileName' to $stagedPath")
-            RootShell.copyFile(src, stagedPath)
-        } else {
-            FileLogger.d("Service", "Kernel already staged at $stagedPath")
-        }
-        ConfigChannel.writeBulkConvolverPath(stagedPath)
-        lastBulkConvolverKey = fileName
-    }
-
-    private fun pushBulkDdcFromVdcFile(name: String) {
-        if (name == lastBulkDdcKey) return
-        val ddcDir = File(getExternalFilesDir(null), "DDC")
-        val file = File(ddcDir, "$name.vdc")
-        if (!file.exists()) {
-            FileLogger.w("Service", "DDC file missing: $name")
-            return
-        }
-        var coeffs44100: FloatArray? = null
-        var coeffs48000: FloatArray? = null
+    fun parseVdc(file: File): Pair<List<FloatArray>, List<FloatArray>>? {
         try {
+            var coeffs44100: FloatArray? = null
+            var coeffs48000: FloatArray? = null
             for (line in file.readLines()) {
                 val trimmed = line.trim()
                 when {
@@ -526,25 +456,190 @@ class ViperService : LifecycleService() {
                     }
                 }
             }
+
+            val a = coeffs44100
+            val b = coeffs48000
+            if (a == null || b == null || a.isEmpty() || a.size != b.size || a.size % 5 != 0) {
+                FileLogger.w(
+                    "Service",
+                    "DDC coefficient parse failure: ${file.name} 44100=${a?.size} 48000=${b?.size}",
+                )
+                return null
+            }
+            val sec44 = a.toList().chunked(5).map { it.toFloatArray() }
+            val sec48 = b.toList().chunked(5).map { it.toFloatArray() }
+            return sec44 to sec48
         } catch (e: Exception) {
-            FileLogger.e("Service", "Failed to parse DDC: $name", e)
+            FileLogger.e("Service", "Failed to parse DDC: ${file.name}", e)
+            return null
+        }
+    }
+
+    fun applyConvolverKernelAidl(
+        fileName: String,
+        force: Boolean = false,
+    ) {
+        if (fileName == lastBulkConvolverKey && !force) return
+        if (fileName.isEmpty()) {
+            ConfigChannel.writeBulkConvolverPath("")
+            lastBulkConvolverKey = null
             return
         }
-        val a = coeffs44100
-        val b = coeffs48000
-        if (a == null || b == null || a.isEmpty() || a.size != b.size || a.size % 5 != 0) {
-            FileLogger.w(
-                "Service",
-                "DDC coefficient parse failure: $name " +
-                    "44100=${a?.size} 48000=${b?.size}",
-            )
+        val kernelDir = File(getExternalFilesDir(null), "Kernel")
+        val src = File(kernelDir, fileName)
+        if (!src.exists()) {
+            FileLogger.w("Service", "Kernel src missing: $fileName")
             return
         }
-        val flat = FloatArray(a.size * 2)
-        System.arraycopy(a, 0, flat, 0, a.size)
-        System.arraycopy(b, 0, flat, a.size, b.size)
-        ConfigChannel.writeBulkDdc(a.size, flat)
+        val safeName = fileName.replace("'", "")
+        val stagedPath = "/data/local/tmp/v4a/kernel/$safeName"
+        val staged = File(stagedPath)
+        val needCopy = !(staged.exists() && staged.length() == src.length())
+        if (needCopy) {
+            FileLogger.d("Service", "Staging kernel '$fileName' to $stagedPath")
+            RootShell.copyFile(src, stagedPath)
+        } else {
+            FileLogger.d("Service", "Kernel already staged at $stagedPath")
+        }
+        ConfigChannel.writeBulkConvolverPath(stagedPath)
+        lastBulkConvolverKey = fileName
+    }
+
+    fun applyDdcDeviceAidl(
+        name: String,
+        force: Boolean = false,
+    ) {
+        if (name == lastBulkDdcKey && !force) return
+        val ddcDir = File(getExternalFilesDir(null), "DDC")
+        val file = File(ddcDir, "$name.vdc")
+        if (!file.exists()) {
+            FileLogger.w("Service", "DDC file missing: $name")
+            return
+        }
+        val parsed = parseVdc(file) ?: return
+        val sec44100 = parsed.first
+        val sec48000 = parsed.second
+        val perRateSize = sec44100.sumOf { it.size }
+        val flat = FloatArray(perRateSize * 2)
+        var off = 0
+        for (sec in sec44100) {
+            System.arraycopy(sec, 0, flat, off, sec.size)
+            off += sec.size
+        }
+        for (sec in sec48000) {
+            System.arraycopy(sec, 0, flat, off, sec.size)
+            off += sec.size
+        }
+        ConfigChannel.writeBulkDdc(perRateSize, flat)
         lastBulkDdcKey = name
+    }
+
+    fun applyConvolverKernelHidl(
+        fileName: String,
+        effect: ViperEffect? = null,
+    ) {
+        val sendInts: (Int, Int, Int, Int) -> Unit =
+            if (effect != null) {
+                { p, a, b, c -> effect.setParameter(p, a, b, c) }
+            } else {
+                { p, a, b, c -> dispatchParam(p, a, b, c) }
+            }
+        val sendBytes: (Int, ByteArray) -> Unit =
+            if (effect != null) {
+                { p, v -> effect.setParameter(p, v) }
+            } else {
+                { p, v -> dispatchParam(p, v) }
+            }
+        if (fileName.isEmpty()) {
+            sendInts(ViperParams.PARAM_CONVOLVER_PREPARE_BUFFER, 0, 0, 1)
+            return
+        }
+        val src = File(File(getExternalFilesDir(null), "Kernel"), fileName)
+        if (!src.exists()) {
+            FileLogger.w("Service", "Kernel file missing: $fileName")
+            return
+        }
+
+        try {
+            val decoded = WavDecoder.decode(src.readBytes())
+            val samples = decoded.samples
+            val totalFloats = samples.size
+            val channelCount = decoded.channels
+            FileLogger.i("Service", "Kernel decoded: $fileName samples=$totalFloats ch=$channelCount")
+
+            sendInts(ViperParams.PARAM_CONVOLVER_PREPARE_BUFFER, totalFloats, channelCount, 0)
+
+            val rawBytes =
+                ByteBuffer
+                    .allocate(totalFloats * 4)
+                    .order(ByteOrder.LITTLE_ENDIAN)
+                    .also { for (f in samples) it.putFloat(f) }
+                    .array()
+            val crc = CRC32().apply { update(rawBytes) }.value.toInt()
+
+            val maxFloatsPerChunk = 2046
+            var offset = 0
+            var chunkIndex = 0
+            while (offset < totalFloats) {
+                val remaining = totalFloats - offset
+                val floatsInChunk = minOf(remaining, maxFloatsPerChunk)
+                val chunk = ByteBuffer.allocate(8192).order(ByteOrder.LITTLE_ENDIAN)
+                chunk.putInt(chunkIndex)
+                chunk.putInt(floatsInChunk)
+                chunk.put(rawBytes, offset * 4, floatsInChunk * 4)
+                sendBytes(ViperParams.PARAM_CONVOLVER_SET_BUFFER, chunk.array())
+                offset += floatsInChunk
+                chunkIndex++
+            }
+
+            val kernelId = fileName.hashCode()
+            sendInts(ViperParams.PARAM_CONVOLVER_COMMIT_BUFFER, totalFloats, crc, kernelId)
+            FileLogger.i("Service", "Kernel streamed: $fileName chunks=$chunkIndex crc=0x${crc.toUInt().toString(16)}")
+        } catch (e: Exception) {
+            FileLogger.e("Service", "Failed to stream kernel: $fileName", e)
+        }
+    }
+
+    fun applyDdcDeviceHidl(
+        name: String,
+        effect: ViperEffect? = null,
+    ) {
+        val file = File(File(getExternalFilesDir(null), "DDC"), "$name.vdc")
+        if (!file.exists()) {
+            FileLogger.w("Service", "DDC file missing: $name")
+            return
+        }
+        val parsed = parseVdc(file) ?: return
+        val sec44100 = parsed.first
+        val sec48000 = parsed.second
+        val sectionCount = sec44100.size
+        val floatsPerRate = sectionCount * 5
+        val naturalSize = 4 + floatsPerRate * 4 * 2
+        val wireSize =
+            when {
+                naturalSize <= 256 -> {
+                    256
+                }
+
+                naturalSize <= 1024 -> {
+                    1024
+                }
+
+                else -> {
+                    FileLogger.w("Service", "DDC file too large ($naturalSize bytes; max 1024)")
+                    return
+                }
+            }
+        val bytes = ByteArray(wireSize)
+        val buf = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
+        buf.putInt(floatsPerRate)
+        for (s in sec44100) for (v in s) buf.putFloat(v)
+        for (s in sec48000) for (v in s) buf.putFloat(v)
+        if (effect == null) {
+            dispatchParam(ViperParams.PARAM_DDC_COEFFICIENTS, bytes)
+        } else {
+            effect.setParameter(ViperParams.PARAM_DDC_COEFFICIENTS, bytes)
+        }
     }
 
     fun getActiveEffect(): ViperEffect? {

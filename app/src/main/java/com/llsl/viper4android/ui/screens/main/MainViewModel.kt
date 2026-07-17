@@ -40,8 +40,6 @@ import com.llsl.viper4android.effect.saveEffectPrefs
 import com.llsl.viper4android.effect.serializeEffectPrefs
 import com.llsl.viper4android.service.ViperService
 import com.llsl.viper4android.utils.FileLogger
-import com.llsl.viper4android.utils.RootShell
-import com.llsl.viper4android.utils.WavDecoder
 import com.llsl.viper4android.viper.ConfigChannel
 import com.llsl.viper4android.viper.ViperEffect
 import com.llsl.viper4android.viper.ViperParams
@@ -61,11 +59,8 @@ import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
-import java.util.zip.CRC32
 import javax.inject.Inject
 
 data class DriverStatus(
@@ -327,13 +322,6 @@ class MainViewModel
             }
             FileLogger.d("ViewModel", "dispatchFullState: master=ON")
             service.dispatchFullState(state, true)
-
-            if (state.convolver.enable && state.convolver.kernelFile.isNotEmpty()) {
-                viewModelScope.launch(Dispatchers.IO) { stageAndDispatchKernel(state.convolver.kernelFile) }
-            }
-            if (state.ddc.enable && state.ddc.device.isNotEmpty()) {
-                viewModelScope.launch(Dispatchers.IO) { streamDdcCoefficients(state.ddc.device) }
-            }
         }
 
         fun setMasterEnabled(enabled: Boolean) {
@@ -350,144 +338,43 @@ class MainViewModel
             FileLogger.i("ViewModel", "Convolver kernel: $fileName")
             applyPref(Effects.convolver.kernelFile, fileName)
             if (!_uiState.value.convolver.enable) return
-            if (fileName.isEmpty()) {
+            viewModelScope.launch(Dispatchers.IO) { applyConvolverKernel(fileName) }
+        }
+
+        private fun applyConvolverKernel(fileName: String) {
+            if (!_uiState.value.convolver.enable) return
+            try {
                 ifMasterOn {
                     if (_aidlModeEnabled.value) {
-                        viperService?.dispatchConvolverKernelPath("")
+                        viperService?.applyConvolverKernelAidl(fileName, force = true)
                     } else {
-                        viperService?.dispatchParam(ViperParams.PARAM_CONVOLVER_PREPARE_BUFFER, 0, 0, 1)
+                        viperService?.applyConvolverKernelHidl(fileName)
                     }
                 }
-                return
-            }
-            viewModelScope.launch(Dispatchers.IO) { stageAndDispatchKernel(fileName) }
-        }
-
-        private fun stageAndDispatchKernel(fileName: String) {
-            if (!_uiState.value.convolver.enable) return
-            val src = File(getFilesDir("Kernel"), fileName)
-            if (!src.exists()) {
-                FileLogger.w("ViewModel", "Kernel file missing: $fileName")
-                return
-            }
-            try {
-                if (_aidlModeEnabled.value) {
-                    stageAndDispatchKernelAidl(src, fileName)
-                } else {
-                    streamKernelLegacy(src, fileName)
-                }
             } catch (e: Exception) {
-                FileLogger.e("ViewModel", "Failed to stage kernel: $fileName", e)
+                FileLogger.e("ViewModel", "Failed to apply kernel: $fileName", e)
             }
-        }
-
-        private fun stageAndDispatchKernelAidl(
-            src: File,
-            fileName: String,
-        ) {
-            val safeName = fileName.replace("'", "")
-            val stagedPath = "/data/local/tmp/v4a/kernel/$safeName"
-            RootShell.copyFile(src, stagedPath)
-            FileLogger.i("ViewModel", "Kernel staged at $stagedPath")
-            ifMasterOn { viperService?.dispatchConvolverKernelPath(stagedPath) }
-        }
-
-        private fun streamKernelLegacy(
-            src: File,
-            fileName: String,
-        ) {
-            val service = viperService ?: return
-            val decoded = WavDecoder.decode(src.readBytes())
-            val samples = decoded.samples
-            val totalFloats = samples.size
-            val channelCount = decoded.channels
-            FileLogger.i("ViewModel", "Kernel decoded: $fileName samples=$totalFloats ch=$channelCount")
-
-            ifMasterOn { service.dispatchParam(ViperParams.PARAM_CONVOLVER_PREPARE_BUFFER, totalFloats, channelCount, 0) }
-
-            val rawBytes =
-                ByteBuffer
-                    .allocate(totalFloats * 4)
-                    .order(ByteOrder.LITTLE_ENDIAN)
-                    .also { for (f in samples) it.putFloat(f) }
-                    .array()
-            val crc = CRC32().apply { update(rawBytes) }.value.toInt()
-
-            val maxFloatsPerChunk = 2046
-            var offset = 0
-            var chunkIndex = 0
-            while (offset < totalFloats) {
-                val remaining = totalFloats - offset
-                val floatsInChunk = minOf(remaining, maxFloatsPerChunk)
-                val chunk = ByteBuffer.allocate(8192).order(ByteOrder.LITTLE_ENDIAN)
-                chunk.putInt(chunkIndex)
-                chunk.putInt(floatsInChunk)
-                chunk.put(rawBytes, offset * 4, floatsInChunk * 4)
-                ifMasterOn { service.dispatchParam(ViperParams.PARAM_CONVOLVER_SET_BUFFER, chunk.array()) }
-                offset += floatsInChunk
-                chunkIndex++
-            }
-
-            val kernelId = fileName.hashCode()
-            ifMasterOn {
-                service.dispatchParam(ViperParams.PARAM_CONVOLVER_COMMIT_BUFFER, totalFloats, crc, kernelId)
-            }
-            FileLogger.i("ViewModel", "Kernel streamed: $fileName chunks=$chunkIndex crc=0x${crc.toUInt().toString(16)}")
         }
 
         fun setDdcDevice(name: String) {
             FileLogger.i("ViewModel", "DDC device: $name")
             applyPref(Effects.ddc.device, name)
             if (name.isEmpty()) return
-            viewModelScope.launch(Dispatchers.IO) { streamDdcCoefficients(name) }
+            viewModelScope.launch(Dispatchers.IO) { applyDdcDevice(name) }
         }
 
-        private fun streamDdcCoefficients(name: String) {
+        private fun applyDdcDevice(name: String) {
             if (!_uiState.value.ddc.enable) return
-            val file = File(getFilesDir("DDC"), "$name.vdc")
-            if (!file.exists()) {
-                FileLogger.w("ViewModel", "VDC file missing: $name")
-                return
-            }
-            val parsed = parseVdc(file) ?: return
-            ifMasterOn { viperService?.dispatchDdcCoefficients(parsed.first, parsed.second) }
-        }
-
-        private fun parseVdc(file: File): Pair<List<FloatArray>, List<FloatArray>>? {
             try {
-                var coeffs44100: FloatArray? = null
-                var coeffs48000: FloatArray? = null
-                for (line in file.readLines()) {
-                    val trimmed = line.trim()
-                    when {
-                        trimmed.startsWith("SR_44100:") -> {
-                            coeffs44100 =
-                                trimmed
-                                    .removePrefix("SR_44100:")
-                                    .split(",")
-                                    .map { it.trim().toFloat() }
-                                    .toFloatArray()
-                        }
-
-                        trimmed.startsWith("SR_48000:") -> {
-                            coeffs48000 =
-                                trimmed
-                                    .removePrefix("SR_48000:")
-                                    .split(",")
-                                    .map { it.trim().toFloat() }
-                                    .toFloatArray()
-                        }
+                ifMasterOn {
+                    if (_aidlModeEnabled.value) {
+                        viperService?.applyDdcDeviceAidl(name, force = true)
+                    } else {
+                        viperService?.applyDdcDeviceHidl(name)
                     }
                 }
-                if (coeffs44100 == null || coeffs48000 == null) return null
-                if (coeffs44100.size != coeffs48000.size) return null
-                if (coeffs44100.size % 5 != 0) return null
-                val sec44 = coeffs44100.toList().chunked(5).map { it.toFloatArray() }
-                val sec48 = coeffs48000.toList().chunked(5).map { it.toFloatArray() }
-                return sec44 to sec48
             } catch (e: Exception) {
-                FileLogger.e("ViewModel", "Failed to parse VDC: ${file.name}", e)
-                return null
+                FileLogger.e("ViewModel", "Failed to apply DDC device: $name", e)
             }
         }
 
@@ -805,8 +692,10 @@ class MainViewModel
                 _uiState.value.ddc.device
                     .isNotEmpty()
             ) {
+                val v = _uiState.value.ddc
+                applyPref(Effects.ddc.device, v.device)
                 viewModelScope.launch(Dispatchers.IO) {
-                    streamDdcCoefficients(_uiState.value.ddc.device)
+                    applyDdcDevice(v.device)
                 }
             }
         }
@@ -862,8 +751,10 @@ class MainViewModel
                 _uiState.value.convolver.kernelFile
                     .isNotEmpty()
             ) {
+                val v = _uiState.value.convolver
+                applyPref(Effects.convolver.kernelFile, v.kernelFile)
                 viewModelScope.launch(Dispatchers.IO) {
-                    stageAndDispatchKernel(_uiState.value.convolver.kernelFile)
+                    applyConvolverKernel(v.kernelFile)
                 }
             }
         }
