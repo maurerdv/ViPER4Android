@@ -8,10 +8,6 @@
     <string name="notification_bulk_op_channel_name">Групповые операции</string>
     <string name="notification_bulk_op_channel_description">Прогресс выполнения групповых операций</string>
 
-    <!-- Tabs -->
-    <string name="tab_headphone">Наушники</string>
-    <string name="tab_speaker">Динамик</string>
-
     <!-- Master -->
     <string name="master_enable">Мастер включён</string>
     <string name="menu_driver_status">Статус драйвера</string>
@@ -40,8 +36,11 @@
     <string name="label_strong">Сильно</string>
     <string name="label_deleted">Удалено</string>
 
+    <!-- Numeric input dialog -->
+    <string name="dialog_value_range">Range: %1$s \u2013 %2$s</string>
+    <string name="dialog_value_range_unit">Range: %1$s \u2013 %2$s %3$s</string>
+
     <!-- Output / Master limiter -->
-    <string name="section_output">Мастер-лимитер</string>
     <string name="label_output_volume">Выходное усиление</string>
     <string name="label_output_pan">Панорама на выходе</string>
     <string name="label_output_limiter">Порог лимитера</string>
@@ -135,7 +134,6 @@
 
     <!-- Dynamic System -->
     <string name="section_dynamic_system">Динамическая система</string>
-    <string name="label_dynamic_system_device">Устройство</string>
     <string name="label_dynamic_system_strength">Интенсивность динамического усиления басов</string>
     <string name="label_dynamic_system_x_low_freq">X Низкая частота</string>
     <string name="label_dynamic_system_x_high_freq">X Высокая частота</string>
@@ -208,17 +206,6 @@
     <string name="preset_cleared">Удалено</string>
     <string name="preset_update_title">Обновление профиля</string>
     <string name="preset_update_confirm">Перезаписать «%1$s» с текущими настройками? Это действие нельзя отменить.</string>
-    <!-- V2_EXPORT_REMOVE_BEFORE_MERGE BEGIN -->
-    <string name="export_preset_action">Export preset</string>
-    <string name="export_as_v1">Export as v1 (.v1.json)</string>
-    <string name="export_as_v1_description">Current single-mode format. Use for app-to-app transfer on this version.</string>
-    <string name="export_as_v2">Export as v2 (.v2.json)</string>
-    <string name="export_as_v2_description">Unified cross-platform format. Use to migrate to ViPER4Android v2.</string>
-    <string name="export_all_action">Export All</string>
-    <string name="export_all_title">Export All Presets</string>
-    <string name="export_all_progress">Exporting presets</string>
-    <string name="export_all_done">Exported</string>
-    <!-- V2_EXPORT_REMOVE_BEFORE_MERGE END -->
 
     <!-- Driver Status -->
     <string name="driver_not_found">Драйвер не найден</string>
@@ -282,13 +269,10 @@
     <string name="debug_filter_all">Все</string>
     <string name="debug_filter_info">Информация</string>
     <string name="debug_filter_debug">Отладка</string>
+    <string name="debug_filter_warn">Warn</string>
     <string name="debug_filter_error">Ошибка</string>
     <string name="debug_filter_app">Приложение</string>
     <string name="debug_filter_driver">Драйвер</string>
-    <string name="debug_filter_effect">Эффект</string>
-    <string name="debug_filter_dispatch">Диспетчеризация</string>
-    <string name="debug_filter_config">Конфигурация</string>
-    <string name="debug_filter_command">Команда</string>
     <string name="delete_file_title">Удалить Фаил</string>
     <string name="delete_file_message">Удалить %1$s?</string>
 

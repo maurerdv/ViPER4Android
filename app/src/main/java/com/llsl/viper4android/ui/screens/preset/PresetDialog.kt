@@ -1,8 +1,5 @@
 package com.llsl.viper4android.ui.screens.preset
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,18 +12,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.IosShare
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -44,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import com.llsl.viper4android.R
 import com.llsl.viper4android.data.model.Preset
 
-@OptIn(ExperimentalMaterial3Api::class) // V2_EXPORT_REMOVE_BEFORE_MERGE
 @Composable
 fun PresetDialog(
     presets: List<Preset>,
@@ -55,11 +47,6 @@ fun PresetDialog(
     onUpdate: (Long) -> Unit,
     onClearAll: () -> Unit,
     onDismiss: () -> Unit,
-    // V2_EXPORT_REMOVE_BEFORE_MERGE BEGIN
-    onExportV1: (Long, Uri) -> Unit = { _, _ -> },
-    onExportV2: (Long, Uri) -> Unit = { _, _ -> },
-    onExportAll: (Uri, Boolean) -> Unit = { _, _ -> },
-    // V2_EXPORT_REMOVE_BEFORE_MERGE END
 ) {
     var showSaveInput by remember { mutableStateOf(false) }
     var saveInputName by remember { mutableStateOf("") }
@@ -69,30 +56,6 @@ fun PresetDialog(
     var showClearAllConfirm by remember { mutableStateOf(false) }
     var showUpdateConfirm by remember { mutableStateOf(false) }
     var updateTargetPreset by remember { mutableStateOf<Preset?>(null) }
-    // V2_EXPORT_REMOVE_BEFORE_MERGE BEGIN
-    var exportTarget by remember { mutableStateOf<Preset?>(null) }
-    var pendingExportPreset by remember { mutableStateOf<Preset?>(null) }
-    var showExportAllSheet by remember { mutableStateOf(false) }
-    var pendingExportAllAsV2 by remember { mutableStateOf<Boolean?>(null) }
-    val v1Launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
-            val target = pendingExportPreset
-            pendingExportPreset = null
-            if (uri != null && target != null) onExportV1(target.id, uri)
-        }
-    val v2Launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
-            val target = pendingExportPreset
-            pendingExportPreset = null
-            if (uri != null && target != null) onExportV2(target.id, uri)
-        }
-    val exportAllLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
-            val asV2 = pendingExportAllAsV2
-            pendingExportAllAsV2 = null
-            if (uri != null && asV2 != null) onExportAll(uri, asV2)
-        }
-    // V2_EXPORT_REMOVE_BEFORE_MERGE END
 
     fun commitPendingDelete() {
         pendingDeletePreset?.let { onDelete(it.id) }
@@ -240,71 +203,6 @@ fun PresetDialog(
         return
     }
 
-    // V2_EXPORT_REMOVE_BEFORE_MERGE BEGIN
-    exportTarget?.let { target ->
-        ModalBottomSheet(onDismissRequest = { exportTarget = null }) {
-            Column {
-                Text(
-                    text = stringResource(R.string.export_preset_action),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-                )
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.export_as_v1)) },
-                    supportingContent = { Text(stringResource(R.string.export_as_v1_description)) },
-                    modifier =
-                        Modifier.clickable {
-                            pendingExportPreset = target
-                            exportTarget = null
-                            v1Launcher.launch("${target.name}.v1.json")
-                        },
-                )
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.export_as_v2)) },
-                    supportingContent = { Text(stringResource(R.string.export_as_v2_description)) },
-                    modifier =
-                        Modifier.clickable {
-                            pendingExportPreset = target
-                            exportTarget = null
-                            v2Launcher.launch("${target.name}.v2.json")
-                        },
-                )
-            }
-        }
-    }
-    if (showExportAllSheet) {
-        ModalBottomSheet(onDismissRequest = { showExportAllSheet = false }) {
-            Column {
-                Text(
-                    text = stringResource(R.string.export_all_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-                )
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.export_as_v1)) },
-                    supportingContent = { Text(stringResource(R.string.export_as_v1_description)) },
-                    modifier =
-                        Modifier.clickable {
-                            pendingExportAllAsV2 = false
-                            showExportAllSheet = false
-                            exportAllLauncher.launch(null)
-                        },
-                )
-                ListItem(
-                    headlineContent = { Text(stringResource(R.string.export_as_v2)) },
-                    supportingContent = { Text(stringResource(R.string.export_as_v2_description)) },
-                    modifier =
-                        Modifier.clickable {
-                            pendingExportAllAsV2 = true
-                            showExportAllSheet = false
-                            exportAllLauncher.launch(null)
-                        },
-                )
-            }
-        }
-    }
-    // V2_EXPORT_REMOVE_BEFORE_MERGE END
-
     AlertDialog(
         onDismissRequest = {
             commitPendingDelete()
@@ -342,9 +240,6 @@ fun PresetDialog(
                                     updateTargetPreset = preset
                                     showUpdateConfirm = true
                                 },
-                                // V2_EXPORT_REMOVE_BEFORE_MERGE BEGIN
-                                onExport = { exportTarget = preset },
-                                // V2_EXPORT_REMOVE_BEFORE_MERGE END
                             )
                             HorizontalDivider()
                         }
@@ -374,14 +269,6 @@ fun PresetDialog(
         dismissButton = {
             Row {
                 if (presets.isNotEmpty()) {
-                    // V2_EXPORT_REMOVE_BEFORE_MERGE BEGIN
-                    TextButton(onClick = {
-                        commitPendingDelete()
-                        showExportAllSheet = true
-                    }) {
-                        Text(stringResource(R.string.export_all_action))
-                    }
-                    // V2_EXPORT_REMOVE_BEFORE_MERGE END
                     TextButton(
                         onClick = {
                             commitPendingDelete()
@@ -413,9 +300,6 @@ private fun PresetItem(
     onDelete: () -> Unit,
     onRename: () -> Unit,
     onUpdate: () -> Unit,
-    // V2_EXPORT_REMOVE_BEFORE_MERGE BEGIN
-    onExport: () -> Unit = {},
-    // V2_EXPORT_REMOVE_BEFORE_MERGE END
 ) {
     Row(
         modifier =
@@ -433,22 +317,8 @@ private fun PresetItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(
-                text = stringResource(if (preset.fxType == 1) R.string.tab_headphone else R.string.tab_speaker),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
         Row {
-            // V2_EXPORT_REMOVE_BEFORE_MERGE BEGIN
-            IconButton(onClick = onExport) {
-                Icon(
-                    Icons.Default.IosShare,
-                    contentDescription = stringResource(R.string.export_preset_action),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            // V2_EXPORT_REMOVE_BEFORE_MERGE END
             IconButton(onClick = onRename) {
                 Icon(
                     Icons.Default.Edit,

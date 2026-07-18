@@ -3,14 +3,15 @@ package com.llsl.viper4android.ui.screens.main
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,21 +19,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Speaker
 import androidx.compose.material.icons.filled.SpeakerGroup
-import androidx.compose.material.icons.outlined.Headphones
-import androidx.compose.material.icons.outlined.Speaker
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarDefaults
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -40,13 +37,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -55,12 +51,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.llsl.viper4android.R
-import com.llsl.viper4android.audio.ViperParams
+import com.llsl.viper4android.effect.EffectState
 import com.llsl.viper4android.ui.screens.debug.DebugLogDialog
 import com.llsl.viper4android.ui.screens.device.DeviceDialog
 import com.llsl.viper4android.ui.screens.preset.PresetDialog
 import com.llsl.viper4android.ui.screens.settings.SettingsDialog
 import com.llsl.viper4android.ui.screens.status.DriverStatusDialog
+import com.llsl.viper4android.ui.theme.master_on_container_dark
+import com.llsl.viper4android.ui.theme.master_on_container_light
+import com.llsl.viper4android.ui.theme.master_on_onContainer_dark
+import com.llsl.viper4android.ui.theme.master_on_onContainer_light
+import com.llsl.viper4android.ui.theme.status_active_green
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,7 +85,6 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     var showSettingsDialog by remember { mutableStateOf(false) }
     var showDebugLog by remember { mutableStateOf(false) }
     var showDeviceDialog by remember { mutableStateOf(false) }
-    var debugLogClearTime by remember { mutableLongStateOf(0L) }
 
     val context = LocalContext.current
     val appVersionName =
@@ -98,10 +98,6 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
 
     val clearAllProgressStr = stringResource(R.string.preset_clear_all_progress)
     val clearedStr = stringResource(R.string.preset_cleared)
-    // V2_EXPORT_REMOVE_BEFORE_MERGE BEGIN
-    val exportAllProgressStr = stringResource(R.string.export_all_progress)
-    val exportAllDoneStr = stringResource(R.string.export_all_done)
-    // V2_EXPORT_REMOVE_BEFORE_MERGE END
 
     if (showPresetDialog) {
         PresetDialog(
@@ -123,25 +119,6 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                 }
             },
             onDismiss = { showPresetDialog = false },
-            // V2_EXPORT_REMOVE_BEFORE_MERGE BEGIN
-            onExportV1 = viewModel::exportPresetAsV1ToUri,
-            onExportV2 = viewModel::exportPresetAsV2ToUri,
-            onExportAll = { treeUri, asV2 ->
-                viewModel.exportAllPresetsToFolder(
-                    treeUri = treeUri,
-                    asV2 = asV2,
-                    notificationTitle = exportAllProgressStr,
-                    successStr = exportAllDoneStr,
-                ) { exported, total ->
-                    Toast
-                        .makeText(
-                            context,
-                            "$exportAllDoneStr: $exported / $total",
-                            Toast.LENGTH_SHORT,
-                        ).show()
-                }
-            },
-            // V2_EXPORT_REMOVE_BEFORE_MERGE END
         )
     }
 
@@ -160,8 +137,6 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
 
     if (showDebugLog) {
         DebugLogDialog(
-            clearTimestamp = debugLogClearTime,
-            onClear = { debugLogClearTime = System.currentTimeMillis() },
             onDisableDebug = {
                 viewModel.disableDebugMode()
                 showDebugLog = false
@@ -233,7 +208,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             driverStatus = driverStatus,
             appVersionName = appVersionName,
             onAutoStartChanged = viewModel::toggleAutoStart,
-            onImportPreset = { importPresetLauncher.launch(arrayOf("application/json", "text/xml", "application/xml", "*/*")) },
+            onImportPreset = { importPresetLauncher.launch(arrayOf("application/json", "*/*")) },
             onImportKernel = {
                 importKernelLauncher.launch(
                     arrayOf(
@@ -249,13 +224,34 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
         )
     }
 
-    val selectedTab = if (state.fxType == ViperParams.FX_TYPE_SPEAKER) 1 else 0
-    val isSpkMode = selectedTab == 1
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
+                title = {
+                    Column {
+                        Text(stringResource(R.string.app_name))
+                        val deviceName = state.activeDeviceName
+                        if (deviceName.isNotEmpty()) {
+                            val dotColor =
+                                if (state.masterEnable) {
+                                    status_active_green
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Canvas(modifier = Modifier.size(5.dp)) {
+                                    drawCircle(dotColor)
+                                }
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(
+                                    text = deviceName,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                )
+                            }
+                        }
+                    }
+                },
                 colors =
                     TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -297,61 +293,38 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                 },
             )
         },
-        bottomBar = {
-            Column {
-                val deviceName = state.activeDeviceName
-                if (deviceName.isNotEmpty()) {
-                    Row(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .background(NavigationBarDefaults.containerColor)
-                                .padding(horizontal = 16.dp, vertical = 4.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Canvas(modifier = Modifier.size(6.dp)) {
-                            drawCircle(Color(0xFF4CAF50))
-                        }
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = deviceName,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+        floatingActionButton = {
+            val masterOn = state.masterEnable
+            val darkTheme = isSystemInDarkTheme()
+            val containerColor =
+                when {
+                    !masterOn -> MaterialTheme.colorScheme.errorContainer
+                    darkTheme -> master_on_container_dark
+                    else -> master_on_container_light
                 }
-                NavigationBar {
-                    NavigationBarItem(
-                        selected = selectedTab == 0,
-                        onClick = { viewModel.setFxType(ViperParams.FX_TYPE_HEADPHONE) },
-                        icon = {
-                            Icon(
-                                imageVector = if (selectedTab == 0) Icons.Filled.Headphones else Icons.Outlined.Headphones,
-                                contentDescription = null,
-                            )
-                        },
-                        label = { Text(stringResource(R.string.tab_headphone)) },
-                    )
-                    NavigationBarItem(
-                        selected = selectedTab == 1,
-                        onClick = { viewModel.setFxType(ViperParams.FX_TYPE_SPEAKER) },
-                        icon = {
-                            Icon(
-                                imageVector = if (selectedTab == 1) Icons.Filled.Speaker else Icons.Outlined.Speaker,
-                                contentDescription = null,
-                            )
-                        },
-                        label = { Text(stringResource(R.string.tab_speaker)) },
-                    )
+            val onContainerColor =
+                when {
+                    !masterOn -> MaterialTheme.colorScheme.onErrorContainer
+                    darkTheme -> master_on_onContainer_dark
+                    else -> master_on_onContainer_light
                 }
+            FloatingActionButton(
+                onClick = { viewModel.setMasterEnabled(!masterOn) },
+                shape = MaterialTheme.shapes.large,
+                containerColor = containerColor,
+                contentColor = onContainerColor,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PowerSettingsNew,
+                    contentDescription = stringResource(R.string.master_enable),
+                )
             }
         },
+        floatingActionButtonPosition = FabPosition.End,
     ) { paddingValues ->
         EffectList(
             state = state,
             viewModel = viewModel,
-            isSpkMode = isSpkMode,
             modifier = Modifier.padding(paddingValues),
         )
     }
@@ -359,41 +332,44 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
 
 @Composable
 private fun EffectList(
-    state: MainUiState,
+    state: EffectState,
     viewModel: MainViewModel,
-    isSpkMode: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val targetAlpha = if (state.masterEnable) 1f else 0.38f
+    val alpha by animateFloatAsState(
+        targetValue = targetAlpha,
+        animationSpec = tween(durationMillis = 200),
+        label = "effectListAlpha",
+    )
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().graphicsLayer { this.alpha = alpha },
+        contentPadding = PaddingValues(bottom = 88.dp),
     ) {
         item { Spacer(modifier = Modifier.height(8.dp)) }
-        item { MasterLimiterSection(state, viewModel, isSpkMode) }
-        item { PlaybackGainSection(state, viewModel, isSpkMode) }
-        item { LUFSTargetingSection(state, viewModel, isSpkMode) }
-        item { MultibandCompressorSection(state, viewModel, isSpkMode) }
-        item { FetCompressorSection(state, viewModel, isSpkMode) }
-        item { DdcSection(state, viewModel, isSpkMode) }
-        item { SpectrumExtensionSection(state, viewModel, isSpkMode) }
-        item { EqualizerSection(state, viewModel, isSpkMode) }
-        item { DynamicEqSection(state, viewModel, isSpkMode) }
-        item { ConvolverSection(state, viewModel, isSpkMode) }
-        item { FieldSurroundSection(state, viewModel, isSpkMode) }
-        item { DiffSurroundSection(state, viewModel, isSpkMode) }
-        item { StereoImagerSection(state, viewModel, isSpkMode) }
-        item { HeadphoneSurroundSection(state, viewModel, isSpkMode) }
-        item { ReverberationSection(state, viewModel, isSpkMode) }
-        item { DynamicSystemSection(state, viewModel, isSpkMode) }
-        item { TubeSimulatorSection(state, viewModel, isSpkMode) }
-        item { PsychoacousticBassSection(state, viewModel, isSpkMode) }
-        item { ViperBassSection(state, viewModel, isSpkMode) }
-        item { ViperBassMonoSection(state, viewModel, isSpkMode) }
-        item { ViperClaritySection(state, viewModel, isSpkMode) }
-        item { AuditoryProtectionSection(state, viewModel, isSpkMode) }
-        item { AnalogXSection(state, viewModel, isSpkMode) }
-        if (isSpkMode) {
-            item { SpeakerOptSection(state, viewModel) }
-        }
-        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item { MasterLimiterRows(state, viewModel) }
+        item { PlaybackGainSection(state, viewModel) }
+        item { LUFSTargetingSection(state, viewModel) }
+        item { MultibandCompressorSection(state, viewModel) }
+        item { FetCompressorSection(state, viewModel) }
+        item { DdcSection(state, viewModel) }
+        item { SpectrumExtensionSection(state, viewModel) }
+        item { EqualizerSection(state, viewModel) }
+        item { DynamicEqSection(state, viewModel) }
+        item { ConvolverSection(state, viewModel) }
+        item { FieldSurroundSection(state, viewModel) }
+        item { DiffSurroundSection(state, viewModel) }
+        item { StereoImagerSection(state, viewModel) }
+        item { HeadphoneSurroundSection(state, viewModel) }
+        item { ReverberationSection(state, viewModel) }
+        item { DynamicSystemSection(state, viewModel) }
+        item { TubeSimulatorSection(state, viewModel) }
+        item { PsychoacousticBassSection(state, viewModel) }
+        item { ViperBassSection(state, viewModel) }
+        item { ViperBassMonoSection(state, viewModel) }
+        item { ViperClaritySection(state, viewModel) }
+        item { AuditoryProtectionSection(state, viewModel) }
+        item { AnalogXSection(state, viewModel) }
+        item { SpeakerOptSection(state, viewModel) }
     }
 }
