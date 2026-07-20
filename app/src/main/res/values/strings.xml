@@ -8,10 +8,6 @@
     <string name="notification_bulk_op_channel_name">Bulk Operations</string>
     <string name="notification_bulk_op_channel_description">Progress for bulk operations</string>
 
-    <!-- Tabs -->
-    <string name="tab_headphone">Headphone</string>
-    <string name="tab_speaker">Speaker</string>
-
     <!-- Master -->
     <string name="master_enable">Master Enable</string>
     <string name="menu_driver_status">Driver Status</string>
@@ -40,8 +36,11 @@
     <string name="label_strong">Strong</string>
     <string name="label_deleted">Deleted</string>
 
+    <!-- Numeric input dialog -->
+    <string name="dialog_value_range">Range: %1$s \u2013 %2$s</string>
+    <string name="dialog_value_range_unit">Range: %1$s \u2013 %2$s %3$s</string>
+
     <!-- Output / Master limiter -->
-    <string name="section_output">Master Limiter</string>
     <string name="label_output_volume">Output Gain</string>
     <string name="label_output_pan">Output Pan</string>
     <string name="label_output_limiter">Threshold Limit</string>
@@ -135,7 +134,6 @@
 
     <!-- Dynamic System -->
     <string name="section_dynamic_system">Dynamic System</string>
-    <string name="label_dynamic_system_device">Device</string>
     <string name="label_dynamic_system_strength">Dynamic Bass Strength</string>
     <string name="label_dynamic_system_x_low_freq">X Low Freq</string>
     <string name="label_dynamic_system_x_high_freq">X High Freq</string>
@@ -271,13 +269,10 @@
     <string name="debug_filter_all">All</string>
     <string name="debug_filter_info">Info</string>
     <string name="debug_filter_debug">Debug</string>
+    <string name="debug_filter_warn">Warn</string>
     <string name="debug_filter_error">Error</string>
     <string name="debug_filter_app">App</string>
     <string name="debug_filter_driver">Driver</string>
-    <string name="debug_filter_effect">Effect</string>
-    <string name="debug_filter_dispatch">Dispatch</string>
-    <string name="debug_filter_config">Config</string>
-    <string name="debug_filter_command">Command</string>
     <string name="delete_file_title">Delete File</string>
     <string name="delete_file_message">Delete "%1$s"?</string>
 

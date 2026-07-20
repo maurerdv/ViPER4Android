@@ -21,12 +21,12 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.llsl.viper4android.R
 import com.llsl.viper4android.ui.screens.main.DriverStatus
+import com.llsl.viper4android.ui.theme.status_active_green
 
 @Composable
 fun SettingsDialog(
@@ -132,7 +132,7 @@ fun SettingsDialog(
                     label = stringResource(R.string.settings_driver_arch),
                     value = if (driverStatus.installed) driverStatus.architecture else "-",
                 )
-                if (!aidlModeActive) {
+                if (aidlModeActive) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     Row(
                         modifier =
@@ -148,7 +148,7 @@ fun SettingsDialog(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Canvas(modifier = Modifier.size(6.dp)) {
-                            drawCircle(Color(0xFF4CAF50))
+                            drawCircle(status_active_green)
                         }
                     }
                 }

@@ -8,10 +8,6 @@
     <string name="notification_bulk_op_channel_name">批量操作</string>
     <string name="notification_bulk_op_channel_description">批量操作进度</string>
 
-    <!-- Tabs -->
-    <string name="tab_headphone">耳机</string>
-    <string name="tab_speaker">扬声器</string>
-
     <!-- Master -->
     <string name="master_enable">总开关</string>
     <string name="menu_driver_status">驱动状态</string>
@@ -40,8 +36,11 @@
     <string name="label_strong">强</string>
     <string name="label_deleted">已删除</string>
 
+    <!-- Numeric input dialog -->
+    <string name="dialog_value_range">范围: %1$s \u2013 %2$s</string>
+    <string name="dialog_value_range_unit">范围: %1$s \u2013 %2$s %3$s</string>
+
     <!-- Output / Master limiter -->
-    <string name="section_output">主控制器</string>
     <string name="label_output_volume">输出增益</string>
     <string name="label_output_pan">音量平衡</string>
     <string name="label_output_limiter">阈值限制</string>
@@ -135,7 +134,6 @@
 
     <!-- Dynamic System -->
     <string name="section_dynamic_system">动态系统</string>
-    <string name="label_dynamic_system_device">设备</string>
     <string name="label_dynamic_system_strength">动态低音强度</string>
     <string name="label_dynamic_system_x_low_freq">X 低频</string>
     <string name="label_dynamic_system_x_high_freq">X 高频</string>
@@ -271,13 +269,10 @@
     <string name="debug_filter_all">全部</string>
     <string name="debug_filter_info">信息</string>
     <string name="debug_filter_debug">调试</string>
+    <string name="debug_filter_warn">警告</string>
     <string name="debug_filter_error">错误</string>
     <string name="debug_filter_app">应用</string>
     <string name="debug_filter_driver">驱动</string>
-    <string name="debug_filter_effect">音效</string>
-    <string name="debug_filter_dispatch">调度</string>
-    <string name="debug_filter_config">配置</string>
-    <string name="debug_filter_command">命令</string>
     <string name="delete_file_title">删除文件</string>
     <string name="delete_file_message">确认删除 "%1$s"?</string>
 

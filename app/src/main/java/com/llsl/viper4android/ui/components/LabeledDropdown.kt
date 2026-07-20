@@ -39,6 +39,7 @@ fun LabeledDropdown(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onDeleteOption: ((Int, String) -> Unit)? = null,
+    isOptionDeletable: (Int, String) -> Boolean = { _, _ -> onDeleteOption != null },
 ) {
     var expanded by remember { mutableStateOf(false) }
     var deleteTarget by remember { mutableStateOf<Pair<Int, String>?>(null) }
@@ -69,7 +70,7 @@ fun LabeledDropdown(
             onDismissRequest = { expanded = false },
         ) {
             options.forEachIndexed { index, option ->
-                val canDelete = onDeleteOption != null && index > 0
+                val canDelete = onDeleteOption != null && isOptionDeletable(index, option)
                 if (canDelete) {
                     Box(
                         modifier =
@@ -89,9 +90,7 @@ fun LabeledDropdown(
                                     },
                                 ).padding(horizontal = 16.dp),
                         contentAlignment = Alignment.CenterStart,
-                    ) {
-                        Text(option, style = MaterialTheme.typography.bodyLarge)
-                    }
+                    ) { Text(option, style = MaterialTheme.typography.bodyLarge) }
                 } else {
                     DropdownMenuItem(
                         text = { Text(option) },
@@ -114,14 +113,10 @@ fun LabeledDropdown(
                 TextButton(onClick = {
                     onDeleteOption?.invoke(index, name)
                     deleteTarget = null
-                }) {
-                    Text(stringResource(R.string.action_delete))
-                }
+                }) { Text(stringResource(R.string.action_delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { deleteTarget = null }) {
-                    Text(stringResource(R.string.action_cancel))
-                }
+                TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.action_cancel)) }
             },
         )
     }
